@@ -644,7 +644,10 @@ function buildPromptText(){
   if(headline)cp.push('headline: "'+headline+'"');
   if(sub)cp.push('subtext: "'+sub+'"');
   if(cta)cp.push('CTA: "'+cta+'"');
-  if(hasLogo)cp.push('brand logo top-left');
+  var lgiInput=document.getElementById('lgi');
+  var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
+  if(hasLogo&&logoFname)cp.push('↳ Attach "'+logoFname+'" as Logo: place top-left corner, maintain original proportions');
+  else if(hasLogo)cp.push('brand logo top-left');
   if(cp.length){copyRow.style.display='flex';set('ps-copy-val',cp.join(' / '));}
   else copyRow.style.display='none';
 
@@ -736,7 +739,7 @@ async function generate(){
   }
 
   try{
-    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key='+apiKey,{
+    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key='+apiKey,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
