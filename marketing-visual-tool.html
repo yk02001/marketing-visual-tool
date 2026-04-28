@@ -562,11 +562,24 @@ function buildPromptText(){
   var hasLogo=document.getElementById('lgi').files&&document.getElementById('lgi').files.length>0;
   var ar=selRatio==='custom'?(function(){var cw=document.getElementById('cw').value.trim(),ch=document.getElementById('ch').value.trim();return(cw&&ch)?cw+':'+ch:'1:1';})():selAr;
   var hasRef=refData.some(function(d){return d!==null;});
-  var rd={product:'Maintain exact product appearance from uploaded image.',style:'Match the visual atmosphere of reference image.',color:'Apply the color palette from reference.',layout:'Follow the compositional structure of reference.',competitor:'Differentiate from competitor while noting its approach.'};
+  var slotLabels=['商品圖','風格參考','競品參考'];
+  var rdPerSlot={
+    0:{en:'Image 1 (product photo)',instruction:'Maintain the exact appearance, shape, texture, and details of this product. Use it as the main subject.'},
+    1:{en:'Image 2 (style reference)',instruction:'Match the overall visual atmosphere, mood, color grading, and aesthetic style of this image. Do not copy the subject.'},
+    2:{en:'Image 3 (competitor reference)',instruction:'Study the visual language of this competitor image and intentionally differentiate — use a distinct composition, color, or mood.'}
+  };
 
-  var subject=product||'product hero shot';
-  if(hasRef)subject+=' — '+refTypes.map(function(t){return rd[t]||'';}).filter(Boolean).join(' ');
-  set('ps-subject',subject);
+  var subjectParts=[];
+  if(product) subjectParts.push('Product: '+product);
+  var uploadedCount=0;
+  refData.forEach(function(d,i){
+    if(d!==null){
+      uploadedCount++;
+      subjectParts.push(rdPerSlot[i].en+' — '+rdPerSlot[i].instruction);
+    }
+  });
+  if(!product&&uploadedCount===0) subjectParts.push('product hero shot');
+  set('ps-subject',subjectParts.join('\n'));
 
   var vis=bkw.slice(0,2).concat([DB.light[selLight],DB.imgStyle[selImgStyle],DB.dof[selDof]]);
   if(selLayer==='2')vis.push('two-layer depth: subject + background');
@@ -639,13 +652,19 @@ async function generate(){
 
   if(hasRef){
     var parts=[];
+    var imgLabels=[
+      'This is Image 1 — the PRODUCT PHOTO. Maintain its exact appearance, shape, texture, and details as the main subject.',
+      'This is Image 2 — the STYLE REFERENCE. Match its visual atmosphere, mood, and aesthetic. Do not copy its subject.',
+      'This is Image 3 — the COMPETITOR REFERENCE. Study its visual language and intentionally differentiate in composition, color, or mood.'
+    ];
     refData.forEach(function(d,i){
       if(!d)return;
       var b64=d.split(',')[1];
       var mime=d.split(';')[0].split(':')[1];
+      parts.push({text:imgLabels[i]});
       parts.push({inline_data:{mime_type:mime,data:b64}});
     });
-    parts.push({text:'Based on the uploaded reference image(s), generate a marketing visual following this specification:\n\n'+prompt});
+    parts.push({text:'Now generate a marketing visual image following this specification:\n\n'+prompt});
     contents=[{role:'user',parts:parts}];
   } else {
     contents=[{role:'user',parts:[{text:'Generate a marketing visual image following this specification:\n\n'+prompt}]}];
@@ -657,7 +676,7 @@ async function generate(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         contents:contents,
-        generationConfig:{responseModalities:['IMAGE','TEXT']}
+        generationConfig:{responseModalities:['IMAGE','TEXT'],temperature:1.0}
       })
     });
     var data=await res.json();
@@ -666,9 +685,23 @@ async function generate(){
       setStatus('錯誤：'+msg,'error');btn.disabled=false;btn.textContent='產生這張圖';return;
     }
     var imgPart=null;
+    var textPart=null;
+    // Try standard candidates structure
     if(data.candidates&&data.candidates[0]&&data.candidates[0].content){
-      data.candidates[0].content.parts.forEach(function(p){if(p.inline_data)imgPart=p.inline_data;});
+      data.candidates[0].content.parts.forEach(function(p){
+        if(p.inline_data) imgPart=p.inline_data;
+        if(p.text) textPart=p.text;
+      });
     }
+    // Fallback: try top-level parts
+    if(!imgPart&&data.content&&data.content.parts){
+      data.content.parts.forEach(function(p){
+        if(p.inline_data) imgPart=p.inline_data;
+        if(p.text) textPart=p.text;
+      });
+    }
+    // Debug: log full response to console
+    console.log('Gemini response:', JSON.stringify(data).slice(0,500));
     if(imgPart){
       var src='data:'+imgPart.mime_type+';base64,'+imgPart.data;
       document.getElementById('result-img').src=src;
