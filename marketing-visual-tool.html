@@ -589,7 +589,20 @@ function rmRef(i){
   slot.classList.remove('filled');slot.onclick=function(){trigRef(i);};
   document.getElementById('rf'+i).value='';bld();
 }
-function hlg(inp){if(inp.files&&inp.files[0]){var n=document.getElementById('lgn');n.textContent='已上傳：'+inp.files[0].name;n.style.display='block';bld();}}
+function hlg(inp){
+  if(inp.files&&inp.files[0]){
+    var n=document.getElementById('lgn');
+    n.innerHTML='已上傳：<strong>'+inp.files[0].name+'</strong> <button onclick="clearLogo()" style="margin-left:6px;font-size:11px;padding:1px 7px;border:0.5px solid var(--border2);border-radius:4px;background:transparent;color:var(--text3);cursor:pointer;">✕ 移除</button>';
+    n.style.display='block';bld();
+  }
+}
+function clearLogo(){
+  var inp=document.getElementById('lgi');
+  inp.value='';
+  var n=document.getElementById('lgn');
+  n.style.display='none';n.innerHTML='';
+  bld();
+}
 function toggleAdv(){var sec=document.getElementById('adv-sec');sec.classList.toggle('open');document.getElementById('adv-icon').style.transform=sec.classList.contains('open')?'rotate(180deg)':'';}
 function toggleKey(){var fi=document.getElementById('api-key');fi.type=fi.type==='password'?'text':'password';}
 
@@ -754,24 +767,26 @@ async function generate(){
     }
     var imgPart=null;
     var textPart=null;
-    // Try standard candidates structure — handle both inlineData and inline_data
-    if(data.candidates&&data.candidates[0]&&data.candidates[0].content){
-      data.candidates[0].content.parts.forEach(function(p){
-        if(p.inlineData) imgPart=p.inlineData;
-        if(p.inline_data) imgPart=p.inline_data;
+    console.log('Gemini response v4:', JSON.stringify(data).slice(0,600));
+    function scanParts(parts){
+      if(!Array.isArray(parts))return;
+      parts.forEach(function(p){
+        if(!imgPart){
+          if(p.inlineData&&p.inlineData.data) imgPart=p.inlineData;
+          else if(p.inline_data&&p.inline_data.data) imgPart=p.inline_data;
+        }
         if(p.text) textPart=p.text;
       });
     }
-    // Fallback: try top-level parts
-    if(!imgPart&&data.content&&data.content.parts){
-      data.content.parts.forEach(function(p){
-        if(p.inlineData) imgPart=p.inlineData;
-        if(p.inline_data) imgPart=p.inline_data;
-        if(p.text) textPart=p.text;
-      });
+    // candidates[0].content.parts
+    if(data.candidates&&data.candidates[0]){
+      var c0=data.candidates[0];
+      if(c0.content&&c0.content.parts) scanParts(c0.content.parts);
+      else if(c0.parts) scanParts(c0.parts);
     }
-    // Debug: log full response to console
-    console.log('Gemini response:', JSON.stringify(data).slice(0,500));
+    // top-level content or parts fallback
+    if(!imgPart&&data.content&&data.content.parts) scanParts(data.content.parts);
+    if(!imgPart&&data.parts) scanParts(data.parts);
     if(imgPart){
       var mimeType=imgPart.mimeType||imgPart.mime_type||'image/jpeg';
       var src='data:'+mimeType+';base64,'+imgPart.data;
