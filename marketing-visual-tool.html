@@ -320,6 +320,28 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       <input type="file" id="lgi" accept=".png,.svg,.jpg" style="display:none" onchange="hlg(this)">
     </div>
     <div id="lgn" style="font-size:11px;color:var(--text3);margin-top:3px;display:none;"></div>
+    <div class="divider"></div>
+    <p class="sec" style="margin-bottom:7px;">局部強調設計</p>
+    <p class="hint" style="margin-bottom:9px;">選擇視覺標籤類型，搭配自訂文案一起帶入 Prompt</p>
+    <div class="pills" id="g-badge">
+      <button class="pill on" data-v="none">無</button>
+      <button class="pill" data-v="tag">特價標籤</button>
+      <button class="pill" data-v="stamp">印章</button>
+      <button class="pill" data-v="badge">徽章</button>
+      <button class="pill" data-v="sticker">撕角貼紙</button>
+      <button class="pill" data-v="box">色塊 Box</button>
+      <button class="pill" data-v="ribbon">緞帶</button>
+    </div>
+    <div id="badge-input-row" style="display:none;margin-top:4px;">
+      <div class="field-row">
+        <span class="fl">標籤文案</span>
+        <input class="fi" id="f-badge-text" type="text" placeholder="e.g. 早鳥79折 / 限時搶購 / 名額有限" oninput="bld()">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <p class="sec" style="margin-bottom:6px;">額外補充說明</p>
+    <p class="hint" style="margin-bottom:7px;">可自由補充任何額外要求或細節，會附加到 Prompt 最尾端</p>
+    <textarea class="fi" id="f-extra" rows="3" placeholder="e.g. 背景需要有模糊城市感、整體色調偏冷、產品需要有水滴質感..." oninput="bld()" style="resize:vertical;font-size:12px;line-height:1.5;padding-top:8px;"></textarea>
   </div>
 
   <!-- Step 6: Result -->
@@ -346,8 +368,10 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       <div class="prompt-section"><span class="ps-label">COMPOSITION</span><span class="ps-value" id="ps-composition">—</span></div>
       <div class="prompt-section"><span class="ps-label">COLOR</span><span class="ps-value" id="ps-color">—</span></div>
       <div class="prompt-section" id="ps-copy-row" style="display:none"><span class="ps-label">COPY</span><span class="ps-value" id="ps-copy-val">—</span></div>
+      <div class="prompt-section" id="ps-badge-row" style="display:none"><span class="ps-label">ACCENT</span><span class="ps-value" id="ps-badge-val">—</span></div>
       <div class="prompt-section"><span class="ps-label">CONSTRAINT</span><span class="ps-value" id="ps-constraint">—</span></div>
       <div class="prompt-section"><span class="ps-label">FORMAT</span><span class="ps-value" id="ps-format">—</span></div>
+      <div class="prompt-section" id="ps-extra-row" style="display:none"><span class="ps-label">EXTRA</span><span class="ps-value" id="ps-extra-val">—</span></div>
     </div>
   </div>
 
@@ -381,6 +405,7 @@ var selGoal='click',selEm='trust',selLight='soft',selRatio='1:1',selAr='1:1';
 var selPos='center',selPoKw='subject centered, symmetrical balanced composition';
 var selLv=1,selDof='shallow',selImgStyle='editorial',selLayer='1';
 var refTypes=['product'];
+var selBadge='none';
 var primaryColor='#6B5CE7';
 var auxColors={};
 var auxCount=0;
@@ -397,7 +422,16 @@ var DB={
   light:{soft:'soft diffused lighting, gentle gradual shadows, flattering even illumination',cinematic:'cinematic directional lighting, dramatic contrast, film-quality atmosphere',studio:'controlled studio lighting, precise highlights, professional product photography',natural:'natural daylight quality, organic light feel, authentic environmental illumination'},
   lv:{1:'no watermark, no extra objects, clean background',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, strict composition adherence, commercially safe'},
   dof:{shallow:'shallow depth of field, subject sharp, background softly blurred',deep:'deep focus throughout, full scene sharpness',flat:'flat graphic style, no depth perspective'},
-  imgStyle:{editorial:'editorial photography aesthetic, magazine-quality',minimal:'minimalist composition, extreme negative space',tech:'tech product visual language, modern clean aesthetic',luxury:'luxury brand visual codes, premium material quality'}
+  imgStyle:{editorial:'editorial photography aesthetic, magazine-quality',minimal:'minimalist composition, extreme negative space',tech:'tech product visual language, modern clean aesthetic',luxury:'luxury brand visual codes, premium material quality'},
+  badge:{
+    none:null,
+    tag:'price tag label in corner, bold promotional text, contrasting color accent, sharp edges',
+    stamp:'circular rubber stamp overlay, distressed ink texture, bold uppercase text inside circle',
+    badge:'shield or hexagon badge graphic, official emblem style, premium metallic feel',
+    sticker:'torn corner sticker design, slightly rotated, casual handmade feel, white border',
+    box:'solid color rectangular box overlay, high contrast text block, clean geometric shape',
+    ribbon:'diagonal ribbon banner across corner, folded fabric texture, promotional feel'
+  }
 };
 
 var CONFLICTS=[
@@ -494,6 +528,16 @@ function mkPills(id,key){
 mkPills('g-goal','goal');mkPills('g-em','em');mkPills('g-light','light');
 mkPills('g-dof','dof');mkPills('g-style','imgStyle');mkPills('g-layer','layer');
 
+document.querySelectorAll('#g-badge .pill').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#g-badge .pill').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');
+    selBadge=this.dataset.v;
+    document.getElementById('badge-input-row').style.display=selBadge==='none'?'none':'block';
+    bld();
+  });
+});
+
 document.querySelectorAll('#ratio-grid .ratio-btn').forEach(function(b){
   b.addEventListener('click',function(){
     document.querySelectorAll('#ratio-grid .ratio-btn').forEach(function(x){x.classList.remove('on');});
@@ -562,11 +606,10 @@ function buildPromptText(){
   var hasLogo=document.getElementById('lgi').files&&document.getElementById('lgi').files.length>0;
   var ar=selRatio==='custom'?(function(){var cw=document.getElementById('cw').value.trim(),ch=document.getElementById('ch').value.trim();return(cw&&ch)?cw+':'+ch:'1:1';})():selAr;
   var hasRef=refData.some(function(d){return d!==null;});
-  var slotLabels=['商品圖','風格參考','競品參考'];
   var rdPerSlot={
-    0:{en:'Image 1 (product photo)',instruction:'Maintain the exact appearance, shape, texture, and details of this product. Use it as the main subject.'},
-    1:{en:'Image 2 (style reference)',instruction:'Match the overall visual atmosphere, mood, color grading, and aesthetic style of this image. Do not copy the subject.'},
-    2:{en:'Image 3 (competitor reference)',instruction:'Study the visual language of this competitor image and intentionally differentiate — use a distinct composition, color, or mood.'}
+    0:{role:'PRODUCT PHOTO',instruction:'Maintain the exact appearance, shape, texture, and details of this product. Use it as the main subject.'},
+    1:{role:'STYLE REFERENCE',instruction:'Match the overall visual atmosphere, mood, color grading, and aesthetic style. Do not copy the subject.'},
+    2:{role:'COMPETITOR REFERENCE',instruction:'Study the visual language and intentionally differentiate — use a distinct composition, color, or mood.'}
   };
 
   var subjectParts=[];
@@ -575,7 +618,9 @@ function buildPromptText(){
   refData.forEach(function(d,i){
     if(d!==null){
       uploadedCount++;
-      subjectParts.push(rdPerSlot[i].en+' — '+rdPerSlot[i].instruction);
+      var fileInput=document.getElementById('rf'+i);
+      var fname=(fileInput&&fileInput.files&&fileInput.files[0])?fileInput.files[0].name:'image_'+(i+1);
+      subjectParts.push('↳ Attach "'+ fname +'" as Image '+(i+1)+' ['+rdPerSlot[i].role+']: '+rdPerSlot[i].instruction);
     }
   });
   if(!product&&uploadedCount===0) subjectParts.push('product hero shot');
@@ -603,8 +648,24 @@ function buildPromptText(){
   if(cp.length){copyRow.style.display='flex';set('ps-copy-val',cp.join(' / '));}
   else copyRow.style.display='none';
 
+  // ACCENT badge section
+  var badgeRow=document.getElementById('ps-badge-row');
+  var badgeText=document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value.trim():'';
+  if(selBadge!=='none'&&DB.badge[selBadge]){
+    var badgeDesc=DB.badge[selBadge];
+    if(badgeText) badgeDesc+=' with text: "'+badgeText+'"';
+    badgeRow.style.display='flex';set('ps-badge-val',badgeDesc);
+  } else badgeRow.style.display='none';
+
   set('ps-constraint',DB.lv[selLv]);
-  set('ps-format','aspect ratio '+ar+', high resolution, commercial photography quality, no text overlays unless specified');
+  set('ps-format','aspect ratio '+ar+', high resolution, commercial photography quality, no text overlays unless specified above');
+
+  // EXTRA section
+  var extraRow=document.getElementById('ps-extra-row');
+  var extraVal=document.getElementById('f-extra')?document.getElementById('f-extra').value.trim():'';
+  if(extraVal){extraRow.style.display='flex';set('ps-extra-val',extraVal);}
+  else extraRow.style.display='none';
+
   return document.getElementById('prompt-block').innerText;
 }
 
@@ -626,6 +687,10 @@ function buildFullPrompt(){
   sections.forEach(function(s){var el=document.getElementById(s[1]);if(el&&el.textContent&&el.textContent!=='—')lines.push('['+s[0]+']\n'+el.textContent);});
   var cr=document.getElementById('ps-copy-row');
   if(cr&&cr.style.display!=='none'){var cv=document.getElementById('ps-copy-val');if(cv&&cv.textContent)lines.push('[COPY]\n'+cv.textContent);}
+  var br=document.getElementById('ps-badge-row');
+  if(br&&br.style.display!=='none'){var bv=document.getElementById('ps-badge-val');if(bv&&bv.textContent)lines.push('[ACCENT]\n'+bv.textContent);}
+  var er=document.getElementById('ps-extra-row');
+  if(er&&er.style.display!=='none'){var ev=document.getElementById('ps-extra-val');if(ev&&ev.textContent)lines.push('[EXTRA]\n'+ev.textContent);}
   return lines.join('\n\n');
 }
 
@@ -671,7 +736,7 @@ async function generate(){
   }
 
   try{
-    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key='+apiKey,{
+    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key='+apiKey,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
