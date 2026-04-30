@@ -423,6 +423,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       </button>
     </div>
     <div class="prompt-block" id="prompt-block">
+      <div class="prompt-section" id="ps-intent-row" style="display:none"><span class="ps-label">INTENT</span><span class="ps-value" id="ps-intent-val">—</span></div>
       <div class="prompt-section"><span class="ps-label">SUBJECT</span><span class="ps-value" id="ps-subject">—</span></div>
       <div class="prompt-section"><span class="ps-label">VISUAL</span><span class="ps-value" id="ps-visual">—</span></div>
       <div class="prompt-section"><span class="ps-label">EMOTION</span><span class="ps-value" id="ps-emotion">—</span></div>
@@ -687,6 +688,339 @@ var STRAT_PROMPT_DB={
     explain:{trust:'no-nonsense product display, plain-spoken visual clarity, honest brand directness',excitement:'information as entertainment, colorful visual guidance, playful knowledge delivery',urgency:'bold information impact, high-contrast benefit branding, instant comprehension design',calm:'simplicity as kindness, soft paced layout, effortless brand value understanding'}
   }
 };
+
+// ── History & Settings Management ──
+var HIST_KEY='mvg_history';
+var SETTINGS_KEY='mvg_settings';
+var MAX_HIST=20;
+
+function getCurrentSettings(){
+  var lgiInput=document.getElementById('lgi');
+  return {
+    version:8,
+    timestamp:new Date().toISOString(),
+    audience:selAudience,
+    goal:selGoal,
+    emotion:selEm,
+    light:selLight,
+    ratio:selRatio,
+    ar:selAr,
+    position:selPos,
+    level:selLv,
+    dof:selDof,
+    imgStyle:selImgStyle,
+    layer:selLayer,
+    dot:{x:dot.x,y:dot.y},
+    primaryColor:primaryColor,
+    auxColors:auxColors,
+    badge:selBadge,
+    product:document.getElementById('fp').value,
+    headline:document.getElementById('fh').value,
+    sub:document.getElementById('fs').value,
+    cta:document.getElementById('fc').value,
+    extra:document.getElementById('f-extra')?document.getElementById('f-extra').value:'',
+    badgeText:document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value:'',
+    prompt:buildFullPrompt()
+  };
+}
+
+function applySettings(s){
+  if(!s) return;
+  try{
+    selAudience=s.audience||'b2c';
+    selGoal=s.goal||'click';
+    selEm=s.emotion||'trust';
+    selLight=s.light||'soft';
+    selRatio=s.ratio||'1:1';
+    selAr=s.ar||'1:1';
+    selPos=s.position||'center';
+    selLv=s.level||1;
+    selDof=s.dof||'shallow';
+    selImgStyle=s.imgStyle||'editorial';
+    selLayer=s.layer||'1';
+    if(s.dot){dot.x=s.dot.x;dot.y=s.dot.y;}
+    primaryColor=s.primaryColor||'#6B5CE7';
+    auxColors=s.auxColors||{};
+    selBadge=s.badge||'none';
+
+    // Update UI
+    document.getElementById('sw0').style.background=primaryColor;
+    document.getElementById('cp0').value=primaryColor;
+    document.getElementById('hx0').value=primaryColor;
+    updateSugg(primaryColor);
+
+    // Rebuild aux color rows
+    document.getElementById('aux-rows').innerHTML='';
+    auxCount=0;
+    Object.keys(auxColors).forEach(function(k){
+      auxCount=Math.max(auxCount,parseInt(k));
+      renderAuxRow(k,auxColors[k],'輔助色'+k);
+    });
+    checkAddBtn();
+
+    // Update pills
+    function setPill(groupId,val){
+      document.querySelectorAll('#'+groupId+' .pill').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#'+groupId+' .pill[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setGoalBtn(val){
+      document.querySelectorAll('#g-goal .goal-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#g-goal .goal-btn[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setAudBtn(val){
+      document.querySelectorAll('#g-audience .aud-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#g-audience .aud-btn[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setPosBtn(val){
+      document.querySelectorAll('#pos-grid .pos-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#pos-grid .pos-btn[data-p="'+val+'"]');
+      if(t){t.classList.add('on');selPoKw=t.dataset.kw;}
+    }
+    function setLvBtn(val){
+      document.querySelectorAll('#level-grid .level-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#level-grid .level-btn[data-lv="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setRatioBtn(val){
+      document.querySelectorAll('#ratio-grid .ratio-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#ratio-grid .ratio-btn[data-r="'+val+'"]');
+      if(t) t.classList.add('on');
+      document.getElementById('ratio-custom').style.display=val==='custom'?'flex':'none';
+    }
+    function setBadgeBtn(val){
+      document.querySelectorAll('#g-badge .pill').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#g-badge .pill[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+      document.getElementById('badge-input-row').style.display=val==='none'?'none':'block';
+    }
+
+    setAudBtn(selAudience);
+    setGoalBtn(selGoal);
+    setPill('g-em',selEm);
+    setPill('g-light',selLight);
+    setRatioBtn(selRatio);
+    setPosBtn(selPos);
+    setLvBtn(selLv);
+    setPill('g-dof',selDof);
+    setPill('g-style',selImgStyle);
+    setPill('g-layer',selLayer);
+    setBadgeBtn(selBadge);
+
+    if(s.product) document.getElementById('fp').value=s.product;
+    if(s.headline) document.getElementById('fh').value=s.headline;
+    if(s.sub) document.getElementById('fs').value=s.sub;
+    if(s.cta) document.getElementById('fc').value=s.cta;
+    if(s.extra&&document.getElementById('f-extra')) document.getElementById('f-extra').value=s.extra;
+    if(s.badgeText&&document.getElementById('f-badge-text')) document.getElementById('f-badge-text').value=s.badgeText;
+
+    document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+    draw();
+    document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+    document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
+    bld();
+  }catch(e){console.error('applySettings error:',e);}
+}
+
+function saveToHistory(imgSrc){
+  var s=getCurrentSettings();
+  if(imgSrc) s.imgThumb=imgSrc;
+  var hist=getHistory();
+  hist.unshift(s);
+  if(hist.length>MAX_HIST) hist=hist.slice(0,MAX_HIST);
+  try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){}
+  renderHistory();
+}
+
+function getHistory(){
+  try{var d=localStorage.getItem(HIST_KEY);return d?JSON.parse(d):[];}catch(e){return[];}
+}
+
+function renderHistory(){
+  var hist=getHistory();
+  var list=document.getElementById('hist-list');
+  var empty=document.getElementById('hist-empty');
+  if(!hist.length){if(empty)empty.style.display='block';list.innerHTML='<div class="hist-empty" id="hist-empty">尚無歷史紀錄。每次生圖後自動儲存。</div>';return;}
+  if(empty)empty.style.display='none';
+  list.innerHTML=hist.map(function(s,i){
+    var d=new Date(s.timestamp);
+    var timeStr=d.toLocaleDateString('zh-TW')+' '+d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+    var audLabel=s.audience==='b2b'?'B2B':'B2C';
+    var tierLabel=s.dot?(1-s.dot.y>0.65?'Premium':1-s.dot.y>0.35?'Mid':'Mass'):'';
+    var goalLabel={click:'點擊率',convert:'轉換',brand:'品牌感',explain:'內容解釋'}[s.goal]||s.goal;
+    var emLabel={trust:'Trust',excitement:'Excitement',urgency:'Urgency',calm:'Calm'}[s.emotion]||s.emotion;
+    var imgHtml=s.imgThumb?'<img class="hist-img" src="'+s.imgThumb+'" alt="">':'';
+    return '<div class="hist-item" onclick="applySettings(getHistory()['+i+'])">'
+      +'<div class="hist-item-header"><span class="hist-item-time">'+timeStr+'</span>'
+      +'<button class="hist-item-del" onclick="event.stopPropagation();deleteHist('+i+')" title="刪除">✕</button></div>'
+      +'<div style="display:flex;gap:8px;align-items:flex-start">'
+      +(imgHtml?'<div>'+imgHtml+'</div>':'')
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="hist-item-tags">'
+      +'<span class="hist-tag">'+audLabel+'</span>'
+      +'<span class="hist-tag">'+tierLabel+'</span>'
+      +'<span class="hist-tag">'+goalLabel+'</span>'
+      +'<span class="hist-tag">'+emLabel+'</span>'
+      +(s.ratio?'<span class="hist-tag">'+s.ratio+'</span>':'')
+      +(s.product?'<span class="hist-tag">'+s.product.slice(0,10)+'</span>':'')
+      +'</div>'
+      +'<div class="hist-item-preview">'+(s.prompt||'').slice(0,120)+'</div>'
+      +'</div></div>'
+      +'</div>';
+  }).join('');
+}
+
+function deleteHist(i){
+  var hist=getHistory();hist.splice(i,1);
+  try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){}
+  renderHistory();
+}
+
+function clearAllHist(){
+  if(!confirm('確定要清除全部歷史紀錄？')) return;
+  try{localStorage.removeItem(HIST_KEY);}catch(e){}
+  renderHistory();
+}
+
+function exportJSON(){
+  var s=getCurrentSettings();
+  delete s.prompt;
+  s.exportedAt=new Date().toISOString();
+  var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  var prod=s.product?s.product.slice(0,12).replace(/[^a-zA-Z0-9一-鿿]/g,'_'):'settings';
+  a.download='mvg_'+prod+'_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importJSON(inp){
+  if(!inp.files||!inp.files[0]) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var s=JSON.parse(e.target.result);
+      applySettings(s);
+      inp.value='';
+      alert('設定已匯入成功！');
+    }catch(err){
+      alert('匯入失敗：請確認檔案格式正確。');
+    }
+  };
+  reader.readAsText(inp.files[0]);
+}
+
+function toggleHist(btn){
+  var body=document.getElementById('hist-body');
+  var arrow=document.getElementById('hist-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+  if(body.classList.contains('open')) renderHistory();
+}
+
+async function generate(){
+  var apiKey=document.getElementById('api-key').value.trim();
+  if(!apiKey){setStatus('請先填入 Gemini API Key','error');return;}
+  var btn=document.getElementById('gen-btn');
+  btn.disabled=true;btn.textContent='生成中…';
+  setStatus('正在傳送給 Gemini…','');
+  document.getElementById('img-result').classList.remove('show');
+  document.getElementById('img-placeholder').style.display='flex';
+  document.getElementById('dl-btn').classList.remove('show');
+
+  var prompt=buildFullPrompt();
+  var contents=[];
+  var hasRef=refData.some(function(d){return d!==null;});
+
+  if(hasRef){
+    var parts=[];
+    var imgLabels=[
+      'This is Image 1 — the PRODUCT PHOTO. Maintain its exact appearance, shape, texture, and details as the main subject.',
+      'This is Image 2 — the STYLE REFERENCE. Match its visual atmosphere, mood, and aesthetic. Do not copy its subject.',
+      'This is Image 3 — the COMPETITOR REFERENCE. Study its visual language and intentionally differentiate in composition, color, or mood.'
+    ];
+    refData.forEach(function(d,i){
+      if(!d)return;
+      var b64=d.split(',')[1];
+      var mime=d.split(';')[0].split(':')[1];
+      parts.push({text:imgLabels[i]});
+      parts.push({inline_data:{mime_type:mime,data:b64}});
+    });
+    parts.push({text:'Now generate a marketing visual image following this specification:\n\n'+prompt});
+    contents=[{role:'user',parts:parts}];
+  } else {
+    contents=[{role:'user',parts:[{text:'Generate a marketing visual image following this specification:\n\n'+prompt}]}];
+  }
+
+  try{
+    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key='+apiKey,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:contents,
+        generationConfig:{responseModalities:['IMAGE','TEXT'],temperature:1.0}
+      })
+    });
+    var data=await res.json();
+    if(!res.ok){
+      var msg=(data.error&&data.error.message)||'API 回傳錯誤 '+res.status;
+      setStatus('錯誤：'+msg,'error');btn.disabled=false;btn.textContent='產生這張圖';return;
+    }
+    var imgPart=null;
+    var textPart=null;
+    console.log('Gemini response v4:', JSON.stringify(data).slice(0,600));
+    function scanParts(parts){
+      if(!Array.isArray(parts))return;
+      parts.forEach(function(p){
+        if(!imgPart){
+          if(p.inlineData&&p.inlineData.data) imgPart=p.inlineData;
+          else if(p.inline_data&&p.inline_data.data) imgPart=p.inline_data;
+        }
+        if(p.text) textPart=p.text;
+      });
+    }
+    // candidates[0].content.parts
+    if(data.candidates&&data.candidates[0]){
+      var c0=data.candidates[0];
+      if(c0.content&&c0.content.parts) scanParts(c0.content.parts);
+      else if(c0.parts) scanParts(c0.parts);
+    }
+    // top-level content or parts fallback
+    if(!imgPart&&data.content&&data.content.parts) scanParts(data.content.parts);
+    if(!imgPart&&data.parts) scanParts(data.parts);
+    if(imgPart){
+      var mimeType=imgPart.mimeType||imgPart.mime_type||'image/jpeg';
+      var src='data:'+mimeType+';base64,'+imgPart.data;
+      document.getElementById('result-img').src=src;
+      document.getElementById('img-result').classList.add('show');
+      document.getElementById('img-placeholder').style.display='none';
+      document.getElementById('dl-btn').classList.add('show');
+      document.getElementById('dl-btn').dataset.src=src;
+      setStatus('生成成功 ✓','success');
+      saveToHistory(src);
+    } else {
+      setStatus('Gemini 未回傳圖片，請嘗試調整 Prompt 或稍後再試','error');
+    }
+  }catch(err){
+    setStatus('網路錯誤：'+err.message,'error');
+  }
+  btn.disabled=false;btn.textContent='產生這張圖';
+}
+
+function setStatus(msg,type){
+  var el=document.getElementById('gen-status');
+  el.textContent=msg;
+  el.className='gen-status'+(type?' '+type:'');
+}
+
+function downloadImg(){
+  var src=document.getElementById('dl-btn').dataset.src;
+  var a=document.createElement('a');a.href=src;a.download='marketing-visual.png';a.click();
+}
+
 
 var DB={
   goal:{
@@ -991,6 +1325,21 @@ function buildPromptText(){
     2:{role:'COMPETITOR REFERENCE',instruction:'Study the visual language and intentionally differentiate — use a distinct composition, color, or mood.'}
   };
 
+  // INTENT: inject visual strategy text into prompt
+  var intentRow=document.getElementById('ps-intent-row');
+  var p3=1-dot.y,e3=dot.x;
+  var tier3=p3>0.65?'premium':p3>0.35?'mid':'mass';
+  var intentText='';
+  try{
+    intentText=STRAT_DB[selAudience][tier3][selGoal][selEm]||'';
+  }catch(ex){}
+  if(intentText&&intentRow){
+    intentRow.style.display='flex';
+    set('ps-intent-val',intentText);
+  } else if(intentRow){
+    intentRow.style.display='none';
+  }
+
   var subjectParts=[];
   if(product) subjectParts.push('Product: '+product);
   var uploadedCount=0;
@@ -1116,7 +1465,7 @@ function bld(){
 }
 
 function buildFullPrompt(){
-  var sections=[['SUBJECT','ps-subject'],['VISUAL','ps-visual'],['EMOTION','ps-emotion'],['COMPOSITION','ps-composition'],['COLOR','ps-color'],['CONSTRAINT','ps-constraint'],['FORMAT','ps-format']];
+  var sections=[['INTENT','ps-intent-val'],['SUBJECT','ps-subject'],['VISUAL','ps-visual'],['EMOTION','ps-emotion'],['COMPOSITION','ps-composition'],['COLOR','ps-color'],['CONSTRAINT','ps-constraint'],['FORMAT','ps-format']];
   var lines=[];
   sections.forEach(function(s){var el=document.getElementById(s[1]);if(el&&el.textContent&&el.textContent!=='—')lines.push('['+s[0]+']\n'+el.textContent);});
   var cr=document.getElementById('ps-copy-row');
@@ -1133,343 +1482,8 @@ function buildFullPrompt(){
 function cpAll(){
   navigator.clipboard.writeText(buildFullPrompt()).then(function(){
     var btn=document.getElementById('cpb');btn.textContent='已複製 ✓';
-    
-
-
-// ── History & Settings Management ──
-var HIST_KEY='mvg_history';
-var SETTINGS_KEY='mvg_settings';
-var MAX_HIST=20;
-
-function getCurrentSettings(){
-  var lgiInput=document.getElementById('lgi');
-  return {
-    version:8,
-    timestamp:new Date().toISOString(),
-    audience:selAudience,
-    goal:selGoal,
-    emotion:selEm,
-    light:selLight,
-    ratio:selRatio,
-    ar:selAr,
-    position:selPos,
-    level:selLv,
-    dof:selDof,
-    imgStyle:selImgStyle,
-    layer:selLayer,
-    dot:{x:dot.x,y:dot.y},
-    primaryColor:primaryColor,
-    auxColors:auxColors,
-    badge:selBadge,
-    product:document.getElementById('fp').value,
-    headline:document.getElementById('fh').value,
-    sub:document.getElementById('fs').value,
-    cta:document.getElementById('fc').value,
-    extra:document.getElementById('f-extra')?document.getElementById('f-extra').value:'',
-    badgeText:document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value:'',
-    prompt:buildFullPrompt()
-  };
-}
-
-function applySettings(s){
-  if(!s) return;
-  try{
-    selAudience=s.audience||'b2c';
-    selGoal=s.goal||'click';
-    selEm=s.emotion||'trust';
-    selLight=s.light||'soft';
-    selRatio=s.ratio||'1:1';
-    selAr=s.ar||'1:1';
-    selPos=s.position||'center';
-    selLv=s.level||1;
-    selDof=s.dof||'shallow';
-    selImgStyle=s.imgStyle||'editorial';
-    selLayer=s.layer||'1';
-    if(s.dot){dot.x=s.dot.x;dot.y=s.dot.y;}
-    primaryColor=s.primaryColor||'#6B5CE7';
-    auxColors=s.auxColors||{};
-    selBadge=s.badge||'none';
-
-    // Update UI
-    document.getElementById('sw0').style.background=primaryColor;
-    document.getElementById('cp0').value=primaryColor;
-    document.getElementById('hx0').value=primaryColor;
-    updateSugg(primaryColor);
-
-    // Rebuild aux color rows
-    document.getElementById('aux-rows').innerHTML='';
-    auxCount=0;
-    Object.keys(auxColors).forEach(function(k){
-      auxCount=Math.max(auxCount,parseInt(k));
-      renderAuxRow(k,auxColors[k],'輔助色'+k);
-    });
-    checkAddBtn();
-
-    // Update pills
-    function setPill(groupId,val){
-      document.querySelectorAll('#'+groupId+' .pill').forEach(function(b){b.classList.remove('on');});
-      var t=document.querySelector('#'+groupId+' .pill[data-v="'+val+'"]');
-      if(t) t.classList.add('on');
-    }
-    function setGoalBtn(val){
-      document.querySelectorAll('#g-goal .goal-btn').forEach(function(b){b.classList.remove('on');});
-      var t=document.querySelector('#g-goal .goal-btn[data-v="'+val+'"]');
-      if(t) t.classList.add('on');
-    }
-    function setAudBtn(val){
-      document.querySelectorAll('#g-audience .aud-btn').forEach(function(b){b.classList.remove('on');});
-      var t=document.querySelector('#g-audience .aud-btn[data-v="'+val+'"]');
-      if(t) t.classList.add('on');
-    }
-    function setPosBtn(val){
-      document.querySelectorAll('#pos-grid .pos-btn').forEach(function(b){b.classList.remove('on');});
-      var t=document.querySelector('#pos-grid .pos-btn[data-p="'+val+'"]');
-      if(t){t.classList.add('on');selPoKw=t.dataset.kw;}
-    }
-    function setLvBtn(val){
-      document.querySelectorAll('#level-grid .level-btn').forEach(function(b){b.classList.remove('on');});
-      var t=document.querySelector('#level-grid .level-btn[data-lv="'+val+'"]');
-      if(t) t.classList.add('on');
-    }
-    function setRatioBtn(val){
-      document.querySelectorAll('#ratio-grid .ratio-btn').forEach(function(b){b.classList.remove('on');});
-      var t=document.querySelector('#ratio-grid .ratio-btn[data-r="'+val+'"]');
-      if(t) t.classList.add('on');
-      document.getElementById('ratio-custom').style.display=val==='custom'?'flex':'none';
-    }
-    function setBadgeBtn(val){
-      document.querySelectorAll('#g-badge .pill').forEach(function(b){b.classList.remove('on');});
-      var t=document.querySelector('#g-badge .pill[data-v="'+val+'"]');
-      if(t) t.classList.add('on');
-      document.getElementById('badge-input-row').style.display=val==='none'?'none':'block';
-    }
-
-    setAudBtn(selAudience);
-    setGoalBtn(selGoal);
-    setPill('g-em',selEm);
-    setPill('g-light',selLight);
-    setRatioBtn(selRatio);
-    setPosBtn(selPos);
-    setLvBtn(selLv);
-    setPill('g-dof',selDof);
-    setPill('g-style',selImgStyle);
-    setPill('g-layer',selLayer);
-    setBadgeBtn(selBadge);
-
-    if(s.product) document.getElementById('fp').value=s.product;
-    if(s.headline) document.getElementById('fh').value=s.headline;
-    if(s.sub) document.getElementById('fs').value=s.sub;
-    if(s.cta) document.getElementById('fc').value=s.cta;
-    if(s.extra&&document.getElementById('f-extra')) document.getElementById('f-extra').value=s.extra;
-    if(s.badgeText&&document.getElementById('f-badge-text')) document.getElementById('f-badge-text').value=s.badgeText;
-
-    document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
-    draw();
-    document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
-    document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
-    bld();
-  }catch(e){console.error('applySettings error:',e);}
-}
-
-function saveToHistory(imgSrc){
-  var s=getCurrentSettings();
-  if(imgSrc) s.imgThumb=imgSrc;
-  var hist=getHistory();
-  hist.unshift(s);
-  if(hist.length>MAX_HIST) hist=hist.slice(0,MAX_HIST);
-  try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){}
-  renderHistory();
-}
-
-function getHistory(){
-  try{var d=localStorage.getItem(HIST_KEY);return d?JSON.parse(d):[];}catch(e){return[];}
-}
-
-function renderHistory(){
-  var hist=getHistory();
-  var list=document.getElementById('hist-list');
-  var empty=document.getElementById('hist-empty');
-  if(!hist.length){if(empty)empty.style.display='block';list.innerHTML='<div class="hist-empty" id="hist-empty">尚無歷史紀錄。每次生圖後自動儲存。</div>';return;}
-  if(empty)empty.style.display='none';
-  list.innerHTML=hist.map(function(s,i){
-    var d=new Date(s.timestamp);
-    var timeStr=d.toLocaleDateString('zh-TW')+' '+d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-    var audLabel=s.audience==='b2b'?'B2B':'B2C';
-    var tierLabel=s.dot?(1-s.dot.y>0.65?'Premium':1-s.dot.y>0.35?'Mid':'Mass'):'';
-    var goalLabel={click:'點擊率',convert:'轉換',brand:'品牌感',explain:'內容解釋'}[s.goal]||s.goal;
-    var emLabel={trust:'Trust',excitement:'Excitement',urgency:'Urgency',calm:'Calm'}[s.emotion]||s.emotion;
-    var imgHtml=s.imgThumb?'<img class="hist-img" src="'+s.imgThumb+'" alt="">':'';
-    return '<div class="hist-item" onclick="applySettings(getHistory()['+i+'])">'
-      +'<div class="hist-item-header"><span class="hist-item-time">'+timeStr+'</span>'
-      +'<button class="hist-item-del" onclick="event.stopPropagation();deleteHist('+i+')" title="刪除">✕</button></div>'
-      +'<div style="display:flex;gap:8px;align-items:flex-start">'
-      +(imgHtml?'<div>'+imgHtml+'</div>':'')
-      +'<div style="flex:1;min-width:0">'
-      +'<div class="hist-item-tags">'
-      +'<span class="hist-tag">'+audLabel+'</span>'
-      +'<span class="hist-tag">'+tierLabel+'</span>'
-      +'<span class="hist-tag">'+goalLabel+'</span>'
-      +'<span class="hist-tag">'+emLabel+'</span>'
-      +(s.ratio?'<span class="hist-tag">'+s.ratio+'</span>':'')
-      +(s.product?'<span class="hist-tag">'+s.product.slice(0,10)+'</span>':'')
-      +'</div>'
-      +'<div class="hist-item-preview">'+(s.prompt||'').slice(0,120)+'</div>'
-      +'</div></div>'
-      +'</div>';
-  }).join('');
-}
-
-function deleteHist(i){
-  var hist=getHistory();hist.splice(i,1);
-  try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){}
-  renderHistory();
-}
-
-function clearAllHist(){
-  if(!confirm('確定要清除全部歷史紀錄？')) return;
-  try{localStorage.removeItem(HIST_KEY);}catch(e){}
-  renderHistory();
-}
-
-function exportJSON(){
-  var s=getCurrentSettings();
-  delete s.prompt;
-  s.exportedAt=new Date().toISOString();
-  var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  var prod=s.product?s.product.slice(0,12).replace(/[^a-zA-Z0-9一-鿿]/g,'_'):'settings';
-  a.download='mvg_'+prod+'_'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function importJSON(inp){
-  if(!inp.files||!inp.files[0]) return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      var s=JSON.parse(e.target.result);
-      applySettings(s);
-      inp.value='';
-      alert('設定已匯入成功！');
-    }catch(err){
-      alert('匯入失敗：請確認檔案格式正確。');
-    }
-  };
-  reader.readAsText(inp.files[0]);
-}
-
-function toggleHist(btn){
-  var body=document.getElementById('hist-body');
-  var arrow=document.getElementById('hist-arrow');
-  body.classList.toggle('open');
-  arrow.classList.toggle('open');
-  if(body.classList.contains('open')) renderHistory();
-}
-
-setTimeout(function(){btn.innerHTML='<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a2 2 0 00-2-2H3a2 2 0 002 2h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> 複製完整 Prompt';},1800);
+    setTimeout(function(){btn.innerHTML='<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a2 2 0 00-2-2H3a2 2 0 002 2h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> 複製完整 Prompt';},1800);
   });
-}
-
-async function generate(){
-  var apiKey=document.getElementById('api-key').value.trim();
-  if(!apiKey){setStatus('請先填入 Gemini API Key','error');return;}
-  var btn=document.getElementById('gen-btn');
-  btn.disabled=true;btn.textContent='生成中…';
-  setStatus('正在傳送給 Gemini…','');
-  document.getElementById('img-result').classList.remove('show');
-  document.getElementById('img-placeholder').style.display='flex';
-  document.getElementById('dl-btn').classList.remove('show');
-
-  var prompt=buildFullPrompt();
-  var contents=[];
-  var hasRef=refData.some(function(d){return d!==null;});
-
-  if(hasRef){
-    var parts=[];
-    var imgLabels=[
-      'This is Image 1 — the PRODUCT PHOTO. Maintain its exact appearance, shape, texture, and details as the main subject.',
-      'This is Image 2 — the STYLE REFERENCE. Match its visual atmosphere, mood, and aesthetic. Do not copy its subject.',
-      'This is Image 3 — the COMPETITOR REFERENCE. Study its visual language and intentionally differentiate in composition, color, or mood.'
-    ];
-    refData.forEach(function(d,i){
-      if(!d)return;
-      var b64=d.split(',')[1];
-      var mime=d.split(';')[0].split(':')[1];
-      parts.push({text:imgLabels[i]});
-      parts.push({inline_data:{mime_type:mime,data:b64}});
-    });
-    parts.push({text:'Now generate a marketing visual image following this specification:\n\n'+prompt});
-    contents=[{role:'user',parts:parts}];
-  } else {
-    contents=[{role:'user',parts:[{text:'Generate a marketing visual image following this specification:\n\n'+prompt}]}];
-  }
-
-  try{
-    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key='+apiKey,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        contents:contents,
-        generationConfig:{responseModalities:['IMAGE','TEXT'],temperature:1.0}
-      })
-    });
-    var data=await res.json();
-    if(!res.ok){
-      var msg=(data.error&&data.error.message)||'API 回傳錯誤 '+res.status;
-      setStatus('錯誤：'+msg,'error');btn.disabled=false;btn.textContent='產生這張圖';return;
-    }
-    var imgPart=null;
-    var textPart=null;
-    console.log('Gemini response v4:', JSON.stringify(data).slice(0,600));
-    function scanParts(parts){
-      if(!Array.isArray(parts))return;
-      parts.forEach(function(p){
-        if(!imgPart){
-          if(p.inlineData&&p.inlineData.data) imgPart=p.inlineData;
-          else if(p.inline_data&&p.inline_data.data) imgPart=p.inline_data;
-        }
-        if(p.text) textPart=p.text;
-      });
-    }
-    // candidates[0].content.parts
-    if(data.candidates&&data.candidates[0]){
-      var c0=data.candidates[0];
-      if(c0.content&&c0.content.parts) scanParts(c0.content.parts);
-      else if(c0.parts) scanParts(c0.parts);
-    }
-    // top-level content or parts fallback
-    if(!imgPart&&data.content&&data.content.parts) scanParts(data.content.parts);
-    if(!imgPart&&data.parts) scanParts(data.parts);
-    if(imgPart){
-      var mimeType=imgPart.mimeType||imgPart.mime_type||'image/jpeg';
-      var src='data:'+mimeType+';base64,'+imgPart.data;
-      document.getElementById('result-img').src=src;
-      document.getElementById('img-result').classList.add('show');
-      document.getElementById('img-placeholder').style.display='none';
-      document.getElementById('dl-btn').classList.add('show');
-      document.getElementById('dl-btn').dataset.src=src;
-      setStatus('生成成功 ✓','success');
-      saveToHistory(src);
-    } else {
-      setStatus('Gemini 未回傳圖片，請嘗試調整 Prompt 或稍後再試','error');
-    }
-  }catch(err){
-    setStatus('網路錯誤：'+err.message,'error');
-  }
-  btn.disabled=false;btn.textContent='產生這張圖';
-}
-
-function setStatus(msg,type){
-  var el=document.getElementById('gen-status');
-  el.textContent=msg;
-  el.className='gen-status'+(type?' '+type:'');
-}
-
-function downloadImg(){
-  var src=document.getElementById('dl-btn').dataset.src;
-  var a=document.createElement('a');a.href=src;a.download='marketing-visual.png';a.click();
 }
 
 setTimeout(function(){
