@@ -749,13 +749,17 @@ function applySettings(s){
     document.getElementById('hx0').value=primaryColor;
     updateSugg(primaryColor);
 
-    // Rebuild aux color rows
+    // Rebuild aux color rows - clear first to avoid duplicates
     document.getElementById('aux-rows').innerHTML='';
+    auxColors={};
     auxCount=0;
-    Object.keys(auxColors).forEach(function(k){
-      auxCount=Math.max(auxCount,parseInt(k));
-      renderAuxRow(k,auxColors[k],'輔助色'+k);
-    });
+    if(s.auxColors&&Object.keys(s.auxColors).length>0){
+      Object.keys(s.auxColors).forEach(function(k){
+        var newId=++auxCount;
+        auxColors[newId]=s.auxColors[k];
+        renderAuxRow(newId,s.auxColors[k],'輔助色'+newId);
+      });
+    }
     checkAddBtn();
 
     // Update pills
