@@ -533,7 +533,7 @@ var PTYPE_DB={
     bg:'natural lifestyle or clean studio background'
   },
   'saas':{
-    visual:'software UI dashboard screenshot displayed on laptop or monitor screen, geometric color blocks, tech product visual language, screen content clearly visible, digital interface showcase, clean modern digital aesthetic',
+    visual:'software UI dashboard screenshot clearly visible on laptop or monitor screen, UI interface with data visualization elements inside the screen, tech product visual language, screen content sharp and legible, clean modern digital product aesthetic — background visual weight must be lower than the main subject, subtle background accents allowed but must not compete with headline or product, background supports not dominates',
     constraint:'clean studio background only, no textured surfaces, no stone or wood materials, no lifestyle props, dark or neutral gradient background preferred, no natural materials',
     bg:'dark gradient or neutral studio background, no natural textures'
   },
@@ -1204,7 +1204,7 @@ var DB={
       safe_note:''
     },
     explain:{
-      prompt:'clear visual hierarchy, informational flat composition, step-by-step visual clarity, educational layout, readable structure',
+      prompt:'clear visual hierarchy, step-by-step visual clarity, educational layout, pre-defined text zones — clean solid color band at bottom reserved for copy overlay',
       light_override:'natural',
       composition_note:'F-pattern information layout, headline top-left as anchor, content flows top-to-bottom in clear zones, CTA isolated at bottom, max 3 information layers',
       contrast:'medium',
@@ -1212,15 +1212,31 @@ var DB={
     }
   },
   em:{
-    trust:{kw:['clean uncluttered scene','honest natural light','credibility visual cues','authentic product presentation'],light_pref:'soft'},
-    excitement:{kw:['high visual energy','dynamic diagonal tension','eye-catching composition','bold striking focal point'],light_pref:'cinematic'},
-    urgency:{kw:['intense focused framing','action-oriented visual weight','time-pressure visual language'],light_pref:'studio'},
-    calm:{kw:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],light_pref:'natural'}
+    trust:{
+      kw_b2c:['clean uncluttered scene','credibility signals visible','warm trust-building atmosphere','honest approachable visual'],
+      kw_b2b:['clean uncluttered scene','credibility visual cues','professional authority signals','logical clarity'],
+      light_pref:'soft'
+    },
+    excitement:{
+      kw_b2c:['high visual energy','bold striking focal point','vivid visual impact','energetic atmosphere'],
+      kw_b2b:['forward-thinking energy','innovative visual language','bold differentiated focal point','progressive dynamic feel'],
+      light_pref:'cinematic'
+    },
+    urgency:{
+      kw_b2c:['compelling action atmosphere','time-sensitive visual urgency','high-stakes visual tension','immediate response trigger'],
+      kw_b2b:['competitive pressure visual','decisive action framing','opportunity window visual language','market timing signal'],
+      light_pref:'studio'
+    },
+    calm:{
+      kw_b2c:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],
+      kw_b2b:['measured confidence','considered restraint','professional calm','stable authoritative presence'],
+      light_pref:'natural'
+    }
   },
   light:{soft:'soft diffused lighting, gentle gradual shadows, flattering even illumination',cinematic:'cinematic directional lighting, dramatic contrast, film-quality atmosphere',studio:'controlled studio lighting, precise highlights, professional product photography',natural:'natural daylight quality, organic light feel, authentic environmental illumination'},
-  lv:{1:'no watermark, no extra objects, clean background, no absolute guarantee claims, no before-after comparison images, no misleading exaggerations',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no absolute language like 保證 or 一定 or 100%, no exaggerated before-after comparison, no fake engagement bait',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, no fake engagement bait, no incorrect use of platform brand elements, strict composition adherence, commercially safe'},
+  lv:{1:'no watermark, no extra objects, clean background, no absolute guarantee claims, no before-after comparison images, no misleading exaggerations',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no absolute language like 保證 or 一定 or 100%, no exaggerated before-after comparison, no fake engagement bait',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, no fake engagement bait, no incorrect use of platform brand elements, background softly blurred to ensure text legibility, strict composition adherence'},
   dof:{shallow:'shallow depth of field, subject sharp, background softly blurred',deep:'deep focus throughout, full scene sharpness',flat:'flat graphic style, no depth perspective'},
-  imgStyle:{editorial:'editorial photography aesthetic, magazine-quality',minimal:'minimalist composition, extreme negative space',tech:'tech product visual language, modern clean aesthetic',luxury:'luxury brand visual codes, premium material quality'},
+  imgStyle:{editorial:'editorial photography aesthetic, magazine-quality, 50mm lens perspective',minimal:'minimalist composition, extreme negative space, 85mm f/2.0 compression',tech:'tech product visual language, modern clean aesthetic, sharp technical precision',luxury:'luxury brand visual codes, premium material quality, 85mm f/1.8 shallow depth of field'},
   safeZone:{
     '1:1':{
       platform:'Shopee 主圖、IG 貼文、FB 廣告',
@@ -1548,6 +1564,15 @@ function buildPromptText(){
   vis.push('image-to-text ratio 7:3');
   vis.push('minimum 35% whitespace');
   vis.push('single dominant focal point');
+  // Lens parameter based on brand tier
+  var p3=1-dot.y;
+  if(p3>0.65){
+    vis.push('shot on 85mm prime lens, f/1.8, professional portrait compression');
+  } else if(p3>0.35){
+    vis.push('50mm standard lens perspective, natural proportions');
+  } else {
+    vis.push('24mm wide angle, candid authentic feel');
+  }
   set('ps-visual',vis.filter(Boolean).join(', '));
 
   // ── [EMOTION] How the image feels ──
@@ -1556,11 +1581,17 @@ function buildPromptText(){
   var goalData=DB.goal[selGoal];
   var em=[];
   if(goalData&&goalData.prompt) em.push(goalData.prompt);
-  // Emotion keywords (max 3)
-  em=em.concat((emData.kw||[]).slice(0,3));
+  // Use B2C or B2B emotion keywords based on audience
+  var emKw=selAudience==='b2b'?(emData.kw_b2b||emData.kw_b2c||[]):(emData.kw_b2c||emData.kw||[]);
+  em=em.concat(emKw.slice(0,3));
   // Audience-specific language
   if(selAudience==='b2b'){
     em.push('professional B2B visual, logical decision support, business value clarity');
+    // High-end rational: add cinematic rendering quality
+    var p4=1-dot.y,e4=dot.x;
+    if(p4>0.65&&e4<0.4){
+      em.push('cinematic render quality, volumetric lighting, commercial photography grade');
+    }
   }
   // Strategy prompt keywords from STRAT_PROMPT_DB
   var stratKw='';
@@ -1576,6 +1607,8 @@ function buildPromptText(){
   if(goalData&&goalData.composition_note) comp.push(goalData.composition_note);
   comp.push('aspect ratio '+ar);
   comp.push('photorealistic commercial photography');
+  comp.push('CTA isolated with high-contrast color block at bottom');
+  comp.push('Z-pattern: headline top → product center → CTA bottom');
   set('ps-composition',comp.filter(Boolean).join(', '));
 
   // ── [COLOR] Brand colors + CTA contrast logic ──
@@ -1620,7 +1653,14 @@ function buildPromptText(){
   if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
     constraintParts.push(PTYPE_DB[selPtype].constraint);
   }
-  set('ps-constraint',constraintParts.filter(Boolean).join(', '));
+  // Deduplicate constraint phrases
+  var constraintRaw=constraintParts.filter(Boolean).join(', ');
+  var constraintSeen={};
+  var constraintFinal=constraintRaw.split(',').map(function(s){return s.trim();}).filter(function(s){
+    if(!s||constraintSeen[s]) return false;
+    constraintSeen[s]=true; return true;
+  }).join(', ');
+  set('ps-constraint',constraintFinal);
 
   // ── [FORMAT] Technical output specs ──
   var ratioKey=selRatio==='custom'?'custom':selAr;
@@ -1711,7 +1751,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v13 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v13.2 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
