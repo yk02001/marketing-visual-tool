@@ -1570,7 +1570,6 @@ function buildPromptText(){
   var col=['primary: '+primaryColor];
   if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
   col.push('color ratio: 60% primary dominant / 30% secondary support / 10% accent highlight — single accent color only');
-  col.push('background must reflect primary color '+primaryColor+' — use as dominant background or large color block, not just as accent');
   set('ps-color',col.join(' / '));
 
   var copyRow=document.getElementById('ps-copy-row');
@@ -1676,7 +1675,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v11 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v11.1 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
