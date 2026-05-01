@@ -1466,6 +1466,7 @@ function toggleKey(){var fi=document.getElementById('api-key');fi.type=fi.type==
 function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
 
 function buildPromptText(){
+  // ── Core variables ──
   var bkw=getBKw(dot.x,dot.y);
   var emData=DB.em[selEm];
   var auxVals=Object.values(auxColors);
@@ -1476,27 +1477,25 @@ function buildPromptText(){
   var hasLogo=document.getElementById('lgi').files&&document.getElementById('lgi').files.length>0;
   var ar=selRatio==='custom'?(function(){var cw=document.getElementById('cw').value.trim(),ch=document.getElementById('ch').value.trim();return(cw&&ch)?cw+':'+ch:'1:1';})():selAr;
   var hasRef=refData.some(function(d){return d!==null;});
+  var hasText=(headline||sub||cta);
   var rdPerSlot={
     0:{role:'PRODUCT PHOTO',instruction:'Maintain the exact appearance, shape, texture, and details of this product. Use it as the main subject.'},
     1:{role:'STYLE REFERENCE',instruction:'Match the overall visual atmosphere, mood, color grading, and aesthetic style. Do not copy the subject.'},
     2:{role:'COMPETITOR REFERENCE',instruction:'Study the visual language and intentionally differentiate — use a distinct composition, color, or mood.'}
   };
 
-  // INTENT: inject visual strategy text into prompt
-  var intentRow=document.getElementById('ps-intent-row');
-  var p3=1-dot.y,e3=dot.x;
-  var tier3=p3>0.65?'premium':p3>0.35?'mid':'mass';
-  var intentText='';
-  try{
-    intentText=STRAT_DB[selAudience][tier3][selGoal][selEm]||'';
-  }catch(ex){}
-  if(intentText&&intentRow){
-    intentRow.style.display='flex';
-    set('ps-intent-val',intentText);
-  } else if(intentRow){
-    intentRow.style.display='none';
-  }
+  // ── Tier / strategy lookup ──
+  var p2=1-dot.y,e2=dot.x;
+  var tier=p2>0.65?'premium':p2>0.35?'mid':'mass';
 
+  // ── [INTENT] Visual strategy text ──
+  var intentRow=document.getElementById('ps-intent-row');
+  var intentText='';
+  try{ intentText=STRAT_DB[selAudience][tier][selGoal][selEm]||''; }catch(ex){}
+  if(intentText&&intentRow){ intentRow.style.display='flex'; set('ps-intent-val',intentText); }
+  else if(intentRow){ intentRow.style.display='none'; }
+
+  // ── [SUBJECT] What is in the image ──
   var subjectParts=[];
   if(product) subjectParts.push('Product: '+product);
   var uploadedCount=0;
@@ -1505,115 +1504,138 @@ function buildPromptText(){
       uploadedCount++;
       var fileInput=document.getElementById('rf'+i);
       var fname=(fileInput&&fileInput.files&&fileInput.files[0])?fileInput.files[0].name:'image_'+(i+1);
-      subjectParts.push('↳ Attach "'+ fname +'" as Image '+(i+1)+' ['+rdPerSlot[i].role+']: '+rdPerSlot[i].instruction);
+      subjectParts.push('↳ Attach "'+fname+'" as Image '+(i+1)+' ['+rdPerSlot[i].role+']: '+rdPerSlot[i].instruction);
     }
   });
   if(!product&&uploadedCount===0) subjectParts.push('product hero shot');
   set('ps-subject',subjectParts.join('\n'));
 
-  var vis=bkw.slice(0,2).concat([DB.light[selLight],DB.imgStyle[selImgStyle],DB.dof[selDof]]);
-  if(selLayer==='2')vis.push('two-layer depth: subject + background');
-  if(selLayer==='3')vis.push('three-layer depth: subject + midground + background');
-  // Inject product type visual rules
+  // ── [VISUAL] What the image looks like ──
+  // Only: product type visual language + lighting + depth + image style
+  // No emotion, no composition, no constraints here
+  var vis=[];
+  // Product type defines the visual language
   if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
-    var ptypeData=PTYPE_DB[selPtype];
-    vis.push(ptypeData.visual);
+    vis.push(PTYPE_DB[selPtype].visual);
   }
-  // Add insight-based visual rules
-  vis.push('image-to-text ratio 7:3, visual dominates');
-  vis.push('minimum 35% whitespace to reduce cognitive load');
-  vis.push('single dominant focal point, avoid competing visual elements');
-  set('ps-visual',vis.join(', '));
+  // Lighting (from user selection, not overridden by goal here)
+  vis.push(DB.light[selLight]);
+  // Image style
+  vis.push(DB.imgStyle[selImgStyle]);
+  // Depth of field
+  vis.push(DB.dof[selDof]);
+  // Layer depth
+  if(selLayer==='2') vis.push('two-layer depth: subject + background');
+  if(selLayer==='3') vis.push('three-layer depth: subject + midground + background');
+  // Core visual rules (insight-based)
+  vis.push('image-to-text ratio 7:3');
+  vis.push('minimum 35% whitespace');
+  vis.push('single dominant focal point');
+  set('ps-visual',vis.filter(Boolean).join(', '));
 
-  // Goal mapping: override light and add goal-specific composition note
+  // ── [EMOTION] How the image feels ──
+  // Only: goal mood + emotion keywords + audience language + strategy keywords
+  // No lighting, no composition, no constraints here
   var goalData=DB.goal[selGoal];
-  var goalPrompt=goalData?goalData.prompt:DB.goal[selGoal];
-  // Add strategy-specific prompt keywords
-  var p2=1-dot.y,e2=dot.x;
-  var tier2=p2>0.65?'premium':p2>0.35?'mid':'mass';
-  var stratPromptKw='';
-  try{ stratPromptKw=STRAT_PROMPT_DB[tier2][selGoal][selEm]||''; }catch(e){}
-  if(selAudience==='b2b'){var b2bKw='professional B2B visual, logical decision support, business value clarity, multi-stakeholder credibility, ROI-focused composition';stratPromptKw=stratPromptKw?stratPromptKw+', '+b2bKw:b2bKw;}
-  var em=[goalPrompt||''].concat(emData.kw.slice(0,3));
-  if(stratPromptKw) em.push(stratPromptKw);
+  var em=[];
+  if(goalData&&goalData.prompt) em.push(goalData.prompt);
+  // Emotion keywords (max 3)
+  em=em.concat((emData.kw||[]).slice(0,3));
+  // Audience-specific language
+  if(selAudience==='b2b'){
+    em.push('professional B2B visual, logical decision support, business value clarity');
+  }
+  // Strategy prompt keywords from STRAT_PROMPT_DB
+  var stratKw='';
+  try{ stratKw=STRAT_PROMPT_DB[tier][selGoal][selEm]||''; }catch(e){}
+  if(stratKw) em.push(stratKw);
   set('ps-emotion',em.filter(Boolean).join(', '));
-  var _goalData=goalData;
-  goalData=_goalData;
-  var goalPrompt2=goalData?goalData.prompt:'';
-  var goalComposition=goalData?goalData.composition_note:'';
-  var goalSafeNote=goalData?goalData.safe_note:'';
 
-  // Safe zone for selected ratio
+  // ── [COMPOSITION] How elements are arranged ──
+  // Only: position + goal composition + aspect ratio
+  // Z-pattern as single clear instruction
+  var comp=[];
+  comp.push(selPoKw); // REQUIRED position (left/center/right)
+  if(goalData&&goalData.composition_note) comp.push(goalData.composition_note);
+  comp.push('aspect ratio '+ar);
+  comp.push('photorealistic commercial photography');
+  set('ps-composition',comp.filter(Boolean).join(', '));
+
+  // ── [COLOR] Brand colors + CTA contrast logic ──
+  var col=['primary: '+primaryColor];
+  if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
+  col.push('color ratio: 60% primary / 30% secondary / 10% accent');
+  // Smart CTA color: contrast against background
+  if(cta){
+    col.push('CTA button color: if primary '+primaryColor+' dominates background use secondary '+
+      (auxVals[0]||'#ffffff')+' or white for CTA; if background is dark/neutral use primary '+
+      primaryColor+' for CTA — always maximum contrast');
+  }
+  set('ps-color',col.join(' / '));
+
+  // ── [COPY] Text to render in image ──
+  var copyRow=document.getElementById('ps-copy-row');
+  var cp=[];
+  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED — render all copy exactly as specified');
+  if(headline) cp.push('headline: "'+headline+'"');
+  if(sub) cp.push('subtext: "'+sub+'"');
+  if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
+  var lgiInput=document.getElementById('lgi');
+  var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
+  if(hasLogo&&logoFname) cp.push('↳ Attach "'+logoFname+'" as Logo: top-left corner, maintain proportions');
+  else if(hasLogo) cp.push('brand logo: top-left corner');
+  if(cp.length){ copyRow.style.display='flex'; set('ps-copy-val',cp.join(' / ')); }
+  else copyRow.style.display='none';
+
+  // ── [ACCENT] Badge/label element ──
+  var badgeRow=document.getElementById('ps-badge-row');
+  var badgeText=document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value.trim():'';
+  if(selBadge!=='none'&&DB.badge[selBadge]){
+    var badgeDesc=DB.badge[selBadge];
+    if(badgeText) badgeDesc+=' — display text: "'+badgeText+'"';
+    badgeRow.style.display='flex'; set('ps-badge-val',badgeDesc);
+  } else badgeRow.style.display='none';
+
+  // ── [CONSTRAINT] What must NOT appear ──
+  // Base level constraint + product type background restriction
+  // No duplication, no format rules here
+  var constraintParts=[DB.lv[selLv]];
+  if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
+    constraintParts.push(PTYPE_DB[selPtype].constraint);
+  }
+  set('ps-constraint',constraintParts.filter(Boolean).join(', '));
+
+  // ── [FORMAT] Technical output specs ──
   var ratioKey=selRatio==='custom'?'custom':selAr;
   var szData=DB.safeZone[ratioKey]||DB.safeZone['custom'];
   var szPrompt=szData.prompt_note||'';
   var szPlatform=szData.platform||'';
   var szRule=szData.rule||'';
-
-  // Compose COMPOSITION section
-  var compParts=[selPoKw];
-  if(goalComposition) compParts.push(goalComposition);
-  compParts.push('aspect ratio '+ar+', photorealistic commercial photography');
-  compParts.push('CTA isolated with high-contrast color block at bottom');
-  compParts.push('Z-pattern: headline top → product center → CTA bottom');
-  set('ps-composition',compParts.join(', '));
-
-  // SAFE ZONE section
-  var szRow=document.getElementById('ps-safezone-row');
-  if(szRow){
-    var szVal='Platform: '+szPlatform+' | Rule: '+szRule;
-    if(goalSafeNote) szVal+=' | '+goalSafeNote;
-    szRow.style.display='flex';
-    set('ps-safezone-val', szVal);
-  }
-
-  var col=['primary: '+primaryColor];
-  if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
-  col.push('color ratio: 60% primary dominant / 30% secondary support / 10% accent highlight — single accent color only');
-  set('ps-color',col.join(' / '));
-
-  var copyRow=document.getElementById('ps-copy-row');
-  var cp=[];
-  if(headline||sub||cta) cp.push('⚠ TEXT RENDERING REQUIRED — include all copy text in the image exactly as specified');
-  if(headline)cp.push('headline: "'+headline+'"');
-  if(sub)cp.push('subtext: "'+sub+'"');
-  if(cta)cp.push('CTA button: "'+cta+'" — render as high-contrast button at bottom of image');
-  var lgiInput=document.getElementById('lgi');
-  var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
-  if(hasLogo&&logoFname)cp.push('↳ Attach "'+logoFname+'" as Logo: place top-left corner, maintain original proportions');
-  else if(hasLogo)cp.push('brand logo top-left');
-  if(cp.length){copyRow.style.display='flex';set('ps-copy-val',cp.join(' / '));}
-  else copyRow.style.display='none';
-
-  // ACCENT badge section
-  var badgeRow=document.getElementById('ps-badge-row');
-  var badgeText=document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value.trim():'';
-  if(selBadge!=='none'&&DB.badge[selBadge]){
-    var badgeDesc=DB.badge[selBadge];
-    if(badgeText){
-      badgeDesc+=' — display text: "'+badgeText+'"';
-    }
-    badgeRow.style.display='flex';set('ps-badge-val',badgeDesc);
-  } else badgeRow.style.display='none';
-
-  var constraintVal=DB.lv[selLv];
-  if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
-    constraintVal+=', '+PTYPE_DB[selPtype].constraint;
-  }
-  set('ps-constraint',constraintVal);
-  var hasText=(headline||sub||cta);
-  var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality'+(hasText?', render all specified COPY text exactly as written in the image':', no unspecified text overlays');
-  if(szPrompt) formatVal+='. SAFE ZONE: '+szPrompt;
+  var goalSafeNote=goalData?goalData.safe_note:'';
+  var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality';
+  if(hasText) formatVal+=', render all COPY text exactly as written';
+  else formatVal+=', no unspecified text overlays';
   set('ps-format',formatVal);
 
-  // EXTRA section
+  // ── [SAFE ZONE] Platform rules ──
+  var szRow=document.getElementById('ps-safezone-row');
+  if(szRow&&szPlatform){
+    var szVal='Platform: '+szPlatform+' | Rule: '+szRule;
+    if(goalSafeNote) szVal+=' | '+goalSafeNote;
+    if(szPrompt) szVal+=' | '+szPrompt;
+    szRow.style.display='flex';
+    set('ps-safezone-val',szVal);
+  }
+
+  // ── [EXTRA] Free text ──
   var extraRow=document.getElementById('ps-extra-row');
   var extraVal=document.getElementById('f-extra')?document.getElementById('f-extra').value.trim():'';
-  if(extraVal){extraRow.style.display='flex';set('ps-extra-val',extraVal);}
+  if(extraVal){ extraRow.style.display='flex'; set('ps-extra-val',extraVal); }
   else extraRow.style.display='none';
 
   return document.getElementById('prompt-block').innerText;
 }
+
 
 function bld(){
   checkConflicts();
@@ -1624,8 +1646,7 @@ function bld(){
   var goalTxt={click:'提升點擊率',convert:'促進轉換',brand:'強化品牌感',explain:'清楚傳達內容'};
   var lvTxt={1:'Basic Clean',2:'Design Control',3:'Brand Safe'};
   var hasRef=refData.some(function(d){return d!==null;});
-  // Get strategy text from STRAT_DB
-  var tier=p>0.65?'premium':p>0.35?'mid':'mass';
+  var tier=( (1-dot.y)>0.65)?'premium':((1-dot.y)>0.35)?'mid':'mass';
   var stratText='';
   var stratEl=document.getElementById('strat');
   if(typeof STRAT_DB!=='undefined'&&STRAT_DB[selAudience]&&STRAT_DB[selAudience][tier]&&STRAT_DB[selAudience][tier][selGoal]&&STRAT_DB[selAudience][tier][selGoal][selEm]){
@@ -1635,9 +1656,7 @@ function bld(){
   } else {
     stratEl.textContent=ps+'品牌 × '+es+'調性，目標：'+goalTxt[selGoal]+'，光線：'+selLight+'，潔淨：'+lvTxt[selLv]+'。';
   }
-  if(hasRef){
-    stratEl.textContent+=' 已載入參考圖，Gemini 會直接讀取。';
-  }
+  if(hasRef){ stratEl.textContent+=' 已載入參考圖，Gemini 會直接讀取。'; }
   console.log('strat check:',selAudience,tier,selGoal,selEm,'→',stratText?'OK':'MISS');
 }
 
@@ -1675,7 +1694,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v11.1 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v12 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
