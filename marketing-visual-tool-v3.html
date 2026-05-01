@@ -534,7 +534,7 @@ var PTYPE_DB={
   },
   'saas':{
     visual:'software UI dashboard screenshot clearly visible on laptop or monitor screen, UI interface with data visualization elements inside the screen, tech product visual language, screen content sharp and legible, clean modern digital product aesthetic — background visual weight must be lower than the main subject, subtle background accents allowed but must not compete with headline or product, background supports not dominates',
-    constraint:'clean studio background only, no textured surfaces, no stone or wood materials, no lifestyle props, dark or neutral gradient background preferred, no natural materials',
+    constraint:'background must not compete with main subject or headline, no intrusive decorative elements in foreground, background supports visual hierarchy',
     bg:'dark gradient or neutral studio background, no natural textures'
   },
   'event':{
@@ -725,19 +725,19 @@ var STRAT_DB={
 // Prompt additions per strategy combination
 var STRAT_PROMPT_DB={
   premium:{
-    click:{trust:'refined elegance, understated luxury, soft sculptural light, tactile quality visible',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'scarce atmosphere, deep tonal pressure, exclusive focal intensity, now-or-never mood',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
+    click:{trust:'premium B2B credibility, authority visual confidence, high-quality professional execution',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'scarce atmosphere, deep tonal pressure, exclusive focal intensity, now-or-never mood',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
     convert:{trust:'craftmanship details, decision-space composition, reassuring precision, purchase confidence',excitement:'desire-evoking lighting, aspirational ownership feel, magnetic product allure',urgency:'elegant pressure, refined urgency, precise high contrast, decisive composition',calm:'quiet persuasion, pure product truth, serene confidence, effortless quality'},
-    brand:{trust:'timeless brand aura, soft authoritative light, enduring visual identity',excitement:'brand world storytelling, infectious brand energy, cinematic brand narrative',urgency:'brand imprint intensity, focal brand power, unmistakable visual signature',calm:'disciplined restraint, brand stillness, anti-trend confidence, composed authority'},
+    brand:{trust:'timeless brand authority, enduring visual identity, premium brand presence',excitement:'brand world storytelling, infectious brand energy, cinematic brand narrative',urgency:'brand imprint intensity, focal brand power, unmistakable visual signature',calm:'disciplined restraint, brand stillness, anti-trend confidence, composed authority'},
     explain:{trust:'headline dominates 50% visual weight, geometric color blocks define zones, cutout person overlay on solid background, max 3 info layers, isolated CTA block at bottom, high-saturation 2-color system',excitement:'high-saturation color collision, oversized bold headline, topic hashtag labels, cutout speaker portrait, energy-forward knowledge visual',urgency:'headline at F-pattern hotspot, date-time high contrast, bottom CTA color block isolated, single action path, compressed decision journey',calm:'three-layer information discipline, dominant headline, clean geometric layout, bottom CTA separated by whitespace'}
   },
   mid:{
-    click:{trust:'warm professional light, relatable balance, approachable credibility',excitement:'everyday joy captured, vibrant approachable energy, spontaneous visual delight',urgency:'value-forward composition, high-contrast benefit focus, deal-urgency atmosphere',calm:'unhurried natural feel, soft welcoming tone, scroll-stopping serenity'},
+    click:{trust:'warm professional tone, relatable balance, approachable credibility',excitement:'everyday joy captured, vibrant approachable energy, spontaneous visual delight',urgency:'value-forward composition, high-contrast benefit focus, deal-urgency atmosphere',calm:'unhurried natural feel, soft welcoming tone, scroll-stopping serenity'},
     convert:{trust:'practical clarity, CTA-ready composition, useful trust signals',excitement:'ownership joy, value excitement, heart-and-mind conversion visual',urgency:'smart-shopper framing, limited-time visual logic, decisive value composition',calm:'low-friction layout, decision fatigue reduction, relaxed conversion design'},
     brand:{trust:'consistent reliable palette, honest brand warmth, cumulative trust building',excitement:'brand vitality, memorable color energy, positive brand momentum',urgency:'competitive brand presence, dominant focal brand color, leadership visual stance',calm:'long-term brand familiarity, visual consistency, reassuring brand stability'},
     explain:{trust:'bold headline top half, cutout speaker on geometric color block, 3-tier info hierarchy, bottom isolated CTA, high-saturation main color, authority credibility signals',excitement:'high-saturation color splash background, large headline + partner logo, cutout person overlay, hashtag topic labels, energetic B2B event visual',urgency:'headline + date high visibility, bottom CTA color block maximum contrast, minimal info layers, fast registration path',calm:'3-layer layout discipline, saturated but clean palette, cutout figure simplifies background, clear CTA separation'}
   },
   mass:{
-    click:{trust:'real-life grounded composition, authentic natural light, relatable scene',excitement:'contagious high-saturation energy, dynamic share-worthy visual, vibrant lifestyle joy',urgency:'bold promotional atmosphere, thumb-stopping high contrast, irresistible value focal',calm:'noise-free visual calm, friendly low-pressure tone, welcoming simple composition'},
+    click:{trust:'real-life grounded composition, authentic relatable scene, genuine human connection',excitement:'contagious high-saturation energy, dynamic share-worthy visual, vibrant lifestyle joy',urgency:'bold promotional atmosphere, thumb-stopping high contrast, irresistible value focal',calm:'noise-free visual calm, friendly low-pressure tone, welcoming simple composition'},
     convert:{trust:'clear honest product display, direct communication, trust-to-purchase bridge',excitement:'instant purchase joy, clear offer excitement, feel-good conversion energy',urgency:'heartbeat CTA intensity, single-path action composition, deal urgency maximized',calm:'distraction-free product hero, friction-removed layout, pure conversion simplicity'},
     brand:{trust:'neighborly brand warmth, lifestyle scene authenticity, long-term brand friendship',excitement:'brand happiness DNA, maximum color energy, viral brand vitality',urgency:'trending brand momentum, bold visual heat, cant-ignore brand dynamic',calm:'home-like brand comfort, warm color embrace, familiar brand dependency'},
     explain:{trust:'direct headline message, 3-tier layout, bottom CTA contrast block, plain visual language, immediate comprehension for SMB audience',excitement:'high-saturation main color, large bold headline, topic labels, accessible energy-forward visual for SMB',urgency:'headline + date maximum visibility, isolated bottom CTA, shortest path from content to action',calm:'clean 3-layer layout, saturated but uncluttered, low cognitive load for busy SMB decision makers'}
@@ -1183,7 +1183,7 @@ function downloadImg(){
 var DB={
   goal:{
     click:{
-      prompt:'strong visual hook, bold high-contrast focal point, eye-catching composition, immediate attention-grabbing, dynamic energy',
+      prompt:'strong visual hook, bold high-contrast focal point, immediate attention-grabbing, dynamic visual energy',
       light_override:'cinematic',
       composition_note:'diagonal dynamic layout, strong visual tension, subject fills 70% of frame, bold asymmetric energy — headline top, CTA bottom-right corner',
       contrast:'high',
@@ -1751,7 +1751,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v13.2 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v13.3 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
