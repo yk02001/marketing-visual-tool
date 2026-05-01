@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marketing Visual Generator v9 — awoo</title>
+<title>Marketing Visual Generator</title>
 <style>
 :root{
   --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;
@@ -189,12 +189,15 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 .hist-empty{font-size:12px;color:var(--text3);text-align:center;padding:20px 0;}
 .hist-img{width:48px;height:48px;border-radius:4px;object-fit:cover;flex-shrink:0;border:0.5px solid var(--border);}
 .download-btn.show{display:flex;}
+.version-footer{text-align:center;padding:20px 0 28px;font-size:10px;color:var(--text3);letter-spacing:.05em;}
+.version-badge{display:inline-flex;align-items:center;gap:5px;background:var(--bg2);border:0.5px solid var(--border);border-radius:999px;padding:3px 10px;font-size:10px;color:var(--text3);}
+.version-dot{width:5px;height:5px;border-radius:50%;background:#22c55e;}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="app-header">
-    <div class="app-title">Marketing Visual Generator v7 — awoo <div class="app-sub">設定品牌風格 → 自動生成結構化 Prompt → 直接用 Gemini 生圖</div>
+    <div class="app-title">Marketing Visual Generator <div class="app-sub">設定品牌風格 → 自動生成結構化 Prompt → 直接用 Gemini 生圖</div>
   </div>
 
   <!-- Step 1 -->
@@ -1441,6 +1444,10 @@ function buildPromptText(){
   var vis=bkw.slice(0,2).concat([DB.light[selLight],DB.imgStyle[selImgStyle],DB.dof[selDof]]);
   if(selLayer==='2')vis.push('two-layer depth: subject + background');
   if(selLayer==='3')vis.push('three-layer depth: subject + midground + background');
+  // Add insight-based visual rules
+  vis.push('image-to-text ratio 7:3, visual dominates');
+  vis.push('minimum 35% whitespace to reduce cognitive load');
+  vis.push('single dominant focal point, avoid competing visual elements');
   set('ps-visual',vis.join(', '));
 
   // Goal mapping: override light and add goal-specific composition note
@@ -1472,6 +1479,8 @@ function buildPromptText(){
   var compParts=[selPoKw];
   if(goalComposition) compParts.push(goalComposition);
   compParts.push('aspect ratio '+ar+', photorealistic commercial photography');
+  compParts.push('CTA isolated with high-contrast color block at bottom');
+  compParts.push('Z-pattern: headline top → product center → CTA bottom');
   set('ps-composition',compParts.join(', '));
 
   // SAFE ZONE section
@@ -1485,13 +1494,15 @@ function buildPromptText(){
 
   var col=['primary: '+primaryColor];
   if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
+  col.push('color ratio: 60% primary dominant / 30% secondary support / 10% accent highlight — single accent color only');
   set('ps-color',col.join(' / '));
 
   var copyRow=document.getElementById('ps-copy-row');
   var cp=[];
+  if(headline||sub||cta) cp.push('⚠ TEXT RENDERING REQUIRED — include all copy text in the image exactly as specified');
   if(headline)cp.push('headline: "'+headline+'"');
   if(sub)cp.push('subtext: "'+sub+'"');
-  if(cta)cp.push('CTA: "'+cta+'"');
+  if(cta)cp.push('CTA button: "'+cta+'" — render as high-contrast button at bottom of image');
   var lgiInput=document.getElementById('lgi');
   var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
   if(hasLogo&&logoFname)cp.push('↳ Attach "'+logoFname+'" as Logo: place top-left corner, maintain original proportions');
@@ -1511,7 +1522,8 @@ function buildPromptText(){
   } else badgeRow.style.display='none';
 
   set('ps-constraint',DB.lv[selLv]);
-  var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality, no text overlays unless specified above';
+  var hasText=(headline||sub||cta);
+  var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality'+(hasText?', render all specified COPY text exactly as written in the image':', no unspecified text overlays');
   if(szPrompt) formatVal+='. SAFE ZONE: '+szPrompt;
   set('ps-format',formatVal);
 
@@ -1581,5 +1593,11 @@ setTimeout(function(){
 },80);
 window.addEventListener('resize',function(){draw();});
 </script>
+  <div class="version-footer">
+    <span class="version-badge">
+      <span class="version-dot"></span>
+      Marketing Visual Generator &nbsp;·&nbsp; v9 &nbsp;·&nbsp; 2026.05.01
+    </span>
+  </div>
 </body>
 </html>
