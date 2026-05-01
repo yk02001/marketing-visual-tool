@@ -314,13 +314,13 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div class="divider"></div>
     <p class="sec" style="margin-bottom:7px;">主體位置</p>
     <div class="pos-grid" id="pos-grid">
-      <button class="pos-btn" data-p="left" data-kw="subject positioned on left third, generous negative space on right side">
+      <button class="pos-btn" data-p="left" data-kw="REQUIRED: subject strictly on left third of frame, large negative space on right side for text, asymmetric composition">
         <div class="pos-icon"><div class="pos-dot" style="left:16%"></div></div><span class="pos-label">左置</span>
       </button>
-      <button class="pos-btn on" data-p="center" data-kw="subject centered, symmetrical balanced composition">
+      <button class="pos-btn on" data-p="center" data-kw="REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides">
         <div class="pos-icon"><div class="pos-dot" style="left:50%;transform:translate(-50%,-50%)"></div></div><span class="pos-label">置中</span>
       </button>
-      <button class="pos-btn" data-p="right" data-kw="subject positioned on right third, generous negative space on left side">
+      <button class="pos-btn" data-p="right" data-kw="REQUIRED: subject strictly on right third of frame, large negative space on left side for text, asymmetric composition">
         <div class="pos-icon"><div class="pos-dot" style="right:16%"></div></div><span class="pos-label">右置</span>
       </button>
     </div>
@@ -549,7 +549,7 @@ var PTYPE_DB={
   }
 };
 var selGoal='click',selEm='trust',selLight='soft',selRatio='1:1',selAr='1:1';
-var selPos='center',selPoKw='subject centered, symmetrical balanced composition';
+var selPos='center',selPoKw='REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides';
 var selLv=1,selDof='shallow',selImgStyle='editorial',selLayer='1';
 var refTypes=['product'];
 var selBadge='none';
@@ -1168,28 +1168,28 @@ var DB={
     click:{
       prompt:'strong visual hook, bold high-contrast focal point, eye-catching composition, immediate attention-grabbing, dynamic energy',
       light_override:'cinematic',
-      composition_note:'asymmetric dynamic composition, subject fills 70% of frame, strong diagonal tension',
+      composition_note:'diagonal dynamic layout, strong visual tension, subject fills 70% of frame, bold asymmetric energy — headline top, CTA bottom-right corner',
       contrast:'high',
       safe_note:''
     },
     convert:{
       prompt:'clear product benefit showcase, trust signals visible, action-oriented framing, CTA zone reserved, conversion-optimized layout',
       light_override:'studio',
-      composition_note:'subject centered or left-aligned, right 30% reserved for CTA text overlay, clean uncluttered frame',
+      composition_note:'visual path leads directly to CTA — subject left or center, CTA isolated at bottom with high-contrast block, right 30% reserved for text overlay',
       contrast:'medium-high',
       safe_note:'reserve bottom 15% and right 25% as text-safe zone for CTA overlay'
     },
     brand:{
       prompt:'brand personality expression, cohesive aesthetic language, memorable visual identity, aspirational lifestyle mood',
       light_override:null,
-      composition_note:'generous negative space, brand color dominant, balanced refined composition',
+      composition_note:'symmetric calm layout, generous whitespace 40%+, brand color visually dominant, refined centered balance — logo/headline top, product center, no CTA pressure',
       contrast:'low',
       safe_note:''
     },
     explain:{
       prompt:'clear visual hierarchy, informational flat composition, step-by-step visual clarity, educational layout, readable structure',
       light_override:'natural',
-      composition_note:'flat or minimal depth, structured layout with clear zones, top-to-bottom reading flow',
+      composition_note:'F-pattern information layout, headline top-left as anchor, content flows top-to-bottom in clear zones, CTA isolated at bottom, max 3 information layers',
       contrast:'medium',
       safe_note:'keep central 80% clear for diagram or infographic overlay'
     }
@@ -1201,17 +1201,17 @@ var DB={
     calm:{kw:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],light_pref:'natural'}
   },
   light:{soft:'soft diffused lighting, gentle gradual shadows, flattering even illumination',cinematic:'cinematic directional lighting, dramatic contrast, film-quality atmosphere',studio:'controlled studio lighting, precise highlights, professional product photography',natural:'natural daylight quality, organic light feel, authentic environmental illumination'},
-  lv:{1:'no watermark, no extra objects, clean background',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, strict composition adherence, commercially safe'},
+  lv:{1:'no watermark, no extra objects, clean background, no absolute guarantee claims, no before-after comparison images, no misleading exaggerations',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no absolute language like 保證 or 一定 or 100%, no exaggerated before-after comparison, no fake engagement bait',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, no fake engagement bait, no incorrect use of platform brand elements, strict composition adherence, commercially safe'},
   dof:{shallow:'shallow depth of field, subject sharp, background softly blurred',deep:'deep focus throughout, full scene sharpness',flat:'flat graphic style, no depth perspective'},
   imgStyle:{editorial:'editorial photography aesthetic, magazine-quality',minimal:'minimalist composition, extreme negative space',tech:'tech product visual language, modern clean aesthetic',luxury:'luxury brand visual codes, premium material quality'},
   safeZone:{
     '1:1':{
       platform:'Shopee 主圖、IG 貼文、FB 廣告',
-      rule:'keep all key elements within central 80% of frame (safe zone: ~864×864px of 1080×1080)',
+      rule:'keep all key elements within central 80% of frame (safe zone: ~864×864px of 1080×1080) | Shopee: information clarity first / IG: atmosphere and aesthetic first',
       prompt_note:'all critical elements centered within 80% of frame, avoid placing text or logos near edges'
     },
     '4:5':{
-      platform:'IG 直式貼文（推薦格式）',
+      platform:'IG 直式貼文（推薦格式）— 圖片美感優先，氛圍感強，適合品牌形象和生活感內容',
       rule:'keep elements within central 80% horizontally, top 10% and bottom 15% reserved for IG UI',
       prompt_note:'keep subject and text within central safe area, avoid bottom 15% (IG caption bar) and top 10%'
     },
@@ -1570,6 +1570,7 @@ function buildPromptText(){
   var col=['primary: '+primaryColor];
   if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
   col.push('color ratio: 60% primary dominant / 30% secondary support / 10% accent highlight — single accent color only');
+  col.push('background must reflect primary color '+primaryColor+' — use as dominant background or large color block, not just as accent');
   set('ps-color',col.join(' / '));
 
   var copyRow=document.getElementById('ps-copy-row');
@@ -1675,7 +1676,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v10 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v11 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
