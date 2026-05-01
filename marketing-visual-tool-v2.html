@@ -105,6 +105,14 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 .lv-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--bg3);color:var(--text3);border:0.5px solid var(--border);}
 .level-btn.on .lv-tag{background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.5);border-color:rgba(0,0,0,0.12);}
 .field-row{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:7px;margin-bottom:7px;}
+.ptype-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
+.ptype-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;cursor:pointer;background:transparent;text-align:left;transition:all .12s;display:flex;flex-direction:column;gap:2px;}
+.ptype-btn:hover{background:var(--bg3);}
+.ptype-btn.on{border:2px solid var(--text);background:var(--text);}
+.ptype-main{font-size:11px;font-weight:600;color:var(--text);}
+.ptype-btn.on .ptype-main{color:var(--bg);}
+.ptype-sub{font-size:10px;color:var(--text3);line-height:1.3;}
+.ptype-btn.on .ptype-sub{color:rgba(15,15,15,0.5);}
 .fl{font-size:12px;color:var(--text2);}
 .fi{width:100%;font-size:13px;padding:6px 9px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);}
 .fi::placeholder{color:var(--text3);}
@@ -374,6 +382,25 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
   <!-- Step 5 -->
   <div class="card">
     <div class="sh"><span class="sb">5</span><span class="st">核心文案與品牌</span></div>
+    <p class="sec" style="margin-bottom:8px;">商品類型</p>
+    <div class="ptype-grid" id="g-ptype">
+      <button class="ptype-btn on" data-v="physical">
+        <span class="ptype-main">實體商品</span>
+        <span class="ptype-sub">情境照 · 生活感 · 真實溫度</span>
+      </button>
+      <button class="ptype-btn" data-v="saas">
+        <span class="ptype-main">軟體 / SaaS</span>
+        <span class="ptype-sub">介面截圖 · 幾何色塊 · 科技感</span>
+      </button>
+      <button class="ptype-btn" data-v="event">
+        <span class="ptype-main">活動 / 知識內容</span>
+        <span class="ptype-sub">去背人物 · 大字標題 · 幾何色塊</span>
+      </button>
+      <button class="ptype-btn" data-v="service">
+        <span class="ptype-main">服務 / 人物</span>
+        <span class="ptype-sub">情境人像 · 專業感 · 信任感</span>
+      </button>
+    </div>
     <div class="field-row"><span class="fl">主題商品</span><input class="fi" id="fp" type="text" placeholder="e.g. 玻尿酸精華液" oninput="bld()"></div>
     <div class="field-row"><span class="fl">主標題</span><input class="fi" id="fh" type="text" placeholder="e.g. 72小時鎖水" oninput="bld()"></div>
     <div class="field-row"><span class="fl">副標題</span><input class="fi" id="fs" type="text" placeholder="e.g. 皮膚科醫師推薦" oninput="bld()"></div>
@@ -497,6 +524,30 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 <script>
 var dot={x:0.72,y:0.22};
 var selAudience='b2c';
+var selPtype='physical';
+
+var PTYPE_DB={
+  'physical':{
+    visual:'product in real-life context, authentic lifestyle scene, natural environment, genuine human touch, warm relatable atmosphere',
+    constraint:'natural or studio background appropriate to product, avoid overly artificial backgrounds',
+    bg:'natural lifestyle or clean studio background'
+  },
+  'saas':{
+    visual:'software UI dashboard screenshot displayed on laptop or monitor screen, geometric color blocks, tech product visual language, screen content clearly visible, digital interface showcase, clean modern digital aesthetic',
+    constraint:'clean studio background only, no textured surfaces, no stone or wood materials, no lifestyle props, dark or neutral gradient background preferred, no natural materials',
+    bg:'dark gradient or neutral studio background, no natural textures'
+  },
+  'event':{
+    visual:'cutout speaker portrait overlaid on solid geometric color blocks, bold oversized headline dominates 50%+ visual weight, three-tier information hierarchy, knowledge content visual language, high-saturation color system',
+    constraint:'flat solid color geometric background only, no realistic photography backgrounds, no lifestyle scenes',
+    bg:'solid brand color geometric background, flat design'
+  },
+  'service':{
+    visual:'professional person in context, authentic human presence, trust-building visual language, approachable yet professional, real environment or clean studio',
+    constraint:'clean uncluttered background, no excessive props, person as main subject, credibility-focused composition',
+    bg:'clean professional environment or neutral studio'
+  }
+};
 var selGoal='click',selEm='trust',selLight='soft',selRatio='1:1',selAr='1:1';
 var selPos='center',selPoKw='subject centered, symmetrical balanced composition';
 var selLv=1,selDof='shallow',selImgStyle='editorial',selLayer='1';
@@ -724,6 +775,7 @@ function getCurrentSettings(){
     primaryColor:primaryColor,
     auxColors:auxColors,
     badge:selBadge,
+    ptype:selPtype,
     product:document.getElementById('fp').value,
     headline:document.getElementById('fh').value,
     sub:document.getElementById('fs').value,
@@ -811,6 +863,14 @@ function applySettings(s){
       document.getElementById('badge-input-row').style.display=val==='none'?'none':'block';
     }
 
+    // Restore product type
+    // Handle old ptype values from before simplification
+    var rawPtype=s.ptype||'physical';
+    if(rawPtype==='physical-b2c'||rawPtype==='physical-b2b') rawPtype='physical';
+    selPtype=rawPtype;
+    document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(b){b.classList.remove('on');});
+    var ptb=document.querySelector('#g-ptype .ptype-btn[data-v="'+selPtype+'"]');
+    if(ptb) ptb.classList.add('on');
     setAudBtn(selAudience);
     setGoalBtn(selGoal);
     setPill('g-em',selEm);
@@ -1279,6 +1339,16 @@ function mkPills(id,key){
     });
   });
 }
+// Product type toggle
+document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');
+    selPtype=this.dataset.v;
+    bld();
+  });
+});
+
 // Audience toggle
 document.querySelectorAll('#g-audience .aud-btn').forEach(function(b){
   b.addEventListener('click',function(){
@@ -1444,6 +1514,11 @@ function buildPromptText(){
   var vis=bkw.slice(0,2).concat([DB.light[selLight],DB.imgStyle[selImgStyle],DB.dof[selDof]]);
   if(selLayer==='2')vis.push('two-layer depth: subject + background');
   if(selLayer==='3')vis.push('three-layer depth: subject + midground + background');
+  // Inject product type visual rules
+  if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
+    var ptypeData=PTYPE_DB[selPtype];
+    vis.push(ptypeData.visual);
+  }
   // Add insight-based visual rules
   vis.push('image-to-text ratio 7:3, visual dominates');
   vis.push('minimum 35% whitespace to reduce cognitive load');
@@ -1521,7 +1596,11 @@ function buildPromptText(){
     badgeRow.style.display='flex';set('ps-badge-val',badgeDesc);
   } else badgeRow.style.display='none';
 
-  set('ps-constraint',DB.lv[selLv]);
+  var constraintVal=DB.lv[selLv];
+  if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
+    constraintVal+=', '+PTYPE_DB[selPtype].constraint;
+  }
+  set('ps-constraint',constraintVal);
   var hasText=(headline||sub||cta);
   var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality'+(hasText?', render all specified COPY text exactly as written in the image':', no unspecified text overlays');
   if(szPrompt) formatVal+='. SAFE ZONE: '+szPrompt;
@@ -1596,7 +1675,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v9 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v10 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
