@@ -1174,9 +1174,19 @@ function setStatus(msg,type){
   el.className='gen-status'+(type?' '+type:'');
 }
 
+var dlCount=0;
 function downloadImg(){
   var src=document.getElementById('dl-btn').dataset.src;
-  var a=document.createElement('a');a.href=src;a.download='marketing-visual.png';a.click();
+  if(!src) return;
+  var product=document.getElementById('fp')?document.getElementById('fp').value.trim():'';
+  var prod=product?product.slice(0,12).replace(/[^a-zA-Z0-9一-鿿]/g,'_'):'visual';
+  dlCount++;
+  var seq=dlCount>1?'_'+dlCount:'';
+  var date=new Date().toISOString().slice(0,10);
+  var a=document.createElement('a');
+  a.href=src;
+  a.download='mvg_'+prod+'_'+date+seq+'.png';
+  a.click();
 }
 
 
