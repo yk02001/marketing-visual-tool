@@ -923,7 +923,7 @@ function applySettings(s){
       }
     }
 
-    document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+    var _emKw=selAudience==='b2b'?(DB.em[selEm].kw_b2b||DB.em[selEm].kw_b2c||[]):(DB.em[selEm].kw_b2c||DB.em[selEm].kw||[]);document.getElementById('kw-em').innerHTML=_emKw.map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
     draw();
     document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
     document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
@@ -1193,39 +1193,55 @@ function downloadImg(){
 var DB={
   goal:{
     click:{
-      prompt:'strong visual hook, bold high-contrast focal point, eye-catching composition, immediate attention-grabbing, dynamic energy',
+      prompt:'strong visual hook, bold high-contrast focal point, immediate attention-grabbing, dynamic visual energy, emotional urgency',
       light_override:'cinematic',
-      composition_note:'diagonal dynamic layout, strong visual tension, subject fills 70% of frame, bold asymmetric energy — headline top, CTA bottom-right corner',
+      composition_note:'strong visual tension, high-energy dynamic rhythm, bold focal point dominance, CTA at visual path endpoint',
       contrast:'high',
       safe_note:''
     },
     convert:{
-      prompt:'clear product benefit showcase, trust signals visible, action-oriented framing, CTA zone reserved, conversion-optimized layout',
+      prompt:'clear product benefit showcase, trust signals visible, action-oriented framing, result-focused visual narrative',
       light_override:'studio',
-      composition_note:'visual path leads directly to CTA — subject left or center, CTA isolated at bottom with high-contrast block, right 30% reserved for text overlay',
+      composition_note:'visual path flows directly to CTA, CTA isolated with high-contrast block at bottom, negative space reserved for text overlay',
       contrast:'medium-high',
       safe_note:'reserve bottom 15% and right 25% as text-safe zone for CTA overlay'
     },
     brand:{
-      prompt:'brand personality expression, cohesive aesthetic language, memorable visual identity, aspirational lifestyle mood',
+      prompt:'brand personality expression, cohesive aesthetic language, memorable visual identity, aspirational brand world',
       light_override:null,
-      composition_note:'symmetric calm layout, generous whitespace 40%+, brand color visually dominant, refined centered balance — logo/headline top, product center, no CTA pressure',
+      composition_note:'generous whitespace 40%+, refined calm rhythm, brand color visually present, unhurried visual flow',
       contrast:'low',
       safe_note:''
     },
     explain:{
-      prompt:'clear visual hierarchy, informational flat composition, step-by-step visual clarity, educational layout, readable structure',
+      prompt:'clear information hierarchy, step-by-step visual clarity, educational visual narrative, readable knowledge structure',
       light_override:'natural',
-      composition_note:'F-pattern information layout, headline top-left as anchor, content flows top-to-bottom in clear zones, CTA isolated at bottom, max 3 information layers',
+      composition_note:'F-pattern reading flow, clear information zones top-to-bottom, max 3 information layers, CTA isolated at bottom',
       contrast:'medium',
       safe_note:'keep central 80% clear for diagram or infographic overlay'
     }
   },
   em:{
-    trust:{kw:['clean uncluttered scene','honest natural light','credibility visual cues','authentic product presentation'],light_pref:'soft'},
-    excitement:{kw:['high visual energy','dynamic diagonal tension','eye-catching composition','bold striking focal point'],light_pref:'cinematic'},
-    urgency:{kw:['intense focused framing','action-oriented visual weight','time-pressure visual language'],light_pref:'studio'},
-    calm:{kw:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],light_pref:'natural'}
+    trust:{
+      kw_b2c:['clean uncluttered scene','credibility visual cues','warm approachable tone','relatable authentic feel'],
+      kw_b2b:['clean uncluttered scene','credibility visual cues','professional authority','business confidence'],
+      light_pref:'soft'
+    },
+    excitement:{
+      kw_b2c:['high visual energy','bold striking focal point','vivid visual impact','energetic atmosphere'],
+      kw_b2b:['forward-thinking energy','innovative edge','confident dynamic presence','industry-leading visual'],
+      light_pref:'cinematic'
+    },
+    urgency:{
+      kw_b2c:['compelling action atmosphere','time-sensitive visual urgency','high-stakes visual tension','immediate response trigger'],
+      kw_b2b:['competitive urgency','market timing pressure','decisive action framing','opportunity window visual'],
+      light_pref:'studio'
+    },
+    calm:{
+      kw_b2c:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],
+      kw_b2b:['measured confidence','reliable stability','thoughtful precision','long-term partnership visual'],
+      light_pref:'natural'
+    }
   },
   light:{soft:'soft diffused lighting, gentle gradual shadows, flattering even illumination',cinematic:'cinematic directional lighting, dramatic contrast, film-quality atmosphere',studio:'controlled studio lighting, precise highlights, professional product photography',natural:'natural daylight quality, organic light feel, authentic environmental illumination'},
   lv:{1:'no watermark, no extra objects, clean background, no absolute guarantee claims, no before-after comparison images, no misleading exaggerations',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no absolute language like 保證 or 一定 or 100%, no exaggerated before-after comparison, no fake engagement bait',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, no fake engagement bait, no incorrect use of platform brand elements, strict composition adherence, commercially safe'},
@@ -1356,7 +1372,7 @@ function mkPills(id,key){
     b.addEventListener('click',function(){
       document.querySelectorAll('#'+id+' .pill').forEach(function(x){x.classList.remove('on');});
       this.classList.add('on');
-      if(key==='em'){selEm=this.dataset.v;document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');}
+      if(key==='em'){selEm=this.dataset.v;var _emKw=selAudience==='b2b'?(DB.em[selEm].kw_b2b||DB.em[selEm].kw_b2c||[]):(DB.em[selEm].kw_b2c||DB.em[selEm].kw||[]);document.getElementById('kw-em').innerHTML=_emKw.map(function(k){return'<span class="kw">'+k+'</span>';}).join('');}
       if(key==='goal')selGoal=this.dataset.v;
       if(key==='light')selLight=this.dataset.v;
       if(key==='dof')selDof=this.dataset.v;
@@ -1538,41 +1554,44 @@ function buildPromptText(){
   set('ps-subject',subjectParts.join('\n'));
 
   // ── [VISUAL] What the image looks like ──
-  // Only: product type visual language + lighting + depth + image style
-  // No emotion, no composition, no constraints here
   var vis=[];
-  // Product type defines the visual language
+  // 1. Product type visual language (primary)
+  var ptypeVisual='';
   if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
-    vis.push(PTYPE_DB[selPtype].visual);
+    ptypeVisual=PTYPE_DB[selPtype].visual;
+    vis.push(ptypeVisual);
   }
-  // Lighting (from user selection, not overridden by goal here)
+  // 2. Lighting
   vis.push(DB.light[selLight]);
-  // Image style
-  vis.push(DB.imgStyle[selImgStyle]);
-  // Depth of field
+  // 3. Image style - skip if redundant with product type
+  var imgStyleVal=DB.imgStyle[selImgStyle]||'';
+  var ptypeWords=ptypeVisual.toLowerCase();
+  var imgStyleWords=imgStyleVal.toLowerCase();
+  // Check for overlap: saas+tech both say "tech product visual language"
+  var overlap=imgStyleWords.split(',').some(function(w){
+    return w.trim().length>8&&ptypeWords.indexOf(w.trim())>-1;
+  });
+  if(!overlap) vis.push(imgStyleVal);
+  // 4. Depth of field
   vis.push(DB.dof[selDof]);
-  // Layer depth
-  if(selLayer==='2') vis.push('two-layer depth: subject + background');
+  // 5. Layer depth (skip if dof already implies depth separation)
   if(selLayer==='3') vis.push('three-layer depth: subject + midground + background');
-  // Core visual rules (insight-based)
-  vis.push('image-to-text ratio 7:3');
-  vis.push('minimum 35% whitespace');
-  vis.push('single dominant focal point');
+  // 6. Core visual rules
+  vis.push('image-to-text ratio 7:3, minimum 35% whitespace, single dominant focal point');
   set('ps-visual',vis.filter(Boolean).join(', '));
 
   // ── [EMOTION] How the image feels ──
-  // Only: goal mood + emotion keywords + audience language + strategy keywords
-  // No lighting, no composition, no constraints here
   var goalData=DB.goal[selGoal];
   var em=[];
   if(goalData&&goalData.prompt) em.push(goalData.prompt);
-  // Emotion keywords (max 3)
-  em=em.concat((emData.kw||[]).slice(0,3));
-  // Audience-specific language
+  // Use B2C or B2B emotion keywords based on audience
+  var emKw=selAudience==='b2b'?(emData.kw_b2b||emData.kw_b2c||[]):(emData.kw_b2c||emData.kw||[]);
+  em=em.concat(emKw.slice(0,3));
+  // B2B extra context
   if(selAudience==='b2b'){
-    em.push('professional B2B visual, logical decision support, business value clarity');
+    em.push('logical decision support, business value clarity, multi-stakeholder credibility');
   }
-  // Strategy prompt keywords from STRAT_PROMPT_DB
+  // Strategy prompt keywords
   var stratKw='';
   try{ stratKw=STRAT_PROMPT_DB[tier][selGoal][selEm]||''; }catch(e){}
   if(stratKw) em.push(stratKw);
@@ -1624,13 +1643,21 @@ function buildPromptText(){
   } else badgeRow.style.display='none';
 
   // ── [CONSTRAINT] What must NOT appear ──
-  // Base level constraint + product type background restriction
-  // No duplication, no format rules here
   var constraintParts=[DB.lv[selLv]];
   if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
     constraintParts.push(PTYPE_DB[selPtype].constraint);
   }
-  set('ps-constraint',constraintParts.filter(Boolean).join(', '));
+  // Deduplicate constraint phrases
+  var constraintRaw=constraintParts.filter(Boolean).join(', ');
+  var constraintSeen={};
+  var constraintFinal=constraintRaw.split(',').map(function(s){return s.trim();}).filter(function(s){
+    if(!s) return false;
+    var key=s.toLowerCase().replace(/\s+/g,'');
+    if(constraintSeen[key]) return false;
+    constraintSeen[key]=true;
+    return true;
+  });
+  set('ps-constraint',constraintFinal.join(', '));
 
   // ── [FORMAT] Technical output specs ──
   var ratioKey=selRatio==='custom'?'custom':selAr;
@@ -1713,7 +1740,7 @@ setTimeout(function(){
   draw();updateSugg(primaryColor);
   document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
   document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
-  document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+  var _emKw=selAudience==='b2b'?(DB.em[selEm].kw_b2b||DB.em[selEm].kw_b2c||[]):(DB.em[selEm].kw_b2c||DB.em[selEm].kw||[]);document.getElementById('kw-em').innerHTML=_emKw.map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
   bld();
 },80);
 window.addEventListener('resize',function(){draw();});
@@ -1721,7 +1748,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v12.1 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v12.2 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
