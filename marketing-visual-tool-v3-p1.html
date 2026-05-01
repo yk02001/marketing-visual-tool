@@ -367,9 +367,9 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       <div class="ref-slot" id="rslot-1" onclick="trigRef(1)"><div class="plus">+</div><span class="sl">風格參考</span></div>
       <div class="ref-slot" id="rslot-2" onclick="trigRef(2)"><div class="plus">+</div><span class="sl">競品參考</span></div>
     </div>
-    <input type="file" id="rf0" accept="image/*" style="display:none" onchange="loadRef(0,this)">
-    <input type="file" id="rf1" accept="image/*" style="display:none" onchange="loadRef(1,this)">
-    <input type="file" id="rf2" accept="image/*" style="display:none" onchange="loadRef(2,this)">
+    <input type="file" id="rf0" accept="image/*,image/png,image/jpeg,image/webp" style="display:none" onchange="loadRef(0,this)" onclick="this.value=''">
+    <input type="file" id="rf1" accept="image/*,image/png,image/jpeg,image/webp" style="display:none" onchange="loadRef(1,this)" onclick="this.value=''">
+    <input type="file" id="rf2" accept="image/*,image/png,image/jpeg,image/webp" style="display:none" onchange="loadRef(2,this)" onclick="this.value=''">
     <div class="ref-type-row" id="ref-types">
       <button class="rtp on" data-v="product">商品本體</button>
       <button class="rtp" data-v="style">風格參考</button>
@@ -1467,6 +1467,7 @@ function loadRef(i,inp){
   if(!inp.files||!inp.files[0])return;
   var reader=new FileReader();
   reader.onload=function(e){
+    console.log('loadRef fired, slot:',i);
     refData[i]=e.target.result;
     var slot=document.getElementById('rslot-'+i);slot.innerHTML='';
     var img=document.createElement('img');img.src=e.target.result;slot.appendChild(img);
