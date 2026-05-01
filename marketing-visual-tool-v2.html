@@ -384,7 +384,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div id="lgn" style="font-size:11px;color:var(--text3);margin-top:3px;display:none;"></div>
     <div class="divider"></div>
     <p class="sec" style="margin-bottom:7px;">局部強調設計</p>
-    <p class="hint" style="margin-bottom:9px;">選擇視覺標籤類型，搭配自訂文案一起帶入 Prompt</p>
+    <p class="hint" style="margin-bottom:9px;">選擇視覺強調元素，文案可以是 CTA、促銷訊息、標章說明或任何視覺重點</p>
     <div class="pills" id="g-badge">
       <button class="pill on" data-v="none">無</button>
       <button class="pill" data-v="tag">特價標籤</button>
@@ -397,7 +397,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div id="badge-input-row" style="display:none;margin-top:4px;">
       <div class="field-row">
         <span class="fl">標籤文案</span>
-        <input class="fi" id="f-badge-text" type="text" placeholder="e.g. 早鳥79折 / 限時搶購 / 名額有限" oninput="bld()">
+        <input class="fi" id="f-badge-text" type="text" placeholder="e.g. 立即購買 / 特價9折 / 期間限定 / NEW / 限量" oninput="bld()">
       </div>
     </div>
     <div class="divider"></div>
@@ -607,10 +607,10 @@ var STRAT_DB={
         calm:"低飽和度搭配對稱軸線構圖，視覺變量最小化，傳遞品牌長期合作的穩定性承諾。"
       },
       explain:{
-        trust:"網格系統建立嚴謹資訊層次，視覺路徑線性引導技術評估流程，以秩序感傳遞掌控力。",
-        excitement:"非對稱動態版面加速資訊節奏，以視覺韻律維持技術受眾的持續注意力張力。",
-        urgency:"關鍵技術優勢置於 F 型視覺熱區，高對比色塊壓縮次要資訊的視覺權重，縮短初篩時間。",
-        calm:"增加版面間距，單區塊單訊息原則控制資訊密度，讓複雜方案在視覺上傳遞易導入的訊號。"
+        trust:"大字標題佔據畫面上半部 50% 視覺權重，網格系統控制三層資訊層次，幾何色塊劃定各區域視覺邊界，傳遞品牌專業掌控力。",
+        excitement:"高飽和主色色塊搭配非對稱動態版面，標題視覺衝擊力最大化，以色彩能量傳遞前瞻議題的知識張力。",
+        urgency:"標題置於 F 型視覺起始熱區並佔最高視覺權重，底部獨立對比色 CTA 色塊，壓縮受眾決策路徑至單一行動節點。",
+        calm:"標題主導、版面三層節制，底部留白區隔 CTA，以視覺秩序傳遞品牌長期深耕的穩定信號。"
       }
     },
     mid:{
@@ -633,10 +633,10 @@ var STRAT_DB={
         calm:"視覺變量最小化，色調一致性維持，以視覺穩定性傳遞品牌方向不變的長期承諾。"
       },
       explain:{
-        trust:"功能標示置於視覺路徑主動線，網格系統控制版面規律性，以視覺坦誠傳遞規格完整性。",
-        excitement:"層次遞進的視覺結構引導 Z 型閱讀動線，讓技術評估者在探索中完成方案價值的全面認知。",
-        urgency:"核心優勢置於 F 型視覺熱區，高對比標示縮短初篩時間，加速進入下一採購評估階段。",
-        calm:"版面間距放大，資訊密度降低，讓方案說明在低認知負荷下傳遞易導入的視覺訊號。"
+        trust:"標題視覺權重主導畫面，去背人物疊加幾何色塊建立專業信任感，三層資訊層次控制認知負荷，底部 CTA 獨立色塊強化行動節點。",
+        excitement:"高飽和撞色色塊製造視覺張力，大字標題搭配主題標籤建立話題感，人物去背強化講者權威，以視覺能量驅動報名動機。",
+        urgency:"日期時間資訊高對比置入，標題訊息精準傳遞稀缺感，底部 CTA 色塊視覺獨立，壓縮受眾從理解到行動的路徑長度。",
+        calm:"版面三層節制，主色飽和但不雜亂，人物去背簡化背景干擾，以視覺清晰度傳遞方案易理解的信任訊號。"
       }
     },
     mass:{
@@ -659,10 +659,10 @@ var STRAT_DB={
         calm:"低飽和暖色調配合務實構圖語言，建立品牌與受眾之間低距離感的視覺依附關係。"
       },
       explain:{
-        trust:"最簡視覺標示系統消除解讀障礙，直白版面語言以構圖透明度傳遞品牌誠信度。",
-        excitement:"色彩編碼引導多層視覺路徑，以漸進式資訊結構降低功能認知的門檻高度。",
-        urgency:"關鍵訊息置於 F 型視覺路徑起始熱區，高對比色塊壓縮受眾評估時間，強化即時行動動機。",
-        calm:"單區塊單訊息控制資訊密度，版面節奏放緩，以低壓力視覺結構完成功能認知與品牌理解。"
+        trust:"大字標題直接傳遞核心訊息，版面三層節制不過度複雜，底部 CTA 對比色塊清楚標示行動入口，以直白視覺語言建立中小企業主的即時信任。",
+        excitement:"高飽和主色搭配大字標題，視覺能量滿點，主題標籤強化話題識別度，以活力視覺語言降低中小企業主的參與門檻。",
+        urgency:"標題訊息精準、日期時間高對比顯示，底部 CTA 視覺獨立，以最短視覺路徑驅動立即報名或下載行動。",
+        calm:"版面節制清晰，主色飽和但不複雜，三層資訊層次讓中小企業主在低認知負荷下完成理解與行動。"
       }
     }
   }
@@ -674,19 +674,19 @@ var STRAT_PROMPT_DB={
     click:{trust:'refined elegance, understated luxury, soft sculptural light, tactile quality visible',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'scarce atmosphere, deep tonal pressure, exclusive focal intensity, now-or-never mood',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
     convert:{trust:'craftmanship details, decision-space composition, reassuring precision, purchase confidence',excitement:'desire-evoking lighting, aspirational ownership feel, magnetic product allure',urgency:'elegant pressure, refined urgency, precise high contrast, decisive composition',calm:'quiet persuasion, pure product truth, serene confidence, effortless quality'},
     brand:{trust:'timeless brand aura, soft authoritative light, enduring visual identity',excitement:'brand world storytelling, infectious brand energy, cinematic brand narrative',urgency:'brand imprint intensity, focal brand power, unmistakable visual signature',calm:'disciplined restraint, brand stillness, anti-trend confidence, composed authority'},
-    explain:{trust:'structured clarity, information hierarchy mastery, brand expertise demonstrated',excitement:'dynamic knowledge flow, beautiful information design, engaging visual rhythm',urgency:'three-second clarity, high-contrast information punch, precision visual hierarchy',calm:'breathing room layout, gentle guidance, anxiety-free information design'}
+    explain:{trust:'headline dominates 50% visual weight, geometric color blocks define zones, cutout person overlay on solid background, max 3 info layers, isolated CTA block at bottom, high-saturation 2-color system',excitement:'high-saturation color collision, oversized bold headline, topic hashtag labels, cutout speaker portrait, energy-forward knowledge visual',urgency:'headline at F-pattern hotspot, date-time high contrast, bottom CTA color block isolated, single action path, compressed decision journey',calm:'three-layer information discipline, dominant headline, clean geometric layout, bottom CTA separated by whitespace'}
   },
   mid:{
     click:{trust:'warm professional light, relatable balance, approachable credibility',excitement:'everyday joy captured, vibrant approachable energy, spontaneous visual delight',urgency:'value-forward composition, high-contrast benefit focus, deal-urgency atmosphere',calm:'unhurried natural feel, soft welcoming tone, scroll-stopping serenity'},
     convert:{trust:'practical clarity, CTA-ready composition, useful trust signals',excitement:'ownership joy, value excitement, heart-and-mind conversion visual',urgency:'smart-shopper framing, limited-time visual logic, decisive value composition',calm:'low-friction layout, decision fatigue reduction, relaxed conversion design'},
     brand:{trust:'consistent reliable palette, honest brand warmth, cumulative trust building',excitement:'brand vitality, memorable color energy, positive brand momentum',urgency:'competitive brand presence, dominant focal brand color, leadership visual stance',calm:'long-term brand familiarity, visual consistency, reassuring brand stability'},
-    explain:{trust:'transparent product clarity, honest feature display, brand candor',excitement:'discovery delight, layered visual exploration, engaging information journey',urgency:'instant value recognition, high-contrast key points, rapid comprehension design',calm:'conversational layout spacing, effortless learning flow, gentle visual pacing'}
+    explain:{trust:'bold headline top half, cutout speaker on geometric color block, 3-tier info hierarchy, bottom isolated CTA, high-saturation main color, authority credibility signals',excitement:'high-saturation color splash background, large headline + partner logo, cutout person overlay, hashtag topic labels, energetic B2B event visual',urgency:'headline + date high visibility, bottom CTA color block maximum contrast, minimal info layers, fast registration path',calm:'3-layer layout discipline, saturated but clean palette, cutout figure simplifies background, clear CTA separation'}
   },
   mass:{
     click:{trust:'real-life grounded composition, authentic natural light, relatable scene',excitement:'contagious high-saturation energy, dynamic share-worthy visual, vibrant lifestyle joy',urgency:'bold promotional atmosphere, thumb-stopping high contrast, irresistible value focal',calm:'noise-free visual calm, friendly low-pressure tone, welcoming simple composition'},
     convert:{trust:'clear honest product display, direct communication, trust-to-purchase bridge',excitement:'instant purchase joy, clear offer excitement, feel-good conversion energy',urgency:'heartbeat CTA intensity, single-path action composition, deal urgency maximized',calm:'distraction-free product hero, friction-removed layout, pure conversion simplicity'},
     brand:{trust:'neighborly brand warmth, lifestyle scene authenticity, long-term brand friendship',excitement:'brand happiness DNA, maximum color energy, viral brand vitality',urgency:'trending brand momentum, bold visual heat, cant-ignore brand dynamic',calm:'home-like brand comfort, warm color embrace, familiar brand dependency'},
-    explain:{trust:'no-nonsense product display, plain-spoken visual clarity, honest brand directness',excitement:'information as entertainment, colorful visual guidance, playful knowledge delivery',urgency:'bold information impact, high-contrast benefit branding, instant comprehension design',calm:'simplicity as kindness, soft paced layout, effortless brand value understanding'}
+    explain:{trust:'direct headline message, 3-tier layout, bottom CTA contrast block, plain visual language, immediate comprehension for SMB audience',excitement:'high-saturation main color, large bold headline, topic labels, accessible energy-forward visual for SMB',urgency:'headline + date maximum visibility, isolated bottom CTA, shortest path from content to action',calm:'clean 3-layer layout, saturated but uncluttered, low cognitive load for busy SMB decision makers'}
   }
 };
 
@@ -871,33 +871,43 @@ function applySettings(s){
 function saveToHistory(imgSrc){
   var s=getCurrentSettings();
   // For history: store compressed thumb of generated image, NOT full ref images (too large for localStorage)
-  if(imgSrc) s.imgThumb=compressImg(imgSrc,80);
-  delete s.refImages;  // Remove full ref images from history to save space
-  delete s.logoData;   // Remove logo data from history
+  delete s.refImages;
+  delete s.logoData;
   delete s.prompt;
-  var hist=getHistory();
-  hist.unshift(s);
-  if(hist.length>MAX_HIST) hist=hist.slice(0,MAX_HIST);
-  try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){
-    // If quota exceeded, trim older entries
-    hist=hist.slice(0,10);
-    try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e2){}
+  function doSave(thumb){
+    if(thumb) s.imgThumb=thumb;
+    var hist=getHistory();
+    hist.unshift(s);
+    if(hist.length>MAX_HIST) hist=hist.slice(0,MAX_HIST);
+    try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){
+      hist=hist.slice(0,10);
+      try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e2){}
+    }
+    renderHistory();
   }
-  renderHistory();
+  if(imgSrc){
+    compressImg(imgSrc,120,doSave);
+  } else {
+    doSave(null);
+  }
 }
 
-function compressImg(src,maxPx){
+function compressImg(src,maxPx,callback){
   try{
-    var c=document.createElement('canvas');
     var img=new Image();
+    img.onload=function(){
+      var c=document.createElement('canvas');
+      var w=img.naturalWidth||img.width||200;
+      var h=img.naturalHeight||img.height||200;
+      var scale=Math.min(maxPx/w,maxPx/h,1);
+      c.width=Math.round(w*scale);c.height=Math.round(h*scale);
+      var ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,c.width,c.height);
+      if(callback) callback(c.toDataURL('image/jpeg',0.6));
+    };
+    img.onerror=function(){if(callback) callback(src);};
     img.src=src;
-    var w=img.width||200,h=img.height||200;
-    var scale=Math.min(maxPx/w,maxPx/h,1);
-    c.width=Math.round(w*scale);c.height=Math.round(h*scale);
-    var ctx=c.getContext('2d');
-    ctx.drawImage(img,0,0,c.width,c.height);
-    return c.toDataURL('image/jpeg',0.5);
-  }catch(e){return src.slice(0,200);}
+  }catch(e){if(callback) callback(src);}
 }
 
 function getHistory(){
@@ -1165,12 +1175,12 @@ var DB={
   },
   badge:{
     none:null,
-    tag:'price tag label in corner, bold promotional text, contrasting color accent, sharp edges',
-    stamp:'circular rubber stamp overlay, distressed ink texture, bold uppercase text inside circle',
-    badge:'shield or hexagon badge graphic, official emblem style, premium metallic feel',
-    sticker:'torn corner sticker design, slightly rotated, casual handmade feel, white border',
-    box:'solid color rectangular box overlay, high contrast text block, clean geometric shape',
-    ribbon:'diagonal ribbon banner across corner, folded fabric texture, promotional feel'
+    tag:'label tag graphic element in corner, bold high-contrast text, sharp clean edges, strong visual accent',
+    stamp:'circular stamp overlay, distressed ink texture, bold uppercase text inside circle, authoritative mark',
+    badge:'shield or hexagon badge graphic, official emblem style, strong visual credential',
+    sticker:'torn corner sticker design, slightly rotated, casual handmade feel, white border, eye-catching accent',
+    box:'solid color rectangular overlay, high contrast text block, clean geometric shape, bold visual anchor',
+    ribbon:'diagonal ribbon banner across corner, folded fabric texture, strong directional accent'
   }
 };
 
@@ -1494,7 +1504,9 @@ function buildPromptText(){
   var badgeText=document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value.trim():'';
   if(selBadge!=='none'&&DB.badge[selBadge]){
     var badgeDesc=DB.badge[selBadge];
-    if(badgeText) badgeDesc+=' with text: "'+badgeText+'"';
+    if(badgeText){
+      badgeDesc+=' — display text: "'+badgeText+'"';
+    }
     badgeRow.style.display='flex';set('ps-badge-val',badgeDesc);
   } else badgeRow.style.display='none';
 
