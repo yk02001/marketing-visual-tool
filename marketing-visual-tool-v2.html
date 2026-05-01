@@ -1481,15 +1481,19 @@ function buildPromptText(){
     set('ps-safezone-val', szVal);
   }
 
-  var col=['primary: '+primaryColor+' ('+COLOR_ROLES[0]+')'];
-  auxVals.forEach(function(c,i){
-    col.push('secondary '+(i+1)+': '+c+' ('+COLOR_ROLES[i+1]+')');
-  });
-  if(selColorRatio&&selColorRatio.length===[primaryColor].concat(auxVals).length){
-    col.push('ratio: '+selColorRatio.join('% / ')+'%');
+  var col=['primary: '+primaryColor];
+  var ratioArr=selColorRatio&&selColorRatio.length===[primaryColor].concat(auxVals).length?selColorRatio:null;
+  if(auxVals.length>0){
+    auxVals.forEach(function(c,i){
+      col.push('accent '+(i+1)+': '+c);
+    });
+    if(ratioArr){
+      var roleMap=['dominant background','accent CTA','detail accent'];
+      var ratioStr=ratioArr.map(function(r,i){return r+'% '+roleMap[i];}).join(', ');
+      col.push('color weight: '+ratioStr);
+    }
   }
-  console.log('COLOR debug: auxVals=',auxVals,'ratio=',selColorRatio,'col=',col);
-  set('ps-color',col.join(' | '));
+  set('ps-color',col.join(' / '));
 
   var copyRow=document.getElementById('ps-copy-row');
   var cp=[];
