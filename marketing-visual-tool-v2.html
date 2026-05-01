@@ -105,14 +105,6 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 .lv-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--bg3);color:var(--text3);border:0.5px solid var(--border);}
 .level-btn.on .lv-tag{background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.5);border-color:rgba(0,0,0,0.12);}
 .field-row{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:7px;margin-bottom:7px;}
-.ptype-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
-.ptype-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;cursor:pointer;background:transparent;text-align:left;transition:all .12s;display:flex;flex-direction:column;gap:2px;}
-.ptype-btn:hover{background:var(--bg3);}
-.ptype-btn.on{border:2px solid var(--text);background:var(--text);}
-.ptype-main{font-size:11px;font-weight:600;color:var(--text);}
-.ptype-btn.on .ptype-main{color:var(--bg);}
-.ptype-sub{font-size:10px;color:var(--text3);line-height:1.3;}
-.ptype-btn.on .ptype-sub{color:rgba(15,15,15,0.5);}
 .fl{font-size:12px;color:var(--text2);}
 .fi{width:100%;font-size:13px;padding:6px 9px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);}
 .fi::placeholder{color:var(--text3);}
@@ -314,13 +306,13 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div class="divider"></div>
     <p class="sec" style="margin-bottom:7px;">主體位置</p>
     <div class="pos-grid" id="pos-grid">
-      <button class="pos-btn" data-p="left" data-kw="REQUIRED: subject strictly on left third of frame, large negative space on right side for text, asymmetric composition">
+      <button class="pos-btn" data-p="left" data-kw="subject positioned on left third, generous negative space on right side">
         <div class="pos-icon"><div class="pos-dot" style="left:16%"></div></div><span class="pos-label">左置</span>
       </button>
-      <button class="pos-btn on" data-p="center" data-kw="REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides">
+      <button class="pos-btn on" data-p="center" data-kw="subject centered, symmetrical balanced composition">
         <div class="pos-icon"><div class="pos-dot" style="left:50%;transform:translate(-50%,-50%)"></div></div><span class="pos-label">置中</span>
       </button>
-      <button class="pos-btn" data-p="right" data-kw="REQUIRED: subject strictly on right third of frame, large negative space on left side for text, asymmetric composition">
+      <button class="pos-btn" data-p="right" data-kw="subject positioned on right third, generous negative space on left side">
         <div class="pos-icon"><div class="pos-dot" style="right:16%"></div></div><span class="pos-label">右置</span>
       </button>
     </div>
@@ -382,25 +374,6 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
   <!-- Step 5 -->
   <div class="card">
     <div class="sh"><span class="sb">5</span><span class="st">核心文案與品牌</span></div>
-    <p class="sec" style="margin-bottom:8px;">商品類型</p>
-    <div class="ptype-grid" id="g-ptype">
-      <button class="ptype-btn on" data-v="physical">
-        <span class="ptype-main">實體商品</span>
-        <span class="ptype-sub">情境照 · 生活感 · 真實溫度</span>
-      </button>
-      <button class="ptype-btn" data-v="saas">
-        <span class="ptype-main">軟體 / SaaS</span>
-        <span class="ptype-sub">介面截圖 · 幾何色塊 · 科技感</span>
-      </button>
-      <button class="ptype-btn" data-v="event">
-        <span class="ptype-main">活動 / 知識內容</span>
-        <span class="ptype-sub">去背人物 · 大字標題 · 幾何色塊</span>
-      </button>
-      <button class="ptype-btn" data-v="service">
-        <span class="ptype-main">服務 / 人物</span>
-        <span class="ptype-sub">情境人像 · 專業感 · 信任感</span>
-      </button>
-    </div>
     <div class="field-row"><span class="fl">主題商品</span><input class="fi" id="fp" type="text" placeholder="e.g. 玻尿酸精華液" oninput="bld()"></div>
     <div class="field-row"><span class="fl">主標題</span><input class="fi" id="fh" type="text" placeholder="e.g. 72小時鎖水" oninput="bld()"></div>
     <div class="field-row"><span class="fl">副標題</span><input class="fi" id="fs" type="text" placeholder="e.g. 皮膚科醫師推薦" oninput="bld()"></div>
@@ -524,32 +497,8 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 <script>
 var dot={x:0.72,y:0.22};
 var selAudience='b2c';
-var selPtype='physical';
-
-var PTYPE_DB={
-  'physical':{
-    visual:'product in real-life context, authentic lifestyle scene, natural environment, genuine human touch, warm relatable atmosphere',
-    constraint:'natural or studio background appropriate to product, avoid overly artificial backgrounds',
-    bg:'natural lifestyle or clean studio background'
-  },
-  'saas':{
-    visual:'software UI dashboard screenshot clearly visible on laptop or monitor screen, UI interface with data visualization elements inside the screen, tech product visual language, screen content sharp and legible, clean modern digital product aesthetic — background must be plain studio or dark gradient, no decorative geometric shapes outside the screen',
-    constraint:'clean studio background only, no textured surfaces, no stone or wood materials, no lifestyle props, dark or neutral gradient background preferred, no natural materials',
-    bg:'dark gradient or neutral studio background, no natural textures'
-  },
-  'event':{
-    visual:'cutout speaker portrait overlaid on solid geometric color blocks, bold oversized headline dominates 50%+ visual weight, three-tier information hierarchy, knowledge content visual language, high-saturation color system',
-    constraint:'flat solid color geometric background only, no realistic photography backgrounds, no lifestyle scenes',
-    bg:'solid brand color geometric background, flat design'
-  },
-  'service':{
-    visual:'professional person in context, authentic human presence, trust-building visual language, approachable yet professional, real environment or clean studio',
-    constraint:'clean uncluttered background, no excessive props, person as main subject, credibility-focused composition',
-    bg:'clean professional environment or neutral studio'
-  }
-};
 var selGoal='click',selEm='trust',selLight='soft',selRatio='1:1',selAr='1:1';
-var selPos='center',selPoKw='REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides';
+var selPos='center',selPoKw='subject centered, symmetrical balanced composition';
 var selLv=1,selDof='shallow',selImgStyle='editorial',selLayer='1';
 var refTypes=['product'];
 var selBadge='none';
@@ -725,7 +674,7 @@ var STRAT_DB={
 // Prompt additions per strategy combination
 var STRAT_PROMPT_DB={
   premium:{
-    click:{trust:'premium B2B credibility, authority visual confidence, high-quality professional execution',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'scarce atmosphere, deep tonal pressure, exclusive focal intensity, now-or-never mood',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
+    click:{trust:'refined elegance, understated luxury, soft sculptural light, tactile quality visible',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'scarce atmosphere, deep tonal pressure, exclusive focal intensity, now-or-never mood',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
     convert:{trust:'craftmanship details, decision-space composition, reassuring precision, purchase confidence',excitement:'desire-evoking lighting, aspirational ownership feel, magnetic product allure',urgency:'elegant pressure, refined urgency, precise high contrast, decisive composition',calm:'quiet persuasion, pure product truth, serene confidence, effortless quality'},
     brand:{trust:'timeless brand aura, soft authoritative light, enduring visual identity',excitement:'brand world storytelling, infectious brand energy, cinematic brand narrative',urgency:'brand imprint intensity, focal brand power, unmistakable visual signature',calm:'disciplined restraint, brand stillness, anti-trend confidence, composed authority'},
     explain:{trust:'headline dominates 50% visual weight, geometric color blocks define zones, cutout person overlay on solid background, max 3 info layers, isolated CTA block at bottom, high-saturation 2-color system',excitement:'high-saturation color collision, oversized bold headline, topic hashtag labels, cutout speaker portrait, energy-forward knowledge visual',urgency:'headline at F-pattern hotspot, date-time high contrast, bottom CTA color block isolated, single action path, compressed decision journey',calm:'three-layer information discipline, dominant headline, clean geometric layout, bottom CTA separated by whitespace'}
@@ -775,7 +724,6 @@ function getCurrentSettings(){
     primaryColor:primaryColor,
     auxColors:auxColors,
     badge:selBadge,
-    ptype:selPtype,
     product:document.getElementById('fp').value,
     headline:document.getElementById('fh').value,
     sub:document.getElementById('fs').value,
@@ -863,14 +811,6 @@ function applySettings(s){
       document.getElementById('badge-input-row').style.display=val==='none'?'none':'block';
     }
 
-    // Restore product type
-    // Handle old ptype values from before simplification
-    var rawPtype=s.ptype||'physical';
-    if(rawPtype==='physical-b2c'||rawPtype==='physical-b2b') rawPtype='physical';
-    selPtype=rawPtype;
-    document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(b){b.classList.remove('on');});
-    var ptb=document.querySelector('#g-ptype .ptype-btn[data-v="'+selPtype+'"]');
-    if(ptb) ptb.classList.add('on');
     setAudBtn(selAudience);
     setGoalBtn(selGoal);
     setPill('g-em',selEm);
@@ -923,7 +863,7 @@ function applySettings(s){
       }
     }
 
-    var _emKw=selAudience==='b2b'?(DB.em[selEm].kw_b2b||DB.em[selEm].kw_b2c||[]):(DB.em[selEm].kw_b2c||DB.em[selEm].kw||[]);document.getElementById('kw-em').innerHTML=_emKw.map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+    document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
     draw();
     document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
     document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
@@ -1062,29 +1002,11 @@ function toggleHist(btn){
   if(body.classList.contains('open')) renderHistory();
 }
 
-var currentAbortController=null;
-
 async function generate(){
   var apiKey=document.getElementById('api-key').value.trim();
   if(!apiKey){setStatus('請先填入 Gemini API Key','error');return;}
-  // If already generating, abort
-  if(currentAbortController){
-    currentAbortController.abort();
-    currentAbortController=null;
-    return;
-  }
   var btn=document.getElementById('gen-btn');
-  currentAbortController=new AbortController();
-  btn.disabled=false;
-  btn.textContent='取消生成';
-  btn.style.background='var(--bg3)';
-  btn.style.color='var(--text2)';
-  btn.onclick=function(){
-    if(currentAbortController){currentAbortController.abort();currentAbortController=null;}
-    btn.textContent='產生這張圖';btn.style.background='';btn.style.color='';
-    btn.onclick=function(){generate();};
-    setStatus('已取消','');
-  };
+  btn.disabled=true;btn.textContent='生成中…';
   setStatus('正在傳送給 Gemini…','');
   document.getElementById('img-result').classList.remove('show');
   document.getElementById('img-placeholder').style.display='flex';
@@ -1118,7 +1040,6 @@ async function generate(){
     var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key='+apiKey,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      signal:currentAbortController?currentAbortController.signal:undefined,
       body:JSON.stringify({
         contents:contents,
         generationConfig:{responseModalities:['IMAGE','TEXT'],temperature:1.0}
@@ -1161,21 +1082,13 @@ async function generate(){
       document.getElementById('dl-btn').dataset.src=src;
       setStatus('生成成功 ✓','success');
       saveToHistory(src);
-      currentAbortController=null;
-      btn.textContent='產生這張圖';btn.style.background='';btn.style.color='';
-      btn.onclick=function(){generate();};
     } else {
       setStatus('Gemini 未回傳圖片，請嘗試調整 Prompt 或稍後再試','error');
     }
   }catch(err){
-    if(err.name==='AbortError'){
-      setStatus('已取消','');
-    } else {
-      setStatus('網路錯誤：'+err.message,'error');
-    }
-    currentAbortController=null;
+    setStatus('網路錯誤：'+err.message,'error');
   }
-  btn.disabled=false;btn.textContent='產生這張圖';btn.style.background='';btn.style.color='';btn.onclick=function(){generate();};
+  btn.disabled=false;btn.textContent='產生這張圖';
 }
 
 function setStatus(msg,type){
@@ -1193,68 +1106,52 @@ function downloadImg(){
 var DB={
   goal:{
     click:{
-      prompt:'strong visual hook, bold high-contrast focal point, immediate attention-grabbing, dynamic visual energy',
+      prompt:'strong visual hook, bold high-contrast focal point, eye-catching composition, immediate attention-grabbing, dynamic energy',
       light_override:'cinematic',
-      composition_note:'strong visual tension, high-energy dynamic rhythm, bold focal point dominance, CTA at visual path endpoint',
+      composition_note:'asymmetric dynamic composition, subject fills 70% of frame, strong diagonal tension',
       contrast:'high',
       safe_note:''
     },
     convert:{
-      prompt:'clear product benefit showcase, trust signals visible, action-oriented framing, result-focused visual narrative',
+      prompt:'clear product benefit showcase, trust signals visible, action-oriented framing, CTA zone reserved, conversion-optimized layout',
       light_override:'studio',
-      composition_note:'visual path flows directly to CTA, CTA isolated with high-contrast block at bottom, negative space reserved for text overlay',
+      composition_note:'subject centered or left-aligned, right 30% reserved for CTA text overlay, clean uncluttered frame',
       contrast:'medium-high',
       safe_note:'reserve bottom 15% and right 25% as text-safe zone for CTA overlay'
     },
     brand:{
-      prompt:'brand personality expression, cohesive aesthetic language, memorable visual identity, aspirational brand world',
+      prompt:'brand personality expression, cohesive aesthetic language, memorable visual identity, aspirational lifestyle mood',
       light_override:null,
-      composition_note:'generous whitespace 40%+, refined calm rhythm, brand color visually present, unhurried visual flow',
+      composition_note:'generous negative space, brand color dominant, balanced refined composition',
       contrast:'low',
       safe_note:''
     },
     explain:{
-      prompt:'clear information hierarchy, step-by-step visual clarity, educational visual narrative, readable knowledge structure',
+      prompt:'clear visual hierarchy, informational flat composition, step-by-step visual clarity, educational layout, readable structure',
       light_override:'natural',
-      composition_note:'F-pattern reading flow, clear information zones top-to-bottom, max 3 information layers, CTA isolated at bottom',
+      composition_note:'flat or minimal depth, structured layout with clear zones, top-to-bottom reading flow',
       contrast:'medium',
       safe_note:'keep central 80% clear for diagram or infographic overlay'
     }
   },
   em:{
-    trust:{
-      kw_b2c:['clean uncluttered scene','credibility visual cues','warm approachable tone','relatable authentic feel'],
-      kw_b2b:['clean uncluttered scene','credibility visual cues','professional authority','business confidence'],
-      light_pref:'soft'
-    },
-    excitement:{
-      kw_b2c:['high visual energy','bold striking focal point','vivid visual impact','energetic atmosphere'],
-      kw_b2b:['forward-thinking energy','innovative edge','confident dynamic presence','industry-leading visual'],
-      light_pref:'cinematic'
-    },
-    urgency:{
-      kw_b2c:['compelling action atmosphere','time-sensitive visual urgency','high-stakes visual tension','immediate response trigger'],
-      kw_b2b:['competitive urgency','market timing pressure','decisive action framing','opportunity window visual'],
-      light_pref:'studio'
-    },
-    calm:{
-      kw_b2c:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],
-      kw_b2b:['measured confidence','reliable stability','thoughtful precision','long-term partnership visual'],
-      light_pref:'natural'
-    }
+    trust:{kw:['clean uncluttered scene','honest natural light','credibility visual cues','authentic product presentation'],light_pref:'soft'},
+    excitement:{kw:['high visual energy','dynamic diagonal tension','eye-catching composition','bold striking focal point'],light_pref:'cinematic'},
+    urgency:{kw:['intense focused framing','action-oriented visual weight','time-pressure visual language'],light_pref:'studio'},
+    calm:{kw:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],light_pref:'natural'}
   },
   light:{soft:'soft diffused lighting, gentle gradual shadows, flattering even illumination',cinematic:'cinematic directional lighting, dramatic contrast, film-quality atmosphere',studio:'controlled studio lighting, precise highlights, professional product photography',natural:'natural daylight quality, organic light feel, authentic environmental illumination'},
-  lv:{1:'no watermark, no extra objects, clean background, no absolute guarantee claims, no before-after comparison images, no misleading exaggerations',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no absolute language like 保證 or 一定 or 100%, no exaggerated before-after comparison, no fake engagement bait',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, no fake engagement bait, no incorrect use of platform brand elements, strict composition adherence, commercially safe'},
+  lv:{1:'no watermark, no extra objects, clean background',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, strict composition adherence, commercially safe'},
   dof:{shallow:'shallow depth of field, subject sharp, background softly blurred',deep:'deep focus throughout, full scene sharpness',flat:'flat graphic style, no depth perspective'},
   imgStyle:{editorial:'editorial photography aesthetic, magazine-quality',minimal:'minimalist composition, extreme negative space',tech:'tech product visual language, modern clean aesthetic',luxury:'luxury brand visual codes, premium material quality'},
   safeZone:{
     '1:1':{
       platform:'Shopee 主圖、IG 貼文、FB 廣告',
-      rule:'keep all key elements within central 80% of frame (safe zone: ~864×864px of 1080×1080) | Shopee: information clarity first / IG: atmosphere and aesthetic first',
+      rule:'keep all key elements within central 80% of frame (safe zone: ~864×864px of 1080×1080)',
       prompt_note:'all critical elements centered within 80% of frame, avoid placing text or logos near edges'
     },
     '4:5':{
-      platform:'IG 直式貼文（推薦格式）— 圖片美感優先，氛圍感強，適合品牌形象和生活感內容',
+      platform:'IG 直式貼文（推薦格式）',
       rule:'keep elements within central 80% horizontally, top 10% and bottom 15% reserved for IG UI',
       prompt_note:'keep subject and text within central safe area, avoid bottom 15% (IG caption bar) and top 10%'
     },
@@ -1372,7 +1269,7 @@ function mkPills(id,key){
     b.addEventListener('click',function(){
       document.querySelectorAll('#'+id+' .pill').forEach(function(x){x.classList.remove('on');});
       this.classList.add('on');
-      if(key==='em'){selEm=this.dataset.v;var _emKw=selAudience==='b2b'?(DB.em[selEm].kw_b2b||DB.em[selEm].kw_b2c||[]):(DB.em[selEm].kw_b2c||DB.em[selEm].kw||[]);document.getElementById('kw-em').innerHTML=_emKw.map(function(k){return'<span class="kw">'+k+'</span>';}).join('');}
+      if(key==='em'){selEm=this.dataset.v;document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');}
       if(key==='goal')selGoal=this.dataset.v;
       if(key==='light')selLight=this.dataset.v;
       if(key==='dof')selDof=this.dataset.v;
@@ -1382,16 +1279,6 @@ function mkPills(id,key){
     });
   });
 }
-// Product type toggle
-document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(b){
-  b.addEventListener('click',function(){
-    document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(x){x.classList.remove('on');});
-    this.classList.add('on');
-    selPtype=this.dataset.v;
-    bld();
-  });
-});
-
 // Audience toggle
 document.querySelectorAll('#g-audience .aud-btn').forEach(function(b){
   b.addEventListener('click',function(){
@@ -1509,7 +1396,6 @@ function toggleKey(){var fi=document.getElementById('api-key');fi.type=fi.type==
 function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
 
 function buildPromptText(){
-  // ── Core variables ──
   var bkw=getBKw(dot.x,dot.y);
   var emData=DB.em[selEm];
   var auxVals=Object.values(auxColors);
@@ -1520,25 +1406,27 @@ function buildPromptText(){
   var hasLogo=document.getElementById('lgi').files&&document.getElementById('lgi').files.length>0;
   var ar=selRatio==='custom'?(function(){var cw=document.getElementById('cw').value.trim(),ch=document.getElementById('ch').value.trim();return(cw&&ch)?cw+':'+ch:'1:1';})():selAr;
   var hasRef=refData.some(function(d){return d!==null;});
-  var hasText=(headline||sub||cta);
   var rdPerSlot={
     0:{role:'PRODUCT PHOTO',instruction:'Maintain the exact appearance, shape, texture, and details of this product. Use it as the main subject.'},
     1:{role:'STYLE REFERENCE',instruction:'Match the overall visual atmosphere, mood, color grading, and aesthetic style. Do not copy the subject.'},
     2:{role:'COMPETITOR REFERENCE',instruction:'Study the visual language and intentionally differentiate — use a distinct composition, color, or mood.'}
   };
 
-  // ── Tier / strategy lookup ──
-  var p2=1-dot.y,e2=dot.x;
-  var tier=p2>0.65?'premium':p2>0.35?'mid':'mass';
-
-  // ── [INTENT] Visual strategy text ──
+  // INTENT: inject visual strategy text into prompt
   var intentRow=document.getElementById('ps-intent-row');
+  var p3=1-dot.y,e3=dot.x;
+  var tier3=p3>0.65?'premium':p3>0.35?'mid':'mass';
   var intentText='';
-  try{ intentText=STRAT_DB[selAudience][tier][selGoal][selEm]||''; }catch(ex){}
-  if(intentText&&intentRow){ intentRow.style.display='flex'; set('ps-intent-val',intentText); }
-  else if(intentRow){ intentRow.style.display='none'; }
+  try{
+    intentText=STRAT_DB[selAudience][tier3][selGoal][selEm]||'';
+  }catch(ex){}
+  if(intentText&&intentRow){
+    intentRow.style.display='flex';
+    set('ps-intent-val',intentText);
+  } else if(intentRow){
+    intentRow.style.display='none';
+  }
 
-  // ── [SUBJECT] What is in the image ──
   var subjectParts=[];
   if(product) subjectParts.push('Product: '+product);
   var uploadedCount=0;
@@ -1547,149 +1435,106 @@ function buildPromptText(){
       uploadedCount++;
       var fileInput=document.getElementById('rf'+i);
       var fname=(fileInput&&fileInput.files&&fileInput.files[0])?fileInput.files[0].name:'image_'+(i+1);
-      subjectParts.push('↳ Attach "'+fname+'" as Image '+(i+1)+' ['+rdPerSlot[i].role+']: '+rdPerSlot[i].instruction);
+      subjectParts.push('↳ Attach "'+ fname +'" as Image '+(i+1)+' ['+rdPerSlot[i].role+']: '+rdPerSlot[i].instruction);
     }
   });
   if(!product&&uploadedCount===0) subjectParts.push('product hero shot');
   set('ps-subject',subjectParts.join('\n'));
 
-  // ── [VISUAL] What the image looks like ──
-  var vis=[];
-  // 1. Product type visual language (primary)
-  var ptypeVisual='';
-  if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
-    ptypeVisual=PTYPE_DB[selPtype].visual;
-    vis.push(ptypeVisual);
-  }
-  // 2. Lighting
-  vis.push(DB.light[selLight]);
-  // 3. Image style - skip if redundant with product type
-  var imgStyleVal=DB.imgStyle[selImgStyle]||'';
-  var ptypeWords=ptypeVisual.toLowerCase();
-  var imgStyleWords=imgStyleVal.toLowerCase();
-  // Check for overlap: saas+tech both say "tech product visual language"
-  var overlap=imgStyleWords.split(',').some(function(w){
-    return w.trim().length>8&&ptypeWords.indexOf(w.trim())>-1;
-  });
-  if(!overlap) vis.push(imgStyleVal);
-  // 4. Depth of field
-  vis.push(DB.dof[selDof]);
-  // 5. Layer depth (skip if dof already implies depth separation)
-  if(selLayer==='3') vis.push('three-layer depth: subject + midground + background');
-  // 6. Core visual rules
-  vis.push('image-to-text ratio 7:3, minimum 35% whitespace, single dominant focal point');
-  set('ps-visual',vis.filter(Boolean).join(', '));
+  var vis=bkw.slice(0,2).concat([DB.light[selLight],DB.imgStyle[selImgStyle],DB.dof[selDof]]);
+  if(selLayer==='2')vis.push('two-layer depth: subject + background');
+  if(selLayer==='3')vis.push('three-layer depth: subject + midground + background');
+  // Add insight-based visual rules
+  vis.push('image-to-text ratio 7:3, visual dominates');
+  vis.push('minimum 35% whitespace to reduce cognitive load');
+  vis.push('single dominant focal point, avoid competing visual elements');
+  set('ps-visual',vis.join(', '));
 
-  // ── [EMOTION] How the image feels ──
+  // Goal mapping: override light and add goal-specific composition note
   var goalData=DB.goal[selGoal];
-  var em=[];
-  if(goalData&&goalData.prompt) em.push(goalData.prompt);
-  // Use B2C or B2B emotion keywords based on audience
-  var emKw=selAudience==='b2b'?(emData.kw_b2b||emData.kw_b2c||[]):(emData.kw_b2c||emData.kw||[]);
-  em=em.concat(emKw.slice(0,3));
-  // B2B extra context
-  if(selAudience==='b2b'){
-    em.push('logical decision support, business value clarity, multi-stakeholder credibility');
-  }
-  // Strategy prompt keywords
-  var stratKw='';
-  try{ stratKw=STRAT_PROMPT_DB[tier][selGoal][selEm]||''; }catch(e){}
-  if(stratKw) em.push(stratKw);
+  var goalPrompt=goalData?goalData.prompt:DB.goal[selGoal];
+  // Add strategy-specific prompt keywords
+  var p2=1-dot.y,e2=dot.x;
+  var tier2=p2>0.65?'premium':p2>0.35?'mid':'mass';
+  var stratPromptKw='';
+  try{ stratPromptKw=STRAT_PROMPT_DB[tier2][selGoal][selEm]||''; }catch(e){}
+  if(selAudience==='b2b'){var b2bKw='professional B2B visual, logical decision support, business value clarity, multi-stakeholder credibility, ROI-focused composition';stratPromptKw=stratPromptKw?stratPromptKw+', '+b2bKw:b2bKw;}
+  var em=[goalPrompt||''].concat(emData.kw.slice(0,3));
+  if(stratPromptKw) em.push(stratPromptKw);
   set('ps-emotion',em.filter(Boolean).join(', '));
+  var _goalData=goalData;
+  goalData=_goalData;
+  var goalPrompt2=goalData?goalData.prompt:'';
+  var goalComposition=goalData?goalData.composition_note:'';
+  var goalSafeNote=goalData?goalData.safe_note:'';
 
-  // ── [COMPOSITION] How elements are arranged ──
-  // Only: position + goal composition + aspect ratio
-  // Z-pattern as single clear instruction
-  var comp=[];
-  comp.push(selPoKw); // REQUIRED position (left/center/right)
-  if(goalData&&goalData.composition_note) comp.push(goalData.composition_note);
-  comp.push('aspect ratio '+ar);
-  comp.push('photorealistic commercial photography');
-  set('ps-composition',comp.filter(Boolean).join(', '));
-
-  // ── [COLOR] Brand colors + CTA contrast logic ──
-  var col=['primary: '+primaryColor];
-  if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
-  col.push('color ratio: 60% primary / 30% secondary / 10% accent');
-  // Smart CTA color: contrast against background
-  if(cta){
-    col.push('CTA button color: if primary '+primaryColor+' dominates background use secondary '+
-      (auxVals[0]||'#ffffff')+' or white for CTA; if background is dark/neutral use primary '+
-      primaryColor+' for CTA — always maximum contrast');
-  }
-  set('ps-color',col.join(' / '));
-
-  // ── [COPY] Text to render in image ──
-  var copyRow=document.getElementById('ps-copy-row');
-  var cp=[];
-  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED — render all copy exactly as specified');
-  if(headline) cp.push('headline: "'+headline+'"');
-  if(sub) cp.push('subtext: "'+sub+'"');
-  if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
-  var lgiInput=document.getElementById('lgi');
-  var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
-  if(hasLogo&&logoFname) cp.push('↳ Attach "'+logoFname+'" as Logo: top-left corner, maintain proportions');
-  else if(hasLogo) cp.push('brand logo: top-left corner');
-  if(cp.length){ copyRow.style.display='flex'; set('ps-copy-val',cp.join(' / ')); }
-  else copyRow.style.display='none';
-
-  // ── [ACCENT] Badge/label element ──
-  var badgeRow=document.getElementById('ps-badge-row');
-  var badgeText=document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value.trim():'';
-  if(selBadge!=='none'&&DB.badge[selBadge]){
-    var badgeDesc=DB.badge[selBadge];
-    if(badgeText) badgeDesc+=' — display text: "'+badgeText+'"';
-    badgeRow.style.display='flex'; set('ps-badge-val',badgeDesc);
-  } else badgeRow.style.display='none';
-
-  // ── [CONSTRAINT] What must NOT appear ──
-  var constraintParts=[DB.lv[selLv]];
-  if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
-    constraintParts.push(PTYPE_DB[selPtype].constraint);
-  }
-  // Deduplicate constraint phrases
-  var constraintRaw=constraintParts.filter(Boolean).join(', ');
-  var constraintSeen={};
-  var constraintFinal=constraintRaw.split(',').map(function(s){return s.trim();}).filter(function(s){
-    if(!s) return false;
-    var key=s.toLowerCase().replace(/\s+/g,'');
-    if(constraintSeen[key]) return false;
-    constraintSeen[key]=true;
-    return true;
-  });
-  set('ps-constraint',constraintFinal.join(', '));
-
-  // ── [FORMAT] Technical output specs ──
+  // Safe zone for selected ratio
   var ratioKey=selRatio==='custom'?'custom':selAr;
   var szData=DB.safeZone[ratioKey]||DB.safeZone['custom'];
   var szPrompt=szData.prompt_note||'';
   var szPlatform=szData.platform||'';
   var szRule=szData.rule||'';
-  var goalSafeNote=goalData?goalData.safe_note:'';
-  var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality';
-  if(hasText) formatVal+=', render all COPY text exactly as written';
-  else formatVal+=', no unspecified text overlays';
-  set('ps-format',formatVal);
 
-  // ── [SAFE ZONE] Platform rules ──
+  // Compose COMPOSITION section
+  var compParts=[selPoKw];
+  if(goalComposition) compParts.push(goalComposition);
+  compParts.push('aspect ratio '+ar+', photorealistic commercial photography');
+  compParts.push('CTA isolated with high-contrast color block at bottom');
+  compParts.push('Z-pattern: headline top → product center → CTA bottom');
+  set('ps-composition',compParts.join(', '));
+
+  // SAFE ZONE section
   var szRow=document.getElementById('ps-safezone-row');
-  if(szRow&&szPlatform){
+  if(szRow){
     var szVal='Platform: '+szPlatform+' | Rule: '+szRule;
     if(goalSafeNote) szVal+=' | '+goalSafeNote;
-    if(szPrompt) szVal+=' | '+szPrompt;
     szRow.style.display='flex';
-    set('ps-safezone-val',szVal);
+    set('ps-safezone-val', szVal);
   }
 
-  // ── [EXTRA] Free text ──
+  var col=['primary: '+primaryColor];
+  if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
+  col.push('color ratio: 60% primary dominant / 30% secondary support / 10% accent highlight — single accent color only');
+  set('ps-color',col.join(' / '));
+
+  var copyRow=document.getElementById('ps-copy-row');
+  var cp=[];
+  if(headline||sub||cta) cp.push('⚠ TEXT RENDERING REQUIRED — include all copy text in the image exactly as specified');
+  if(headline)cp.push('headline: "'+headline+'"');
+  if(sub)cp.push('subtext: "'+sub+'"');
+  if(cta)cp.push('CTA button: "'+cta+'" — render as high-contrast button at bottom of image');
+  var lgiInput=document.getElementById('lgi');
+  var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
+  if(hasLogo&&logoFname)cp.push('↳ Attach "'+logoFname+'" as Logo: place top-left corner, maintain original proportions');
+  else if(hasLogo)cp.push('brand logo top-left');
+  if(cp.length){copyRow.style.display='flex';set('ps-copy-val',cp.join(' / '));}
+  else copyRow.style.display='none';
+
+  // ACCENT badge section
+  var badgeRow=document.getElementById('ps-badge-row');
+  var badgeText=document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value.trim():'';
+  if(selBadge!=='none'&&DB.badge[selBadge]){
+    var badgeDesc=DB.badge[selBadge];
+    if(badgeText){
+      badgeDesc+=' — display text: "'+badgeText+'"';
+    }
+    badgeRow.style.display='flex';set('ps-badge-val',badgeDesc);
+  } else badgeRow.style.display='none';
+
+  set('ps-constraint',DB.lv[selLv]);
+  var hasText=(headline||sub||cta);
+  var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality'+(hasText?', render all specified COPY text exactly as written in the image':', no unspecified text overlays');
+  if(szPrompt) formatVal+='. SAFE ZONE: '+szPrompt;
+  set('ps-format',formatVal);
+
+  // EXTRA section
   var extraRow=document.getElementById('ps-extra-row');
   var extraVal=document.getElementById('f-extra')?document.getElementById('f-extra').value.trim():'';
-  if(extraVal){ extraRow.style.display='flex'; set('ps-extra-val',extraVal); }
+  if(extraVal){extraRow.style.display='flex';set('ps-extra-val',extraVal);}
   else extraRow.style.display='none';
 
   return document.getElementById('prompt-block').innerText;
 }
-
 
 function bld(){
   checkConflicts();
@@ -1700,7 +1545,8 @@ function bld(){
   var goalTxt={click:'提升點擊率',convert:'促進轉換',brand:'強化品牌感',explain:'清楚傳達內容'};
   var lvTxt={1:'Basic Clean',2:'Design Control',3:'Brand Safe'};
   var hasRef=refData.some(function(d){return d!==null;});
-  var tier=( (1-dot.y)>0.65)?'premium':((1-dot.y)>0.35)?'mid':'mass';
+  // Get strategy text from STRAT_DB
+  var tier=p>0.65?'premium':p>0.35?'mid':'mass';
   var stratText='';
   var stratEl=document.getElementById('strat');
   if(typeof STRAT_DB!=='undefined'&&STRAT_DB[selAudience]&&STRAT_DB[selAudience][tier]&&STRAT_DB[selAudience][tier][selGoal]&&STRAT_DB[selAudience][tier][selGoal][selEm]){
@@ -1710,7 +1556,9 @@ function bld(){
   } else {
     stratEl.textContent=ps+'品牌 × '+es+'調性，目標：'+goalTxt[selGoal]+'，光線：'+selLight+'，潔淨：'+lvTxt[selLv]+'。';
   }
-  if(hasRef){ stratEl.textContent+=' 已載入參考圖，Gemini 會直接讀取。'; }
+  if(hasRef){
+    stratEl.textContent+=' 已載入參考圖，Gemini 會直接讀取。';
+  }
   console.log('strat check:',selAudience,tier,selGoal,selEm,'→',stratText?'OK':'MISS');
 }
 
@@ -1740,7 +1588,7 @@ setTimeout(function(){
   draw();updateSugg(primaryColor);
   document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
   document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
-  var _emKw=selAudience==='b2b'?(DB.em[selEm].kw_b2b||DB.em[selEm].kw_b2c||[]):(DB.em[selEm].kw_b2c||DB.em[selEm].kw||[]);document.getElementById('kw-em').innerHTML=_emKw.map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+  document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
   bld();
 },80);
 window.addEventListener('resize',function(){draw();});
@@ -1748,7 +1596,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v12.3 &nbsp;·&nbsp; 2026.05.01
+      Marketing Visual Generator &nbsp;·&nbsp; v9 &nbsp;·&nbsp; 2026.05.01
     </span>
   </div>
 </body>
