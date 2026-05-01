@@ -1467,7 +1467,6 @@ function loadRef(i,inp){
   if(!inp.files||!inp.files[0])return;
   var reader=new FileReader();
   reader.onload=function(e){
-    console.log('loadRef fired, slot:',i);
     refData[i]=e.target.result;
     var slot=document.getElementById('rslot-'+i);slot.innerHTML='';
     var img=document.createElement('img');img.src=e.target.result;slot.appendChild(img);
@@ -1662,6 +1661,10 @@ function buildPromptText(){
   var constraintParts=[DB.lv[selLv]];
   if(typeof PTYPE_DB!=='undefined'&&PTYPE_DB[selPtype]){
     constraintParts.push(PTYPE_DB[selPtype].constraint);
+  }
+  // No logo uploaded → tell AI not to render any brand logo
+  if(!hasLogo){
+    constraintParts.push('do not render any brand logo or wordmark — leave top-left area clean for later design overlay');
   }
   // Deduplicate constraint phrases
   var constraintRaw=constraintParts.filter(Boolean).join(', ');
