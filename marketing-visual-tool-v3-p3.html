@@ -1652,7 +1652,7 @@ function buildPromptText(){
   // ── [COPY] Text to render in image ──
   var copyRow=document.getElementById('ps-copy-row');
   var cp=[];
-  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED — render all copy exactly as specified');
+  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED — render each text element EXACTLY ONCE, no duplication: one headline, one subtext, one CTA button');
   if(headline) cp.push('headline: "'+headline+'"');
   if(sub) cp.push('subtext: "'+sub+'"');
   if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
@@ -1785,12 +1785,10 @@ window.addEventListener('resize',function(){draw();});
     </span>
   </div>
   <script>
+  // Build time: fixed at deploy, not runtime
   (function(){
-    var now=new Date();
-    var p=function(n){return n<10?'0'+n:n;};
-    var ts=now.getFullYear()+'.'+p(now.getMonth()+1)+'.'+p(now.getDate())+' '+p(now.getHours())+':'+p(now.getMinutes());
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p3 · '+ts;
+    if(el) el.textContent='Marketing Visual Generator · v3-p3 · 2026.05.02 05:58';
   })();
   </script>
 </body>
