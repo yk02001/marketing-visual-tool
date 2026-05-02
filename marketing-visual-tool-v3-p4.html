@@ -729,9 +729,9 @@ var STRAT_DB={
 // Prompt additions per strategy combination
 var STRAT_PROMPT_DB={
   premium:{
-    click:{trust:'premium B2B credibility, authority visual confidence, high-quality professional execution',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'scarce atmosphere, deep tonal pressure, exclusive focal intensity, now-or-never mood',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
+    click:{trust:'soft even lighting, low contrast neutral palette, clean structured composition, precision detail clarity',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'high contrast ratio 7:1, deep background shadows, tight subject framing, saturated accent on focal point',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
     convert:{trust:'craftmanship details, decision-space composition, reassuring precision, purchase confidence',excitement:'desire-evoking lighting, aspirational ownership feel, magnetic product allure',urgency:'elegant pressure, refined urgency, precise high contrast, decisive composition',calm:'quiet persuasion, pure product truth, serene confidence, effortless quality'},
-    brand:{trust:'timeless brand authority, enduring visual identity, premium brand presence',excitement:'brand world storytelling, infectious brand energy, cinematic brand narrative',urgency:'brand imprint intensity, focal brand power, unmistakable visual signature',calm:'disciplined restraint, brand stillness, anti-trend confidence, composed authority'},
+    brand:{trust:'timeless brand authority, enduring visual identity, premium brand presence',excitement:'brand world storytelling, infectious brand energy, cinematic brand narrative',urgency:'maximum brand color saturation on focal element, high contrast silhouette, bold graphic presence',calm:'disciplined restraint, brand stillness, anti-trend confidence, composed authority'},
     explain:{trust:'headline dominates 50% visual weight, geometric color blocks define zones, cutout person overlay on solid background, max 3 info layers, isolated CTA block at bottom, high-saturation 2-color system',excitement:'high-saturation color collision, oversized bold headline, topic hashtag labels, cutout speaker portrait, energy-forward knowledge visual',urgency:'headline at F-pattern hotspot, date-time high contrast, bottom CTA color block isolated, single action path, compressed decision journey',calm:'three-layer information discipline, dominant headline, clean geometric layout, bottom CTA separated by whitespace'}
   },
   mid:{
@@ -1227,23 +1227,23 @@ var DB={
   },
   em:{
     trust:{
-      kw_b2c:['clean uncluttered scene','credibility signals visible','warm trust-building atmosphere','honest approachable visual'],
-      kw_b2b:['clean uncluttered scene','credibility visual cues','professional authority signals','logical clarity'],
+      kw_b2c:['soft even diffused lighting, low contrast background','neutral muted palette, no saturated distractions','clean open composition, generous breathing room','warm natural light quality, no harsh shadows'],
+      kw_b2b:['soft even studio lighting, controlled low contrast','neutral palette, brand color as sole accent','clean structured layout, precise visual alignment','no dramatic shadows, no high saturation backgrounds'],
       light_pref:'soft'
     },
     excitement:{
-      kw_b2c:['high visual energy','bold striking focal point','vivid visual impact','energetic atmosphere'],
-      kw_b2b:['forward-thinking energy','innovative visual language','bold differentiated focal point','progressive dynamic feel'],
+      kw_b2c:['high saturation color treatment','bold graphic focal contrast','dynamic diagonal lighting','vibrant energetic color blocking'],
+      kw_b2b:['progressive clean composition, sharp geometric accents','bold brand color focal point, high visual weight','dynamic asymmetric balance','modern minimal with strong contrast anchor'],
       light_pref:'cinematic'
     },
     urgency:{
-      kw_b2c:['compelling action atmosphere','time-sensitive visual urgency','high-stakes visual tension','immediate response trigger'],
-      kw_b2b:['competitive pressure visual','decisive action framing','opportunity window visual language','market timing signal'],
+      kw_b2c:['high contrast lighting, deep background shadows','tight subject framing, minimal background','saturated accent color on focal point','bold sharp edges, no soft gradients'],
+      kw_b2b:['high contrast ratio 7:1, dramatic shadow depth','tight composed framing, compressed background','saturated brand color accent on key element','structured minimal composition, decisive visual weight'],
       light_pref:'studio'
     },
     calm:{
-      kw_b2c:['generous breathing room','serene minimal elements','gentle harmonious mood','peaceful composition'],
-      kw_b2b:['measured confidence','considered restraint','professional calm','stable authoritative presence'],
+      kw_b2c:['low contrast soft palette, minimal saturation','wide generous negative space, open composition','gentle diffused ambient light, no harsh shadows','clean symmetric balance, quiet visual rhythm'],
+      kw_b2b:['neutral palette, low visual noise','structured symmetric layout, measured proportions','soft controlled lighting, no dramatic contrast','refined minimal aesthetic, authoritative understatement'],
       light_pref:'natural'
     }
   },
@@ -1578,10 +1578,15 @@ function buildPromptText(){
 
   // Layer 3: Image style — only if not blocked by PTYPE
   var imgStyleVal=DB.imgStyle[selImgStyle]||'';
-  var isBlocked=blockedTerms.some(function(b){
+  // Check if imgStyle overlaps with PTYPE core OR blocked terms
+  var visStr=vis.join(' ').toLowerCase();
+  var isBlockedByTerm=blockedTerms.some(function(b){
     return imgStyleVal.toLowerCase().indexOf(b.toLowerCase())>-1;
   });
-  if(imgStyleVal&&!isBlocked) vis.push(imgStyleVal);
+  var isBlockedByCore=imgStyleVal.split(',').some(function(w){
+    return w.trim().length>5&&visStr.indexOf(w.trim().toLowerCase())>-1;
+  });
+  if(imgStyleVal&&!isBlockedByTerm&&!isBlockedByCore) vis.push(imgStyleVal);
 
   // Layer 4: Depth of field — skip shallow for saas (screen must be sharp)
   if(selPtype==='saas'){
