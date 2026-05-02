@@ -1652,9 +1652,9 @@ function buildPromptText(){
   // ── [COPY] Text to render in image ──
   var copyRow=document.getElementById('ps-copy-row');
   var cp=[];
-  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED — render each text element EXACTLY ONCE, no duplication: one headline, one subtext, one CTA button');
-  if(headline) cp.push('headline: "'+headline+'"');
-  if(sub) cp.push('subtext: "'+sub+'"');
+  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED — strict rules: (1) render each text element EXACTLY ONCE across the entire image — NO duplicates anywhere (2) headline in upper area only (3) subtext once below headline only (4) CTA button once at bottom only (5) CRITICAL: NO truncation, NO cut-off words, NO partial characters — every word must be 100% complete and legible (6) reduce font size if needed to fit all text completely');
+  if(headline) cp.push('headline (render complete, appears only once): "'+headline+'"');
+  if(sub) cp.push('subtext (render complete, no truncation): "'+sub+'"');
   if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
   var lgiInput=document.getElementById('lgi');
   var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
