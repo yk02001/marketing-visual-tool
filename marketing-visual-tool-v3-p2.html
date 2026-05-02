@@ -1767,8 +1767,17 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v3-p2 &nbsp;·&nbsp; 2026.05.02
+      <span id="ver-txt">Marketing Visual Generator · v3-p2</span>
     </span>
   </div>
+  <script>
+  (function(){
+    var now=new Date();
+    var p=function(n){return n<10?'0'+n:n;};
+    var ts=now.getFullYear()+'.'+p(now.getMonth()+1)+'.'+p(now.getDate())+' '+p(now.getHours())+':'+p(now.getMinutes());
+    var el=document.getElementById('ver-txt');
+    if(el) el.textContent='Marketing Visual Generator · v3-p2 · '+ts;
+  })();
+  </script>
 </body>
 </html>
