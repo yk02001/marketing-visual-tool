@@ -1578,15 +1578,18 @@ function buildPromptText(){
 
   // Layer 3: Image style — only if not blocked by PTYPE
   var imgStyleVal=DB.imgStyle[selImgStyle]||'';
-  // Check if imgStyle overlaps with PTYPE core OR blocked terms
+  // Skip imgStyle if PTYPE already defines visual language
+  // saas/event/service: PTYPE core covers visual style, imgStyle adds noise
+  var ptypesWithOwnStyle=['saas','event','service'];
   var visStr=vis.join(' ').toLowerCase();
+  var isBlockedByType=ptypesWithOwnStyle.indexOf(selPtype)>-1;
   var isBlockedByTerm=blockedTerms.some(function(b){
     return imgStyleVal.toLowerCase().indexOf(b.toLowerCase())>-1;
   });
   var isBlockedByCore=imgStyleVal.split(',').some(function(w){
     return w.trim().length>5&&visStr.indexOf(w.trim().toLowerCase())>-1;
   });
-  if(imgStyleVal&&!isBlockedByTerm&&!isBlockedByCore) vis.push(imgStyleVal);
+  if(imgStyleVal&&!isBlockedByType&&!isBlockedByTerm&&!isBlockedByCore) vis.push(imgStyleVal);
 
   // Layer 4: Depth of field — skip shallow for saas (screen must be sharp)
   if(selPtype==='saas'){
@@ -1627,10 +1630,8 @@ function buildPromptText(){
     em.push('professional B2B visual, logical decision support, business value clarity');
 
   }
-  // Strategy prompt keywords from STRAT_PROMPT_DB
-  var stratKw='';
-  try{ stratKw=STRAT_PROMPT_DB[tier][selGoal][selEm]||''; }catch(e){}
-  if(stratKw) em.push(stratKw);
+  // STRAT_PROMPT_DB used for INTENT display only (not EMOTION)
+  // DB.em.kw already contains physical parameters - no duplication needed
   set('ps-emotion',em.filter(Boolean).join(', '));
 
   // ── [COMPOSITION] How elements are arranged ──
