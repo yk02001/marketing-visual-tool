@@ -1244,7 +1244,7 @@ var DB={
     }
   },
   light:{soft:'soft diffused lighting, gentle gradual shadows, flattering even illumination',cinematic:'cinematic directional lighting, dramatic contrast, film-quality atmosphere',studio:'controlled studio lighting, precise highlights, professional product photography',natural:'natural daylight quality, organic light feel, authentic environmental illumination'},
-  lv:{1:'no watermark, no extra objects, clean background, no absolute guarantee claims, no before-after comparison images, no misleading exaggerations',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no absolute language like 保證 or 一定 or 100%, no exaggerated before-after comparison, no fake engagement bait',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, no fake engagement bait, no incorrect use of platform brand elements, background softly blurred to ensure text legibility, strict composition adherence'},
+  lv:{1:'no watermark, no extra objects, clean background',2:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no fake engagement bait',3:'no watermark, no extra objects, clean background, no clutter, no overlapping elements, no random typography, consistent visual spacing, no style mixing, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, no incorrect use of platform brand elements, strict composition adherence'},
   dof:{shallow:'shallow depth of field, subject sharp, background softly blurred',deep:'deep focus throughout, full scene sharpness',flat:'flat graphic style, no depth perspective'},
   imgStyle:{editorial:'editorial photography aesthetic, magazine-quality, 50mm lens perspective',minimal:'minimalist composition, extreme negative space, 85mm f/2.0 compression',tech:'tech product visual language, modern clean aesthetic, sharp technical precision',luxury:'luxury brand visual codes, premium material quality, 85mm f/1.8 shallow depth of field'},
   safeZone:{
@@ -1621,7 +1621,6 @@ function buildPromptText(){
   var comp=[];
   comp.push(selPoKw); // Layer 1: position ALWAYS wins
   if(goalData&&goalData.composition_note) comp.push(goalData.composition_note); // Layer 2: energy/rhythm only
-  comp.push('aspect ratio '+ar);
   comp.push('photorealistic commercial photography');
   set('ps-composition',comp.filter(Boolean).join(', '));
 
