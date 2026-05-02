@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Visual Generator</title>
+<style>
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;
+  --border:#2e2e2e;--border2:#3a3a3a;
+  --text:#e8e6df;--text2:#a8a6a0;--text3:#686664;
+  --accent:#e8e6df;
+  --warn-bg:#2a1f0a;--warn-border:#6b4c12;--warn-text:#d4a843;
+  --radius:10px;--radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;}
+.app{max-width:560px;margin:0 auto;padding:24px 16px 60px;}
+.app-header{margin-bottom:28px;}
+.app-title{font-size:18px;font-weight:600;letter-spacing:-.3px;color:var(--text);}
+.app-sub{font-size:12px;color:var(--text3);margin-top:4px;}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;}
+.sh{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.sb{width:20px;height:20px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:var(--text2);flex-shrink:0;}
+.st{font-size:13px;font-weight:500;color:var(--text);}
+.hint{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.5;}
+.sec{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;}
+.pills{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}
+.audience-toggle{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:14px;}
+.aud-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px;cursor:pointer;background:transparent;text-align:left;transition:all .12s;display:flex;flex-direction:column;gap:3px;}
+.aud-btn:hover{background:var(--bg3);}
+.aud-btn.on{border:2px solid var(--text);background:var(--text);}
+.aud-main{font-size:12px;font-weight:600;color:var(--text);line-height:1;}
+.aud-btn.on .aud-main{color:var(--bg);}
+.aud-sub{font-size:10px;color:var(--text3);line-height:1.3;}
+.aud-btn.on .aud-sub{color:rgba(15,15,15,0.55);}
+.goal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:12px;}
+.goal-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 11px;cursor:pointer;background:transparent;text-align:left;transition:all .12s;display:flex;flex-direction:column;gap:2px;}
+.goal-btn:hover{background:var(--bg3);}
+.goal-btn.on{border:2px solid var(--text);background:var(--text);}
+.goal-main{font-size:12px;font-weight:600;color:var(--text);line-height:1;}
+.goal-btn.on .goal-main{color:var(--bg);}
+.goal-sub{font-size:10px;color:var(--text3);line-height:1.3;}
+.goal-btn.on .goal-sub{color:rgba(15,15,15,0.55);}
+.pill{font-size:12px;padding:4px 12px;border-radius:999px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;background:transparent;transition:all .12s;line-height:1;}
+.pill:hover{border-color:var(--text3);color:var(--text);}
+.pill.on{border-color:var(--text);background:var(--text);color:var(--bg);font-weight:500;}
+.divider{height:0.5px;background:var(--border);margin:.875rem 0;}
+.kw-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;min-height:18px;}
+.kw{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--bg3);color:var(--text3);border:0.5px solid var(--border);}
+.q-outer{position:relative;width:100%;max-width:300px;margin:0 auto;}
+.q-outer canvas{width:100%;height:auto;display:block;cursor:crosshair;border-radius:8px;}
+.ax{position:absolute;font-size:10px;color:var(--text3);pointer-events:none;white-space:nowrap;}
+.badge{font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid var(--text);color:var(--text);font-weight:500;}
+.result-row{display:flex;align-items:center;gap:7px;margin-top:8px;flex-wrap:wrap;}
+.ratio-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:4px;}
+.ratio-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 9px;cursor:pointer;background:transparent;text-align:left;transition:all .12s;}
+.ratio-btn:hover{background:var(--bg3);}
+.ratio-btn.on{border-color:var(--text);background:var(--text);}
+.r-main{font-size:13px;color:var(--text2);display:block;}
+.r-sub{font-size:10px;color:var(--text3);display:block;margin-top:1px;line-height:1.3;}
+.ratio-btn.on .r-main{color:var(--bg);font-weight:600;}
+.ratio-btn.on .r-sub{color:rgba(15,15,15,0.6);}
+.ratio-custom{display:flex;gap:6px;align-items:center;margin-top:4px;}
+.ratio-custom input{width:56px;font-size:12px;padding:5px 7px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);text-align:center;}
+.color-section{display:flex;flex-direction:column;gap:9px;}
+.color-row{display:flex;align-items:center;gap:9px;}
+.color-swatch-wrap{position:relative;width:32px;height:32px;flex-shrink:0;}
+.color-swatch{width:32px;height:32px;border-radius:6px;border:0.5px solid var(--border2);display:block;}
+.color-input-hidden{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;border:none;padding:0;}
+.color-label{font-size:12px;color:var(--text2);width:50px;flex-shrink:0;}
+.color-hex{font-size:12px;font-family:monospace;padding:4px 7px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);width:86px;}
+.suggest-row{display:flex;gap:5px;margin-top:2px;align-items:center;}
+.suggest-chip{width:24px;height:24px;border-radius:5px;border:0.5px solid var(--border2);cursor:pointer;flex-shrink:0;transition:transform .1s;}
+.suggest-chip:hover{transform:scale(1.1);}
+.suggest-label{font-size:11px;color:var(--text3);}
+
+.aux-row{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
+.aux-remove{width:16px;height:16px;border-radius:50%;border:0.5px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto;}
+.aux-remove:hover{background:var(--bg3);}
+.aux-add{font-size:11px;padding:4px 10px;border:0.5px dashed var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;gap:4px;}
+.aux-add:hover{color:var(--text2);}
+.pos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.pos-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:9px 4px;cursor:pointer;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .12s;}
+.pos-btn:hover{background:var(--bg3);}
+.pos-btn.on{border-color:var(--text);background:var(--text);}
+.pos-icon{width:36px;height:24px;border-radius:3px;background:rgba(255,255,255,0.07);position:relative;}
+.pos-btn.on .pos-icon{background:rgba(0,0,0,0.12);}
+.pos-dot{width:9px;height:9px;border-radius:50%;background:var(--text3);position:absolute;top:50%;transform:translateY(-50%);}
+.pos-btn.on .pos-dot{background:var(--bg);}
+.pos-label{font-size:11px;color:var(--text2);}
+.pos-btn.on .pos-label{color:var(--bg);font-weight:500;}
+.level-grid{display:flex;flex-direction:column;gap:5px;}
+.level-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:11px 13px;cursor:pointer;background:transparent;text-align:left;transition:all .12s;}
+.level-btn:hover{background:var(--bg3);}
+.level-btn.on{border-color:var(--text);background:var(--text);}
+.lv-header{display:flex;align-items:baseline;gap:7px;margin-bottom:3px;}
+.lv-num{font-size:10px;padding:1px 7px;border-radius:999px;font-weight:500;border:1px solid var(--border2);color:var(--text3);flex-shrink:0;}
+.level-btn.on .lv-num{border-color:rgba(0,0,0,0.25);color:rgba(0,0,0,0.55);}
+.lv-title{font-size:12px;font-weight:600;color:var(--text);}
+.level-btn.on .lv-title{color:var(--bg);}
+.lv-desc{font-size:11px;color:var(--text3);margin-bottom:5px;line-height:1.4;}
+.level-btn.on .lv-desc{color:rgba(0,0,0,0.5);}
+.lv-tags{display:flex;flex-wrap:wrap;gap:3px;}
+.lv-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--bg3);color:var(--text3);border:0.5px solid var(--border);}
+.level-btn.on .lv-tag{background:rgba(0,0,0,0.1);color:rgba(0,0,0,0.5);border-color:rgba(0,0,0,0.12);}
+.field-row{display:grid;grid-template-columns:76px 1fr;align-items:center;gap:7px;margin-bottom:7px;}
+.ptype-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;}
+.ptype-btn{border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;cursor:pointer;background:transparent;text-align:left;transition:all .12s;display:flex;flex-direction:column;gap:2px;}
+.ptype-btn:hover{background:var(--bg3);}
+.ptype-btn.on{border:2px solid var(--text);background:var(--text);}
+.ptype-main{font-size:11px;font-weight:600;color:var(--text);}
+.ptype-btn.on .ptype-main{color:var(--bg);}
+.ptype-sub{font-size:10px;color:var(--text3);line-height:1.3;}
+.ptype-btn.on .ptype-sub{color:rgba(15,15,15,0.5);}
+.fl{font-size:12px;color:var(--text2);}
+.fi{width:100%;font-size:13px;padding:6px 9px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text);}
+.fi::placeholder{color:var(--text3);}
+.fi:focus{outline:none;border-color:var(--text3);}
+.up-btn{font-size:12px;padding:5px 10px;border:0.5px dashed var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text3);cursor:pointer;width:100%;text-align:center;}
+.up-btn:hover{color:var(--text2);}
+.ref-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:7px;}
+.ref-slot{aspect-ratio:1/1;border-radius:var(--radius-sm);border:0.5px dashed var(--border2);background:var(--bg3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;overflow:hidden;position:relative;}
+.ref-slot.filled{border-style:solid;border-color:var(--border2);}
+.ref-slot img{width:100%;height:100%;object-fit:cover;}
+.ref-slot .plus{font-size:16px;color:var(--text3);}
+.ref-slot .sl{font-size:10px;color:var(--text3);}
+.rm-btn{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.6);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.ref-type-row{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+.rtp{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;background:transparent;transition:all .12s;}
+.rtp:hover{background:var(--bg3);}
+.rtp.on{border-color:var(--text);background:var(--text);color:var(--bg);font-weight:500;}
+.strat{background:var(--bg3);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text2);line-height:1.75;min-height:48px;letter-spacing:.01em;border-left:2px solid var(--border2);}
+.conflict-box{display:none;background:var(--warn-bg);border:0.5px solid var(--warn-border);border-radius:var(--radius-sm);padding:8px 11px;margin-top:7px;gap:7px;align-items:flex-start;}
+.conflict-box.show{display:flex;}
+.conflict-icon{font-size:13px;flex-shrink:0;}
+.conflict-text{font-size:11px;color:var(--warn-text);line-height:1.5;}
+.prompt-block{background:var(--bg3);border-radius:var(--radius-sm);overflow:hidden;border:0.5px solid var(--border);}
+.prompt-section{border-bottom:0.5px solid var(--border);padding:7px 11px;display:flex;gap:9px;align-items:flex-start;}
+.prompt-section:last-child{border-bottom:none;}
+.ps-label{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;min-width:80px;padding-top:2px;flex-shrink:0;}
+.ps-value{font-size:11px;font-family:monospace;color:var(--text2);line-height:1.6;word-break:break-all;}
+.rb{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.copy-btn{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text2);cursor:pointer;}
+.copy-btn:hover{background:var(--bg3);}
+.adv-toggle{font-size:11px;color:var(--text3);cursor:pointer;padding:5px 0;display:flex;align-items:center;gap:4px;border:none;background:transparent;width:100%;}
+.adv-section{display:none;padding-top:9px;border-top:0.5px solid var(--border);margin-top:3px;}
+.adv-section.open{display:block;}
+
+/* ── API + Generate section ── */
+.api-section{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;}
+.api-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.api-badge{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--bg3);color:var(--text3);border:0.5px solid var(--border2);}
+.api-input-wrap{position:relative;}
+.api-fi{width:100%;font-size:12px;font-family:monospace;padding:7px 36px 7px 10px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--bg3);color:var(--text2);}
+.api-fi:focus{outline:none;border-color:var(--text3);}
+.api-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:12px;padding:2px;}
+.api-note{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.4;}
+.gen-btn{width:100%;padding:11px;font-size:13px;font-weight:600;border:1px solid var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text);cursor:pointer;margin-top:10px;letter-spacing:.02em;transition:all .15s;}
+.gen-btn:hover{background:var(--text);color:var(--bg);}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed;}
+.gen-btn.loading{opacity:.7;}
+
+/* result */
+.img-result{margin-top:10px;border-radius:var(--radius-sm);overflow:hidden;display:none;}
+.img-result img{width:100%;display:block;}
+.img-result.show{display:block;}
+.gen-status{font-size:12px;color:var(--text3);margin-top:8px;min-height:18px;text-align:center;}
+.gen-status.error{color:#e05a5a;}
+.gen-status.success{color:#5aae7c;}
+.img-placeholder{margin-top:10px;height:100px;border-radius:var(--radius-sm);background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;}
+.img-placeholder span{font-size:12px;color:var(--text3);}
+.download-btn{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;padding:6px 12px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text2);cursor:pointer;margin-top:7px;width:100%;}
+.download-btn:hover{background:var(--bg3);}
+.download-btn{display:none;}
+.hist-section{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
+.hist-toggle{font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0;display:flex;align-items:center;justify-content:space-between;border:none;background:transparent;width:100%;}
+.hist-toggle-label{display:flex;align-items:center;gap:6px;}
+.hist-toggle-arrow{font-size:10px;color:var(--text3);transition:transform .2s;}
+.hist-toggle-arrow.open{transform:rotate(180deg);}
+.hist-body{display:none;margin-top:12px;}
+.hist-body.open{display:block;}
+.hist-actions{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.hist-btn{font-size:11px;padding:5px 10px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:4px;}
+.hist-btn:hover{background:var(--bg3);}
+.hist-btn.primary{border-color:var(--text);color:var(--text);}
+.hist-list{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto;}
+.hist-item{border:0.5px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;cursor:pointer;background:var(--bg3);transition:all .12s;}
+.hist-item:hover{border-color:var(--border2);}
+.hist-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.hist-item-time{font-size:10px;color:var(--text3);}
+.hist-item-del{font-size:10px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;}
+.hist-item-del:hover{color:var(--text2);}
+.hist-item-tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:5px;}
+.hist-tag{font-size:10px;padding:1px 6px;border-radius:3px;background:var(--bg2);color:var(--text3);border:0.5px solid var(--border);}
+.hist-item-preview{font-size:10px;font-family:monospace;color:var(--text3);line-height:1.4;max-height:36px;overflow:hidden;word-break:break-all;}
+.hist-empty{font-size:12px;color:var(--text3);text-align:center;padding:20px 0;}
+.hist-img{width:48px;height:48px;border-radius:4px;object-fit:cover;flex-shrink:0;border:0.5px solid var(--border);}
+.download-btn.show{display:flex;}
+.version-footer{text-align:center;padding:20px 0 28px;font-size:10px;color:var(--text3);letter-spacing:.05em;}
+.version-badge{display:inline-flex;align-items:center;gap:5px;background:var(--bg2);border:0.5px solid var(--border);border-radius:999px;padding:3px 10px;font-size:10px;color:var(--text3);}
+.version-dot{width:5px;height:5px;border-radius:50%;background:#22c55e;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div class="app-title">Marketing Visual Generator <div class="app-sub">設定品牌風格 → 自動生成結構化 Prompt → 直接用 Gemini 生圖</div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="card">
+    <div class="sh"><span class="sb">1</span><span class="st">品牌風格定位</span></div>
+    <p class="hint">在象限圖點選你的品牌座標</p>
+    <div class="q-outer">
+      <canvas id="qc" width="640" height="640"></canvas>
+      <span class="ax" style="top:3px;left:50%;transform:translateX(-50%)">高端 Premium</span>
+      <span class="ax" style="bottom:3px;left:50%;transform:translateX(-50%)">大眾 Mass</span>
+      <span class="ax" style="left:2px;top:50%;transform:translateY(-50%)">理性</span>
+      <span class="ax" style="right:2px;top:50%;transform:translateY(-50%)">感性</span>
+    </div>
+    <div class="result-row"><span style="font-size:11px;color:var(--text3)">定位：</span><span class="badge" id="blabel">Premium × 感性</span></div>
+    <div class="kw-row" id="kw-brand"></div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="card">
+    <div class="sh"><span class="sb">2</span><span class="st">製圖意圖</span></div>
+    <p class="sec" style="margin-bottom:8px;">受眾類型</p>
+    <div class="audience-toggle" id="g-audience">
+      <button class="aud-btn on" data-v="b2c">
+        <span class="aud-main">B2C 消費者市場</span>
+        <span class="aud-sub">情感驅動 · 快速決策 · 個人認同</span>
+      </button>
+      <button class="aud-btn" data-v="b2b">
+        <span class="aud-main">B2B 企業市場</span>
+        <span class="aud-sub">邏輯驅動 · 長期評估 · 商業價值</span>
+      </button>
+    </div>
+    <p class="sec">行銷目標</p>
+    <div class="goal-grid" id="g-goal">
+      <button class="goal-btn on" data-v="click">
+        <span class="goal-main">點擊率</span>
+        <span class="goal-sub">讓人停下來看 · Attention</span>
+      </button>
+      <button class="goal-btn" data-v="convert">
+        <span class="goal-main">轉換</span>
+        <span class="goal-sub">讓人現在採取行動 · Convert</span>
+      </button>
+      <button class="goal-btn" data-v="brand">
+        <span class="goal-main">品牌感</span>
+        <span class="goal-sub">讓人記住我是誰 · Brand</span>
+      </button>
+      <button class="goal-btn" data-v="explain">
+        <span class="goal-main">內容解釋</span>
+        <span class="goal-sub">讓人看懂我在說什麼 · Explain</span>
+      </button>
+    </div>
+    <p class="sec">情緒定位</p>
+    <div class="pills" id="g-em">
+      <button class="pill on" data-v="trust">Trust 信任</button>
+      <button class="pill" data-v="excitement">Excitement 興奮</button>
+      <button class="pill" data-v="urgency">Urgency 緊迫</button>
+      <button class="pill" data-v="calm">Calm 平靜</button>
+    </div>
+    <div class="kw-row" id="kw-em"></div>
+    <div class="divider"></div>
+    <p class="sec">輸出比例</p>
+    <div class="ratio-grid" id="ratio-grid">
+      <button class="ratio-btn on" data-r="1:1" data-ar="1:1"><span class="r-main">1 : 1</span><span class="r-sub">Shopee 主圖、IG 貼文、FB 廣告</span></button>
+      <button class="ratio-btn" data-r="4:5" data-ar="4:5"><span class="r-main">4 : 5</span><span class="r-sub">IG 直式貼文、FB 直式廣告</span></button>
+      <button class="ratio-btn" data-r="9:16" data-ar="9:16"><span class="r-main">9 : 16</span><span class="r-sub">限時動態、Reels、TikTok</span></button>
+      <button class="ratio-btn" data-r="16:9" data-ar="16:9"><span class="r-main">16 : 9</span><span class="r-sub">YouTube 封面、官網 Banner</span></button>
+      <button class="ratio-btn" data-r="3:1" data-ar="3:1"><span class="r-main">3 : 1</span><span class="r-sub">橫幅廣告、EDM Header</span></button>
+      <button class="ratio-btn" data-r="custom" data-ar=""><span class="r-main">自填</span><span class="r-sub">輸入寬 : 高</span></button>
+    </div>
+    <div class="ratio-custom" id="ratio-custom" style="display:none;">
+      <input id="cw" type="text" placeholder="寬" oninput="bld()">
+      <span style="font-size:13px;color:var(--text3)">:</span>
+      <input id="ch" type="text" placeholder="高" oninput="bld()">
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="card">
+    <div class="sh"><span class="sb">3</span><span class="st">視覺語言</span></div>
+    <p class="sec">光線風格</p>
+    <div class="pills" id="g-light">
+      <button class="pill on" data-v="soft">Soft 柔光</button>
+      <button class="pill" data-v="cinematic">Cinematic 電影感</button>
+      <button class="pill" data-v="studio">Studio 棚拍</button>
+      <button class="pill" data-v="natural">Natural 自然光</button>
+    </div>
+    <div class="divider"></div>
+    <p class="sec" style="margin-bottom:9px;">色彩系統</p>
+    <div class="color-section">
+      <div class="color-row">
+        <span class="color-label">主色</span>
+        <div class="color-swatch-wrap"><div class="color-swatch" id="sw0" style="background:#6B5CE7"></div><input class="color-input-hidden" type="color" id="cp0" value="#6B5CE7" oninput="onCP(0,this.value)"></div>
+        <input class="color-hex" id="hx0" type="text" value="#6B5CE7" oninput="onHX(0,this.value)" maxlength="7" placeholder="#000000">
+      </div>
+      <div class="suggest-row">
+        <span class="suggest-label">建議配色：</span>
+        <div class="suggest-chip" id="sc0"></div>
+        <div class="suggest-chip" id="sc1"></div>
+        <span class="suggest-label" style="margin-left:2px;">← 點擊套用</span>
+      </div>
+      <div id="aux-rows"></div>
+      <button class="aux-add" id="aux-add-btn" onclick="addAux()">
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        加入輔助色
+      </button>
+    </div>
+    <div class="divider"></div>
+    <p class="sec" style="margin-bottom:7px;">主體位置</p>
+    <div class="pos-grid" id="pos-grid">
+      <button class="pos-btn" data-p="left" data-kw="REQUIRED: subject strictly on left third of frame, large negative space on right side for text, asymmetric composition">
+        <div class="pos-icon"><div class="pos-dot" style="left:16%"></div></div><span class="pos-label">左置</span>
+      </button>
+      <button class="pos-btn on" data-p="center" data-kw="REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides">
+        <div class="pos-icon"><div class="pos-dot" style="left:50%;transform:translate(-50%,-50%)"></div></div><span class="pos-label">置中</span>
+      </button>
+      <button class="pos-btn" data-p="right" data-kw="REQUIRED: subject strictly on right third of frame, large negative space on left side for text, asymmetric composition">
+        <div class="pos-icon"><div class="pos-dot" style="right:16%"></div></div><span class="pos-label">右置</span>
+      </button>
+    </div>
+    <div class="divider"></div>
+    <p class="sec" style="margin-bottom:7px;">畫面潔淨等級</p>
+    <div class="level-grid" id="level-grid">
+      <button class="level-btn on" data-lv="1">
+        <div class="lv-header"><span class="lv-num">Level 1</span><span class="lv-title">Basic Clean</span></div>
+        <p class="lv-desc">少量限制，讓 AI 自由發揮</p>
+        <div class="lv-tags"><span class="lv-tag">no watermark</span><span class="lv-tag">no extra objects</span><span class="lv-tag">clean background</span></div>
+      </button>
+      <button class="level-btn" data-lv="2">
+        <div class="lv-header"><span class="lv-num">Level 2</span><span class="lv-title">Design Control</span></div>
+        <p class="lv-desc">設計穩定性規則，避免版面混亂</p>
+        <div class="lv-tags"><span class="lv-tag">no clutter</span><span class="lv-tag">no overlapping text</span><span class="lv-tag">no random typography</span><span class="lv-tag">consistent spacing</span></div>
+      </button>
+      <button class="level-btn" data-lv="3">
+        <div class="lv-header"><span class="lv-num">Level 3</span><span class="lv-title">Brand Safe</span></div>
+        <p class="lv-desc">商業級嚴格限制，避免錯圖翻車</p>
+        <div class="lv-tags"><span class="lv-tag">no style mixing</span><span class="lv-tag">no incorrect logo</span><span class="lv-tag">no irrelevant objects</span><span class="lv-tag">strict composition</span></div>
+      </button>
+    </div>
+    <div class="divider"></div>
+    <button class="adv-toggle" onclick="toggleAdv()">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none" id="adv-icon"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      進階設定
+    </button>
+    <div class="adv-section" id="adv-sec">
+      <p class="sec" style="margin-bottom:7px;margin-top:3px;">景深</p>
+      <div class="pills" id="g-dof"><button class="pill on" data-v="shallow">Shallow 淺景深</button><button class="pill" data-v="deep">Deep 全景清晰</button><button class="pill" data-v="flat">Flat 平面感</button></div>
+      <p class="sec" style="margin-bottom:7px;">圖片風格</p>
+      <div class="pills" id="g-style"><button class="pill on" data-v="editorial">Editorial</button><button class="pill" data-v="minimal">Minimal</button><button class="pill" data-v="tech">Tech</button><button class="pill" data-v="luxury">Luxury</button></div>
+      <p class="sec" style="margin-bottom:7px;">視覺層級</p>
+      <div class="pills" id="g-layer"><button class="pill on" data-v="1">單層</button><button class="pill" data-v="2">雙層</button><button class="pill" data-v="3">三層</button></div>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="card">
+    <div class="sh"><span class="sb">4</span><span class="st">產品參考圖</span></div>
+    <p class="hint">上傳商品圖或視覺參考，最多 3 張（Gemini 會直接讀取圖片內容生成）</p>
+    <div class="ref-grid">
+      <div class="ref-slot" id="rslot-0" onclick="trigRef(0)"><div class="plus">+</div><span class="sl">商品圖</span></div>
+      <div class="ref-slot" id="rslot-1" onclick="trigRef(1)"><div class="plus">+</div><span class="sl">風格參考</span></div>
+      <div class="ref-slot" id="rslot-2" onclick="trigRef(2)"><div class="plus">+</div><span class="sl">競品參考</span></div>
+    </div>
+    <input type="file" id="rf0" accept="image/*,image/png,image/jpeg,image/webp" style="display:none" onchange="loadRef(0,this)" onclick="this.value=''">
+    <input type="file" id="rf1" accept="image/*,image/png,image/jpeg,image/webp" style="display:none" onchange="loadRef(1,this)" onclick="this.value=''">
+    <input type="file" id="rf2" accept="image/*,image/png,image/jpeg,image/webp" style="display:none" onchange="loadRef(2,this)" onclick="this.value=''">
+    <div class="ref-type-row" id="ref-types">
+      <button class="rtp on" data-v="product">商品本體</button>
+      <button class="rtp" data-v="style">風格參考</button>
+      <button class="rtp" data-v="color">色調參考</button>
+      <button class="rtp" data-v="layout">構圖參考</button>
+      <button class="rtp" data-v="competitor">競品分析</button>
+    </div>
+  </div>
+
+  <!-- Step 5 -->
+  <div class="card">
+    <div class="sh"><span class="sb">5</span><span class="st">核心文案與品牌</span></div>
+    <p class="sec" style="margin-bottom:8px;">商品類型</p>
+    <div class="ptype-grid" id="g-ptype">
+      <button class="ptype-btn on" data-v="physical">
+        <span class="ptype-main">實體商品</span>
+        <span class="ptype-sub">情境照 · 生活感 · 真實溫度</span>
+      </button>
+      <button class="ptype-btn" data-v="saas">
+        <span class="ptype-main">軟體 / SaaS</span>
+        <span class="ptype-sub">介面截圖 · 幾何色塊 · 科技感</span>
+      </button>
+      <button class="ptype-btn" data-v="event">
+        <span class="ptype-main">活動 / 知識內容</span>
+        <span class="ptype-sub">去背人物 · 大字標題 · 幾何色塊</span>
+      </button>
+      <button class="ptype-btn" data-v="service">
+        <span class="ptype-main">服務 / 人物</span>
+        <span class="ptype-sub">情境人像 · 專業感 · 信任感</span>
+      </button>
+    </div>
+    <div class="field-row"><span class="fl">主題商品</span><input class="fi" id="fp" type="text" placeholder="e.g. 玻尿酸精華液" oninput="bld()"></div>
+    <div class="field-row"><span class="fl">主標題</span><input class="fi" id="fh" type="text" placeholder="e.g. 72小時鎖水" oninput="bld()"></div>
+    <div class="field-row"><span class="fl">副標題</span><input class="fi" id="fs" type="text" placeholder="e.g. 皮膚科醫師推薦" oninput="bld()"></div>
+    <div class="field-row"><span class="fl">CTA</span><input class="fi" id="fc" type="text" placeholder="e.g. 立即搶購" oninput="bld()"></div>
+    <div class="divider"></div>
+    <div class="field-row">
+      <span class="fl">Logo</span>
+      <button class="up-btn" onclick="document.getElementById('lgi').click()">上傳 Logo（PNG / SVG）</button>
+      <input type="file" id="lgi" accept=".png,.svg,.jpg" style="display:none" onchange="hlg(this)">
+    </div>
+    <div id="lgn" style="font-size:11px;color:var(--text3);margin-top:3px;display:none;"></div>
+    <div class="divider"></div>
+    <p class="sec" style="margin-bottom:7px;">局部強調設計</p>
+    <p class="hint" style="margin-bottom:9px;">選擇視覺強調元素，文案可以是 CTA、促銷訊息、標章說明或任何視覺重點</p>
+    <div class="pills" id="g-badge">
+      <button class="pill on" data-v="none">無</button>
+      <button class="pill" data-v="tag">特價標籤</button>
+      <button class="pill" data-v="stamp">印章</button>
+      <button class="pill" data-v="badge">徽章</button>
+      <button class="pill" data-v="sticker">撕角貼紙</button>
+      <button class="pill" data-v="box">色塊 Box</button>
+      <button class="pill" data-v="ribbon">緞帶</button>
+    </div>
+    <div id="badge-input-row" style="display:none;margin-top:4px;">
+      <div class="field-row">
+        <span class="fl">標籤文案</span>
+        <input class="fi" id="f-badge-text" type="text" placeholder="e.g. 立即購買 / 特價9折 / 期間限定 / NEW / 限量" oninput="bld()">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <p class="sec" style="margin-bottom:6px;">額外補充說明</p>
+    <p class="hint" style="margin-bottom:7px;">可自由補充任何額外要求或細節，會附加到 Prompt 最尾端</p>
+    <textarea class="fi" id="f-extra" rows="3" placeholder="e.g. 背景需要有模糊城市感、整體色調偏冷、產品需要有水滴質感..." oninput="bld()" style="resize:vertical;font-size:12px;line-height:1.5;padding-top:8px;"></textarea>
+  </div>
+
+  <!-- Step 6: Result -->
+  <div class="card">
+    <div class="sh"><span class="sb">6</span><span class="st">生成結果</span></div>
+    <p class="sec" style="margin-bottom:6px;">視覺策略建議</p>
+    <div class="strat" id="strat">選擇上方選項後自動產生…</div>
+    <div id="conflict-box" class="conflict-box">
+      <span class="conflict-icon">⚠</span>
+      <span class="conflict-text" id="conflict-text"></span>
+    </div>
+    <div class="divider"></div>
+    <div class="rb">
+      <p class="sec" style="margin-bottom:0;">結構化 Prompt</p>
+      <button class="copy-btn" id="cpb" onclick="cpAll()">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a2 2 0 00-2-2H3a2 2 0 002 2h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        複製完整 Prompt
+      </button>
+    </div>
+    <div class="prompt-block" id="prompt-block">
+      <div class="prompt-section" id="ps-intent-row" style="display:none"><span class="ps-label">INTENT</span><span class="ps-value" id="ps-intent-val">—</span></div>
+      <div class="prompt-section"><span class="ps-label">SUBJECT</span><span class="ps-value" id="ps-subject">—</span></div>
+      <div class="prompt-section"><span class="ps-label">VISUAL</span><span class="ps-value" id="ps-visual">—</span></div>
+      <div class="prompt-section"><span class="ps-label">EMOTION</span><span class="ps-value" id="ps-emotion">—</span></div>
+      <div class="prompt-section"><span class="ps-label">COMPOSITION</span><span class="ps-value" id="ps-composition">—</span></div>
+      <div class="prompt-section"><span class="ps-label">COLOR</span><span class="ps-value" id="ps-color">—</span></div>
+      <div class="prompt-section" id="ps-copy-row" style="display:none"><span class="ps-label">COPY</span><span class="ps-value" id="ps-copy-val">—</span></div>
+      <div class="prompt-section" id="ps-badge-row" style="display:none"><span class="ps-label">ACCENT</span><span class="ps-value" id="ps-badge-val">—</span></div>
+      <div class="prompt-section"><span class="ps-label">CONSTRAINT</span><span class="ps-value" id="ps-constraint">—</span></div>
+      <div class="prompt-section" id="ps-safezone-row" style="display:none"><span class="ps-label">SAFE ZONE</span><span class="ps-value" id="ps-safezone-val">—</span></div>
+      <div class="prompt-section"><span class="ps-label">FORMAT</span><span class="ps-value" id="ps-format">—</span></div>
+      <div class="prompt-section" id="ps-extra-row" style="display:none"><span class="ps-label">EXTRA</span><span class="ps-value" id="ps-extra-val">—</span></div>
+    </div>
+  </div>
+
+  <!-- History & Settings Management -->
+  <div class="hist-section">
+    <button class="hist-toggle" onclick="toggleHist(this)">
+      <span class="hist-toggle-label">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.2"/><path d="M8 5v3.5l2 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        設定紀錄與管理
+      </span>
+      <span class="hist-toggle-arrow" id="hist-arrow">▾</span>
+    </button>
+    <div class="hist-body" id="hist-body">
+      <div class="hist-actions">
+        <button class="hist-btn primary" onclick="exportJSON()">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="12" width="12" height="2" rx="1" fill="currentColor"/></svg>
+          匯出設定 JSON
+        </button>
+        <button class="hist-btn" onclick="document.getElementById('import-json').click()">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 14V6M5 9l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="2" width="12" height="2" rx="1" fill="currentColor"/></svg>
+          匯入設定 JSON
+        </button>
+        <input type="file" id="import-json" accept=".json" style="display:none" onchange="importJSON(this)">
+        <button class="hist-btn" onclick="clearAllHist()" style="margin-left:auto;">清除全部紀錄</button>
+      </div>
+      <div class="hist-list" id="hist-list">
+        <div class="hist-empty" id="hist-empty">尚無歷史紀錄。每次生圖後自動儲存。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API + Generate -->
+  <div class="api-section">
+    <div class="sh"><span class="sb">7</span><span class="st">Gemini 生圖</span></div>
+    <p class="hint" style="margin-bottom:10px;">填入你自己的 Gemini API Key，費用由你的帳號自行承擔，Key 不會儲存到任何伺服器。</p>
+    <div class="api-label">
+      Gemini API Key
+      <span class="api-badge">只存在瀏覽器</span>
+    </div>
+    <div class="api-input-wrap">
+      <input class="api-fi" type="password" id="api-key" placeholder="貼上你的 API Key（AIza...）">
+      <button class="api-toggle" onclick="toggleKey()" id="key-toggle">👁</button>
+    </div>
+    <p class="api-note">還沒有 API Key？前往 <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--text2)">Google AI Studio</a> 免費申請</p>
+    <button class="gen-btn" id="gen-btn" onclick="generate()">產生這張圖</button>
+    <div class="gen-status" id="gen-status"></div>
+    <div class="img-placeholder" id="img-placeholder"><span>圖片出現在這裡</span></div>
+    <div class="img-result" id="img-result"><img id="result-img" src="" alt="生成圖片"></div>
+    <button class="download-btn" id="dl-btn" onclick="downloadImg()">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="12" width="12" height="2" rx="1" fill="currentColor"/></svg>
+      下載圖片
+    </button>
+  </div>
+</div>
+
+<script>
+var dot={x:0.72,y:0.22};
+var selAudience='b2c';
+var selPtype='physical';
+
+var PTYPE_DB={
+  'physical':{
+    core:'product hero shot, authentic lifestyle context, natural scene depth, tactile material quality visible',
+    lens:'50mm standard lens perspective, natural proportions',
+    constraint:'avoid overly artificial or digital backgrounds',
+    blocked:['UI dashboard','interface','digital product','screen content']
+  },
+  'saas':{
+    core:'laptop or monitor displaying software UI dashboard, screen content sharp and legible, data visualization elements visible inside screen, clean tech product aesthetic',
+    lens:'35mm wide angle, clean technical perspective',
+    constraint:'background must not compete with screen content, no lifestyle props, no human hands unless purposeful',
+    blocked:['lifestyle scene','natural environment','tactile','authentic human touch','luxury brand']
+  },
+  'event':{
+    core:'speaker cutout portrait on geometric background, headline dominates 50%+ visual weight, three-tier information hierarchy',
+    lens:'50mm standard lens, editorial perspective',
+    constraint:'no realistic photography backgrounds, no complex textures',
+    blocked:['lifestyle','natural environment','UI dashboard','interface','luxury']
+  },
+  'service':{
+    core:'professional person in clean setting, direct approachable presence, trust-building visual language',
+    lens:'85mm portrait lens, f/1.8, soft background compression',
+    constraint:'no excessive props, no cluttered background',
+    blocked:['UI dashboard','geometric blocks','interface','digital product']
+  }
+};
+var selGoal='click',selEm='trust',selLight='soft',selRatio='1:1',selAr='1:1';
+var selPos='center',selPoKw='REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides';
+var selLv=1,selDof='shallow',selImgStyle='editorial',selLayer='1';
+var refTypes=['product'];
+var selBadge='none';
+var primaryColor='#6B5CE7';
+var auxColors={};
+var auxCount=0;
+var refData=[null,null,null]; // base64 data
+
+
+var STRAT_DB={
+  b2c:{
+    premium:{
+      click:{
+        trust:"柔光壓縮高光範圍，提升產品表面質感的視覺權重，觸發高端品牌的即時辨識反應。",
+        excitement:"強化明暗對比至 7:1 以上，製造電影感視覺張力，誘發受眾的探索動機。",
+        urgency:"緊縮焦點至單一視覺錨點，配合深色調壓縮負空間，在動態流中建立稀缺感知。",
+        calm:"擴大負空間至畫面 60% 以上，降低視覺密度，在高資訊環境中以留白製造停頓。"
+      },
+      convert:{
+        trust:"棚拍均勻照明還原材質細節，右側保留 30% 負空間作為 CTA 落點，降低決策阻力。",
+        excitement:"單一主光源製造方向性陰影，強化產品輪廓的視覺衝擊力，縮短渴望到行動的路徑。",
+        urgency:"提高前景背景對比度，收緊構圖邊界，以視覺壓迫感驅動即時轉換行為。",
+        calm:"低對比度配置搭配對稱構圖，降低視覺噪音，讓品質細節主導說服邏輯。"
+      },
+      brand:{
+        trust:"品牌主色佔據畫面飽和度主導地位，柔光控制色溫一致性，強化跨媒介品牌識別。",
+        excitement:"高動態範圍光影製造敘事張力，擴展品牌的視覺情感邊界，建立記憶錨點。",
+        urgency:"強焦點搭配品牌色高飽和處理，提升視覺權重，在競爭版位中刻劃品牌深度。",
+        calm:"低飽和度搭配垂直水平軸對稱，減少視覺擾動，傳遞品牌長期穩定的視覺承諾。"
+      },
+      explain:{
+        trust:"網格系統建立資訊層次，視覺路徑由主標至細節線性引導，降低認知負荷。",
+        excitement:"動態網格打破等分構圖，以非對稱視覺節奏加速資訊吸收，維持受眾注意力張力。",
+        urgency:"扁平化層次搭配高對比色塊，將關鍵訊息置於 F 型視覺路徑的起始熱區，縮短閱讀決策時間。",
+        calm:"增加行距與版面間距，降低單位面積資訊密度，讓視覺路徑在無壓力節奏中完成傳遞。"
+      }
+    },
+    mid:{
+      click:{
+        trust:"自然光模擬環境照明，平衡構圖降低視覺不對稱性，建立親近感知與信任反射。",
+        excitement:"提高色彩飽和度並引入斜角動線，製造視覺能量，觸發日常情境中的注意力中斷。",
+        urgency:"強化前景主體的視覺權重，壓縮背景層次，以對比度差異直接傳遞超值感知。",
+        calm:"降低色溫飽和度，減少視覺層級數量，以自然質感降低受眾的防衛性滑動行為。"
+      },
+      convert:{
+        trust:"產品主體置於黃金分割點，CTA 區域以負空間劃定，讓視覺路徑自然導向行動節點。",
+        excitement:"高飽和主色搭配明確利益標示，以色彩對比強化行動誘因，降低理性抗拒。",
+        urgency:"限時視覺元素置於 Z 型視覺路徑終點，高對比色塊強化時效訊號的感知強度。",
+        calm:"減少視覺層次至兩層，增加負空間佔比，降低決策疲勞，提升轉換完成率。"
+      },
+      brand:{
+        trust:"品牌主色維持跨版位飽和度一致性，構圖軸線穩定，在重複曝光中累積視覺信任資產。",
+        excitement:"引入品牌輔助色製造色彩對比，動態構圖增加視覺能量，強化品牌個性的識別邊界。",
+        urgency:"提高品牌色飽和度至視覺主導地位，強焦點構圖壓縮競爭視覺的干擾空間。",
+        calm:"維持色調一致性並控制視覺變量數量，以視覺穩定性建立品牌長期記憶曲線。"
+      },
+      explain:{
+        trust:"功能標示置於視覺路徑主動線，版面間距遵循 8px 基準網格，以規律性傳遞品牌可信度。",
+        excitement:"多層視覺結構引導 Z 型閱讀動線，以層次遞進方式維持受眾的資訊探索動能。",
+        urgency:"高對比標題色搭配精準圖示，在 F 型視覺熱區集中核心優勢，縮短評估到行動的路徑。",
+        calm:"版面間距放大至標準值 1.5 倍，降低資訊密度，讓閱讀行為在低認知負荷下自然完成。"
+      }
+    },
+    mass:{
+      click:{
+        trust:"真實環境照明保留場景自然感，構圖軸線貼近日常視角，觸發受眾的即時自我投射。",
+        excitement:"高飽和度配色搭配動態斜軸構圖，製造最大視覺能量輸出，驅動注意力捕獲與分享行為。",
+        urgency:"促銷視覺元素置於第一視覺熱區，高對比焦點壓縮周邊干擾，強制觸發拇指停頓反射。",
+        calm:"降低飽和度與視覺層次，擴大負空間，以低刺激強度在高競爭版位中製造視覺休止符。"
+      },
+      convert:{
+        trust:"信任元素置於視覺路徑前段，產品細節高清呈現，以直白視覺語言縮短信任建立時間。",
+        excitement:"高飽和主色搭配清晰優惠標示，以色彩對比強化行動誘因，驅動感性決策的即時完成。",
+        urgency:"CTA 元素以最高視覺權重置於畫面視覺終點，單一視覺路徑消除決策分叉，最大化轉換率。",
+        calm:"移除非必要視覺層次，產品主體填滿視覺重心，以構圖純粹性縮短猶豫到行動的距離。"
+      },
+      brand:{
+        trust:"生活場景構圖降低視覺距離感，品牌色穩定出現於視覺錨點，建立長期的情境識別記憶。",
+        excitement:"最高飽和度色彩搭配高對比輔助色，以視覺能量密度建立品牌活力的直覺印象。",
+        urgency:"強對比視覺元素傳遞品牌動態感，以視覺節奏暗示趨勢的不可逆性，強化跟進動機。",
+        calm:"低飽和暖色調降低視覺刺激強度，親近感構圖建立品牌與日常生活的視覺依附關係。"
+      },
+      explain:{
+        trust:"視覺標示系統簡化至最低層次，直白版面語言消除解讀障礙，傳遞品牌資訊的透明度。",
+        excitement:"色彩編碼引導視覺路徑，多層次版面以漸進方式降低資訊吸收的認知門檻。",
+        urgency:"高對比色塊將關鍵訊息置於 F 型視覺路徑起始點，以視覺衝擊力壓縮受眾的評估時間。",
+        calm:"版面節奏放慢，資訊密度降至每區塊單一訊息，以低壓力視覺結構完成品牌價值的傳遞。"
+      }
+    }
+  },
+  b2b:{
+    premium:{
+      click:{
+        trust:"均勻棚拍照明消除雜散光，高細節還原率強化產品工藝的視覺可信度，觸發專業評估的注意力。",
+        excitement:"單一主光源製造方向性陰影，強化產品輪廓的視覺張力，在理性語境中植入差異化的前瞻感知。",
+        urgency:"強焦點壓縮背景視覺層次，深色調提升前景視覺權重，以競爭壓力邏輯建立先行者感知。",
+        calm:"負空間佔比擴大至 60%，低對比度控制視覺擾動，以精緻細節吸引決策者的主動注意力。"
+      },
+      convert:{
+        trust:"棚拍均勻照明還原產品可靠性細節，右側 30% 負空間預留 CTA 落點，引導決策路徑至行動節點。",
+        excitement:"高動態範圍光影突顯差異化特徵，前瞻感構圖擴展決策者對導入後效益的想像空間。",
+        urgency:"高對比度配置搭配明確 CTA 區域，在優雅視覺框架中傳遞採購窗口的時效壓力。",
+        calm:"低視覺噪音構圖搭配高清細節還原，讓理性評估流程在低阻力視覺環境中收斂至決策。"
+      },
+      brand:{
+        trust:"品牌主色跨版位飽和度一致，柔光控制色溫穩定性，在長期曝光中建立視覺可信度資產。",
+        excitement:"高動態範圍光影建立品牌敘事張力，視覺邊界擴展至定義產業標準的感知層次。",
+        urgency:"強焦點配置搭配品牌色高飽和處理，在視覺競爭環境中刻劃不可忽視的市場地位訊號。",
+        calm:"低飽和度搭配對稱軸線構圖，視覺變量最小化，傳遞品牌長期合作的穩定性承諾。"
+      },
+      explain:{
+        trust:"大字標題佔據畫面上半部 50% 視覺權重，網格系統控制三層資訊層次，幾何色塊劃定各區域視覺邊界，傳遞品牌專業掌控力。",
+        excitement:"高飽和主色色塊搭配非對稱動態版面，標題視覺衝擊力最大化，以色彩能量傳遞前瞻議題的知識張力。",
+        urgency:"標題置於 F 型視覺起始熱區並佔最高視覺權重，底部獨立對比色 CTA 色塊，壓縮受眾決策路徑至單一行動節點。",
+        calm:"標題主導、版面三層節制，底部留白區隔 CTA，以視覺秩序傳遞品牌長期深耕的穩定信號。"
+      }
+    },
+    mid:{
+      click:{
+        trust:"環境光模擬真實工作場景，平衡構圖降低視覺距離感，建立規模對等的視覺親近性。",
+        excitement:"適度提高色彩飽和度並引入動態視覺元素，在專業語境中傳遞找到解決方案的發現感知。",
+        urgency:"主體視覺權重最大化，壓縮背景層次，以對比度差異直接傳遞競爭市場中的核心優勢訊號。",
+        calm:"降低視覺刺激強度，以節制的專業感構圖吸引採購主管的主動評估行為。"
+      },
+      convert:{
+        trust:"產品主體置於視覺重心，CTA 區域以負空間劃定，讓視覺路徑自然引導至採購決策節點。",
+        excitement:"活力視覺配置搭配明確 ROI 暗示元素，以感性觸發強化商業決策的合理性感知。",
+        urgency:"預算週期視覺邏輯置於構圖主動線，限時元素高對比處理，強化採購窗口的時效性傳遞。",
+        calm:"減少視覺層次，擴大負空間，降低組織導入的視覺疑慮，提升低阻力決策的完成率。"
+      },
+      brand:{
+        trust:"品牌色飽和度維持跨版位一致性，構圖軸線穩定，在重複曝光中累積長期合作的信任資產。",
+        excitement:"輔助色引入製造視覺對比，動態構圖傳遞品牌成長軌道上的前進動能。",
+        urgency:"品牌色飽和度拉高至視覺主導地位，強焦點壓縮競爭干擾空間，搶佔市場心智位置。",
+        calm:"視覺變量最小化，色調一致性維持，以視覺穩定性傳遞品牌方向不變的長期承諾。"
+      },
+      explain:{
+        trust:"標題視覺權重主導畫面，去背人物疊加幾何色塊建立專業信任感，三層資訊層次控制認知負荷，底部 CTA 獨立色塊強化行動節點。",
+        excitement:"高飽和撞色色塊製造視覺張力，大字標題搭配主題標籤建立話題感，人物去背強化講者權威，以視覺能量驅動報名動機。",
+        urgency:"日期時間資訊高對比置入，標題訊息精準傳遞稀缺感，底部 CTA 色塊視覺獨立，壓縮受眾從理解到行動的路徑長度。",
+        calm:"版面三層節制，主色飽和但不雜亂，人物去背簡化背景干擾，以視覺清晰度傳遞方案易理解的信任訊號。"
+      }
+    },
+    mass:{
+      click:{
+        trust:"真實商業場景照明降低視覺距離感，構圖語言貼近中小企業日常，建立同理性視覺共鳴。",
+        excitement:"直接的視覺能量配置傳遞即時價值感知，以高效視覺語言縮短中小企業主的注意力評估時間。",
+        urgency:"主體視覺元素置於第一熱區，高對比焦點傳遞競爭壓力的緊迫性，觸發主動了解行為。",
+        calm:"低飽和度配色搭配簡潔構圖，以低視覺壓力吸引忙碌決策者的主動停留。"
+      },
+      convert:{
+        trust:"信任元素高視覺權重處理，產品細節清晰還原，以直白視覺邏輯傳遞投資合理性。",
+        excitement:"活潑視覺配置搭配效率提升的視覺暗示，以具體化的成效感知降低導入決策的阻力。",
+        urgency:"CTA 元素最高視覺權重配置，直接視覺路徑消除評估分叉，以立即可用的語言邏輯驅動轉換。",
+        calm:"移除非必要視覺層次，低阻力構圖傳遞容易上手的導入訊號，縮短評估到決策的距離。"
+      },
+      brand:{
+        trust:"生活化商業構圖降低視覺階級感，品牌色穩定出現於視覺錨點，建立與中小企業並行的識別關係。",
+        excitement:"高能量色彩配置搭配清晰品牌識別，以視覺密度傳遞品牌賦能中小企業的視覺主張。",
+        urgency:"高對比視覺元素傳遞數位化趨勢的不可逆性，以動態感知建立現在加入才能跟上的視覺邏輯。",
+        calm:"低飽和暖色調配合務實構圖語言，建立品牌與受眾之間低距離感的視覺依附關係。"
+      },
+      explain:{
+        trust:"大字標題直接傳遞核心訊息，版面三層節制不過度複雜，底部 CTA 對比色塊清楚標示行動入口，以直白視覺語言建立中小企業主的即時信任。",
+        excitement:"高飽和主色搭配大字標題，視覺能量滿點，主題標籤強化話題識別度，以活力視覺語言降低中小企業主的參與門檻。",
+        urgency:"標題訊息精準、日期時間高對比顯示，底部 CTA 視覺獨立，以最短視覺路徑驅動立即報名或下載行動。",
+        calm:"版面節制清晰，主色飽和但不複雜，三層資訊層次讓中小企業主在低認知負荷下完成理解與行動。"
+      }
+    }
+  }
+};
+
+// Prompt additions per strategy combination
+var STRAT_PROMPT_DB={
+  premium:{
+    click:{trust:'soft even lighting, low contrast neutral palette, clean structured composition, precision detail clarity',excitement:'dramatic chiaroscuro, cinematic tension, aspirational desire, bold visual magnetism',urgency:'high contrast ratio 7:1, deep background shadows, tight subject framing, saturated accent on focal point',calm:'generous silence, unhurried luxury, minimal restraint, curated stillness'},
+    convert:{trust:'craftmanship details, decision-space composition, reassuring precision, purchase confidence',excitement:'desire-evoking lighting, aspirational ownership feel, magnetic product allure',urgency:'elegant pressure, refined urgency, precise high contrast, decisive composition',calm:'quiet persuasion, pure product truth, serene confidence, effortless quality'},
+    brand:{trust:'timeless brand authority, enduring visual identity, premium brand presence',excitement:'brand world storytelling, infectious brand energy, cinematic brand narrative',urgency:'maximum brand color saturation on focal element, high contrast silhouette, bold graphic presence',calm:'disciplined restraint, brand stillness, anti-trend confidence, composed authority'},
+    explain:{trust:'headline dominates 50% visual weight, geometric color blocks define zones, cutout person overlay on solid background, max 3 info layers, isolated CTA block at bottom, high-saturation 2-color system',excitement:'high-saturation color collision, oversized bold headline, topic hashtag labels, cutout speaker portrait, energy-forward knowledge visual',urgency:'headline at F-pattern hotspot, date-time high contrast, bottom CTA color block isolated, single action path, compressed decision journey',calm:'three-layer information discipline, dominant headline, clean geometric layout, bottom CTA separated by whitespace'}
+  },
+  mid:{
+    click:{trust:'warm professional tone, relatable balance, approachable credibility',excitement:'everyday joy captured, vibrant approachable energy, spontaneous visual delight',urgency:'value-forward composition, high-contrast benefit focus, deal-urgency atmosphere',calm:'unhurried natural feel, soft welcoming tone, scroll-stopping serenity'},
+    convert:{trust:'practical clarity, decision-clarity visual, useful trust signals',excitement:'ownership joy, value excitement, heart-and-mind conversion visual',urgency:'smart-shopper framing, limited-time visual logic, decisive value composition',calm:'low-friction layout, decision fatigue reduction, relaxed conversion design'},
+    brand:{trust:'consistent reliable palette, honest brand warmth, cumulative trust building',excitement:'brand vitality, memorable color energy, positive brand momentum',urgency:'competitive brand presence, dominant focal brand color, leadership visual stance',calm:'long-term brand familiarity, visual consistency, reassuring brand stability'},
+    explain:{trust:'bold headline top half, cutout speaker on geometric color block, 3-tier info hierarchy, bottom isolated CTA, high-saturation main color, authority credibility signals',excitement:'high-saturation color splash background, large headline + partner logo, cutout person overlay, hashtag topic labels, energetic B2B event visual',urgency:'headline + date high visibility, bottom CTA color block maximum contrast, minimal info layers, fast registration path',calm:'3-layer layout discipline, saturated but clean palette, cutout figure simplifies background, clear CTA separation'}
+  },
+  mass:{
+    click:{trust:'real-life grounded composition, authentic relatable scene, genuine human connection',excitement:'contagious high-saturation energy, dynamic share-worthy visual, vibrant lifestyle joy',urgency:'bold promotional atmosphere, thumb-stopping high contrast, irresistible value focal',calm:'noise-free visual calm, friendly low-pressure tone, welcoming simple composition'},
+    convert:{trust:'clear honest product display, direct communication, trust-to-purchase bridge',excitement:'instant purchase joy, clear offer excitement, feel-good conversion energy',urgency:'heartbeat CTA intensity, single-path action composition, deal urgency maximized',calm:'distraction-free product hero, friction-removed layout, pure conversion simplicity'},
+    brand:{trust:'neighborly brand warmth, lifestyle scene authenticity, long-term brand friendship',excitement:'brand happiness DNA, maximum color energy, viral brand vitality',urgency:'trending brand momentum, bold visual heat, cant-ignore brand dynamic',calm:'home-like brand comfort, warm color embrace, familiar brand dependency'},
+    explain:{trust:'direct headline message, 3-tier layout, bottom CTA contrast block, plain visual language, immediate comprehension for SMB audience',excitement:'high-saturation main color, large bold headline, topic labels, accessible energy-forward visual for SMB',urgency:'headline + date maximum visibility, isolated bottom CTA, shortest path from content to action',calm:'clean 3-layer layout, saturated but uncluttered, low cognitive load for busy SMB decision makers'}
+  }
+};
+
+// ── History & Settings Management ──
+var HIST_KEY='mvg_history';
+var SETTINGS_KEY='mvg_settings';
+var MAX_HIST=20;
+
+function getCurrentSettings(){
+  var lgiInput=document.getElementById('lgi');
+  var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:'';
+  var slotLabels=['商品圖','風格參考','競品參考'];
+  var refNames=refData.map(function(d,i){
+    var inp=document.getElementById('rf'+i);
+    return (inp&&inp.files&&inp.files[0])?inp.files[0].name:null;
+  });
+  return {
+    version:9,
+    timestamp:new Date().toISOString(),
+    audience:selAudience,
+    goal:selGoal,
+    emotion:selEm,
+    light:selLight,
+    ratio:selRatio,
+    ar:selAr,
+    position:selPos,
+    level:selLv,
+    dof:selDof,
+    imgStyle:selImgStyle,
+    layer:selLayer,
+    dot:{x:dot.x,y:dot.y},
+    primaryColor:primaryColor,
+    auxColors:auxColors,
+    badge:selBadge,
+    ptype:selPtype,
+    product:document.getElementById('fp').value,
+    headline:document.getElementById('fh').value,
+    sub:document.getElementById('fs').value,
+    cta:document.getElementById('fc').value,
+    extra:document.getElementById('f-extra')?document.getElementById('f-extra').value:'',
+    badgeText:document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value:'',
+    refImages:refData.slice(),
+    refNames:refNames,
+    logoData:refData._logo||null,
+    logoName:logoFname,
+    prompt:buildFullPrompt()
+  };
+}
+
+function applySettings(s){
+  if(!s) return;
+  try{
+    selAudience=s.audience||'b2c';
+    selGoal=s.goal||'click';
+    selEm=s.emotion||'trust';
+    selLight=s.light||'soft';
+    selRatio=s.ratio||'1:1';
+    selAr=s.ar||'1:1';
+    selPos=s.position||'center';
+    selLv=s.level||1;
+    selDof=s.dof||'shallow';
+    selImgStyle=s.imgStyle||'editorial';
+    selLayer=s.layer||'1';
+    if(s.dot){dot.x=s.dot.x;dot.y=s.dot.y;}
+    primaryColor=s.primaryColor||'#6B5CE7';
+    auxColors=s.auxColors||{};
+    selBadge=s.badge||'none';
+
+    // Update UI
+    document.getElementById('sw0').style.background=primaryColor;
+    document.getElementById('cp0').value=primaryColor;
+    document.getElementById('hx0').value=primaryColor;
+    updateSugg(primaryColor);
+
+    // Rebuild aux color rows
+    document.getElementById('aux-rows').innerHTML='';
+    auxCount=0;
+    Object.keys(auxColors).forEach(function(k){
+      auxCount=Math.max(auxCount,parseInt(k));
+      renderAuxRow(k,auxColors[k],'輔助色'+k);
+    });
+    checkAddBtn();
+
+    // Update pills
+    function setPill(groupId,val){
+      document.querySelectorAll('#'+groupId+' .pill').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#'+groupId+' .pill[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setGoalBtn(val){
+      document.querySelectorAll('#g-goal .goal-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#g-goal .goal-btn[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setAudBtn(val){
+      document.querySelectorAll('#g-audience .aud-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#g-audience .aud-btn[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setPosBtn(val){
+      document.querySelectorAll('#pos-grid .pos-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#pos-grid .pos-btn[data-p="'+val+'"]');
+      if(t){t.classList.add('on');selPoKw=t.dataset.kw;}
+    }
+    function setLvBtn(val){
+      document.querySelectorAll('#level-grid .level-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#level-grid .level-btn[data-lv="'+val+'"]');
+      if(t) t.classList.add('on');
+    }
+    function setRatioBtn(val){
+      document.querySelectorAll('#ratio-grid .ratio-btn').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#ratio-grid .ratio-btn[data-r="'+val+'"]');
+      if(t) t.classList.add('on');
+      document.getElementById('ratio-custom').style.display=val==='custom'?'flex':'none';
+    }
+    function setBadgeBtn(val){
+      document.querySelectorAll('#g-badge .pill').forEach(function(b){b.classList.remove('on');});
+      var t=document.querySelector('#g-badge .pill[data-v="'+val+'"]');
+      if(t) t.classList.add('on');
+      document.getElementById('badge-input-row').style.display=val==='none'?'none':'block';
+    }
+
+    // Restore product type
+    // Handle old ptype values from before simplification
+    var rawPtype=s.ptype||'physical';
+    if(rawPtype==='physical-b2c'||rawPtype==='physical-b2b') rawPtype='physical';
+    selPtype=rawPtype;
+    document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(b){b.classList.remove('on');});
+    var ptb=document.querySelector('#g-ptype .ptype-btn[data-v="'+selPtype+'"]');
+    if(ptb) ptb.classList.add('on');
+    setAudBtn(selAudience);
+    setGoalBtn(selGoal);
+    setPill('g-em',selEm);
+    setPill('g-light',selLight);
+    setRatioBtn(selRatio);
+    setPosBtn(selPos);
+    setLvBtn(selLv);
+    setPill('g-dof',selDof);
+    setPill('g-style',selImgStyle);
+    setPill('g-layer',selLayer);
+    setBadgeBtn(selBadge);
+
+    if(s.product) document.getElementById('fp').value=s.product;
+    if(s.headline) document.getElementById('fh').value=s.headline;
+    if(s.sub) document.getElementById('fs').value=s.sub;
+    if(s.cta) document.getElementById('fc').value=s.cta;
+    if(s.extra&&document.getElementById('f-extra')) document.getElementById('f-extra').value=s.extra;
+    if(s.badgeText&&document.getElementById('f-badge-text')) document.getElementById('f-badge-text').value=s.badgeText;
+
+    // Restore ref images
+    if(s.refImages){
+      var slotLabels2=['商品圖','風格參考','競品參考'];
+      s.refImages.forEach(function(d,i){
+        if(!d) return;
+        refData[i]=d;
+        var slot=document.getElementById('rslot-'+i);
+        if(!slot) return;
+        slot.innerHTML='';
+        var img=document.createElement('img');img.src=d;slot.appendChild(img);
+        var rm=document.createElement('button');rm.className='rm-btn';
+        rm.innerHTML='<svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>';
+        rm.onclick=(function(idx){return function(ev){ev.stopPropagation();rmRef(idx);};})(i);
+        slot.appendChild(rm);
+        slot.classList.add('filled');slot.onclick=null;
+        if(s.refNames&&s.refNames[i]){
+          var fi=document.getElementById('rf'+i);
+          if(fi) fi._restoredName=s.refNames[i];
+        }
+      });
+    }
+
+    // Restore logo
+    if(s.logoData){
+      refData._logo=s.logoData;
+      var lgn=document.getElementById('lgn');
+      if(lgn){
+        var logoName=s.logoName||'logo';
+        lgn.innerHTML='已上傳：<strong>'+logoName+'</strong> <button onclick="clearLogo()" style="margin-left:6px;font-size:11px;padding:1px 7px;border:0.5px solid var(--border2);border-radius:4px;background:transparent;color:var(--text3);cursor:pointer;">✕ 移除</button>';
+        lgn.style.display='block';
+      }
+    }
+
+    document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+    draw();
+    document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+    document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
+    bld();
+  }catch(e){console.error('applySettings error:',e);}
+}
+
+function saveToHistory(imgSrc){
+  var s=getCurrentSettings();
+  // For history: store compressed thumb of generated image, NOT full ref images (too large for localStorage)
+  delete s.refImages;
+  delete s.logoData;
+  delete s.prompt;
+  function doSave(thumb){
+    if(thumb) s.imgThumb=thumb;
+    var hist=getHistory();
+    hist.unshift(s);
+    if(hist.length>MAX_HIST) hist=hist.slice(0,MAX_HIST);
+    try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){
+      hist=hist.slice(0,10);
+      try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e2){}
+    }
+    renderHistory();
+  }
+  if(imgSrc){
+    compressImg(imgSrc,120,doSave);
+  } else {
+    doSave(null);
+  }
+}
+
+function compressImg(src,maxPx,callback){
+  try{
+    var img=new Image();
+    img.onload=function(){
+      var c=document.createElement('canvas');
+      var w=img.naturalWidth||img.width||200;
+      var h=img.naturalHeight||img.height||200;
+      var scale=Math.min(maxPx/w,maxPx/h,1);
+      c.width=Math.round(w*scale);c.height=Math.round(h*scale);
+      var ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,c.width,c.height);
+      if(callback) callback(c.toDataURL('image/jpeg',0.6));
+    };
+    img.onerror=function(){if(callback) callback(src);};
+    img.src=src;
+  }catch(e){if(callback) callback(src);}
+}
+
+function getHistory(){
+  try{var d=localStorage.getItem(HIST_KEY);return d?JSON.parse(d):[];}catch(e){return[];}
+}
+
+function renderHistory(){
+  var hist=getHistory();
+  var list=document.getElementById('hist-list');
+  var empty=document.getElementById('hist-empty');
+  if(!hist.length){if(empty)empty.style.display='block';list.innerHTML='<div class="hist-empty" id="hist-empty">尚無歷史紀錄。每次生圖後自動儲存。</div>';return;}
+  if(empty)empty.style.display='none';
+  list.innerHTML=hist.map(function(s,i){
+    var d=new Date(s.timestamp);
+    var timeStr=d.toLocaleDateString('zh-TW')+' '+d.toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+    var audLabel=s.audience==='b2b'?'B2B':'B2C';
+    var tierLabel=s.dot?(1-s.dot.y>0.65?'Premium':1-s.dot.y>0.35?'Mid':'Mass'):'';
+    var goalLabel={click:'點擊率',convert:'轉換',brand:'品牌感',explain:'內容解釋'}[s.goal]||s.goal;
+    var emLabel={trust:'Trust',excitement:'Excitement',urgency:'Urgency',calm:'Calm'}[s.emotion]||s.emotion;
+    var imgHtml=s.imgThumb?'<img class="hist-img" src="'+s.imgThumb+'" alt="">':'';
+    return '<div class="hist-item" onclick="applySettings(getHistory()['+i+'])">'
+      +'<div class="hist-item-header"><span class="hist-item-time">'+timeStr+'</span>'
+      +'<button class="hist-item-del" onclick="event.stopPropagation();deleteHist('+i+')" title="刪除">✕</button></div>'
+      +'<div style="display:flex;gap:8px;align-items:flex-start">'
+      +(imgHtml?'<div>'+imgHtml+'</div>':'')
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="hist-item-tags">'
+      +'<span class="hist-tag">'+audLabel+'</span>'
+      +'<span class="hist-tag">'+tierLabel+'</span>'
+      +'<span class="hist-tag">'+goalLabel+'</span>'
+      +'<span class="hist-tag">'+emLabel+'</span>'
+      +(s.ratio?'<span class="hist-tag">'+s.ratio+'</span>':'')
+      +(s.product?'<span class="hist-tag">'+s.product.slice(0,10)+'</span>':'')
+      +'</div>'
+      +'<div class="hist-item-preview">'+(s.prompt||'').slice(0,120)+'</div>'
+      +'</div></div>'
+      +'</div>';
+  }).join('');
+}
+
+function deleteHist(i){
+  var hist=getHistory();hist.splice(i,1);
+  try{localStorage.setItem(HIST_KEY,JSON.stringify(hist));}catch(e){}
+  renderHistory();
+}
+
+function clearAllHist(){
+  if(!confirm('確定要清除全部歷史紀錄？')) return;
+  try{localStorage.removeItem(HIST_KEY);}catch(e){}
+  renderHistory();
+}
+
+function exportJSON(){
+  var s=getCurrentSettings();
+  delete s.prompt;
+  s.exportedAt=new Date().toISOString();
+  var blob=new Blob([JSON.stringify(s,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  var prod=s.product?s.product.slice(0,12).replace(/[^a-zA-Z0-9一-鿿]/g,'_'):'settings';
+  a.download='mvg_'+prod+'_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  var imgCount=(s.refImages||[]).filter(Boolean).length+(s.logoData?1:0);
+  if(imgCount>0){var st=document.getElementById('gen-status');if(st){st.textContent='已匯出設定（含 '+imgCount+' 張圖片）';st.className='gen-status success';}}
+}
+
+function importJSON(inp){
+  if(!inp.files||!inp.files[0]) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var s=JSON.parse(e.target.result);
+      applySettings(s);
+      inp.value='';
+      alert('設定已匯入成功！');
+    }catch(err){
+      alert('匯入失敗：請確認檔案格式正確。');
+    }
+  };
+  reader.readAsText(inp.files[0]);
+}
+
+function toggleHist(btn){
+  var body=document.getElementById('hist-body');
+  var arrow=document.getElementById('hist-arrow');
+  body.classList.toggle('open');
+  arrow.classList.toggle('open');
+  if(body.classList.contains('open')) renderHistory();
+}
+
+var currentAbortController=null;
+
+async function generate(){
+  var apiKey=document.getElementById('api-key').value.trim();
+  if(!apiKey){setStatus('請先填入 Gemini API Key','error');return;}
+  if(currentAbortController){currentAbortController.abort();currentAbortController=null;return;}
+  var btn=document.getElementById('gen-btn');
+  currentAbortController=new AbortController();
+  btn.disabled=false;btn.textContent='取消生成';
+  btn.style.background='var(--bg3)';btn.style.color='var(--text2)';
+  btn.onclick=function(){
+    if(currentAbortController){currentAbortController.abort();currentAbortController=null;}
+    btn.textContent='產生這張圖';btn.style.background='';btn.style.color='';
+    btn.onclick=function(){generate();};
+    setStatus('已取消','');
+  };
+  setStatus('正在傳送給 Gemini…','');
+  document.getElementById('img-result').classList.remove('show');
+  document.getElementById('img-placeholder').style.display='flex';
+  document.getElementById('dl-btn').classList.remove('show');
+
+  var prompt=buildFullPrompt();
+  var contents=[];
+  var hasRef=refData.some(function(d){return d!==null;});
+
+  if(hasRef){
+    var parts=[];
+    var imgLabels=[
+      'This is Image 1 — the PRODUCT PHOTO. Maintain its exact appearance, shape, texture, and details as the main subject.',
+      'This is Image 2 — the STYLE REFERENCE. Match its visual atmosphere, mood, and aesthetic. Do not copy its subject.',
+      'This is Image 3 — the COMPETITOR REFERENCE. Study its visual language and intentionally differentiate in composition, color, or mood.'
+    ];
+    refData.forEach(function(d,i){
+      if(!d)return;
+      var b64=d.split(',')[1];
+      var mime=d.split(';')[0].split(':')[1];
+      parts.push({text:imgLabels[i]});
+      parts.push({inline_data:{mime_type:mime,data:b64}});
+    });
+    parts.push({text:'Now generate a marketing visual image following this specification:\n\n'+prompt});
+    contents=[{role:'user',parts:parts}];
+  } else {
+    contents=[{role:'user',parts:[{text:'Generate a marketing visual image following this specification:\n\n'+prompt}]}];
+  }
+
+  try{
+    var res=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image-preview:generateContent?key='+apiKey,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      signal:currentAbortController?currentAbortController.signal:undefined,
+      body:JSON.stringify({
+        contents:contents,
+        generationConfig:{responseModalities:['IMAGE','TEXT'],temperature:1.0}
+      })
+    });
+    var data=await res.json();
+    if(!res.ok){
+      var msg=(data.error&&data.error.message)||'API 回傳錯誤 '+res.status;
+      setStatus('錯誤：'+msg,'error');btn.disabled=false;btn.textContent='產生這張圖';return;
+    }
+    var imgPart=null;
+    var textPart=null;
+    console.log('Gemini response v4:', JSON.stringify(data).slice(0,600));
+    function scanParts(parts){
+      if(!Array.isArray(parts))return;
+      parts.forEach(function(p){
+        if(!imgPart){
+          if(p.inlineData&&p.inlineData.data) imgPart=p.inlineData;
+          else if(p.inline_data&&p.inline_data.data) imgPart=p.inline_data;
+        }
+        if(p.text) textPart=p.text;
+      });
+    }
+    // candidates[0].content.parts
+    if(data.candidates&&data.candidates[0]){
+      var c0=data.candidates[0];
+      if(c0.content&&c0.content.parts) scanParts(c0.content.parts);
+      else if(c0.parts) scanParts(c0.parts);
+    }
+    // top-level content or parts fallback
+    if(!imgPart&&data.content&&data.content.parts) scanParts(data.content.parts);
+    if(!imgPart&&data.parts) scanParts(data.parts);
+    if(imgPart){
+      var mimeType=imgPart.mimeType||imgPart.mime_type||'image/jpeg';
+      var src='data:'+mimeType+';base64,'+imgPart.data;
+      document.getElementById('result-img').src=src;
+      document.getElementById('img-result').classList.add('show');
+      document.getElementById('img-placeholder').style.display='none';
+      document.getElementById('dl-btn').classList.add('show');
+      document.getElementById('dl-btn').dataset.src=src;
+      setStatus('生成成功 ✓','success');
+      saveToHistory(src);
+      currentAbortController=null;
+      btn.textContent='產生這張圖';btn.style.background='';btn.style.color='';
+      btn.onclick=function(){generate();};
+    } else {
+      setStatus('Gemini 未回傳圖片，請嘗試調整 Prompt 或稍後再試','error');
+    }
+  }catch(err){
+    if(err.name==='AbortError'){setStatus('已取消','');}
+    else{setStatus('網路錯誤：'+err.message,'error');}
+    currentAbortController=null;
+  }
+  btn.disabled=false;btn.textContent='產生這張圖';btn.style.background='';btn.style.color='';btn.onclick=function(){generate();};
+}
+
+function setStatus(msg,type){
+  var el=document.getElementById('gen-status');
+  el.textContent=msg;
+  el.className='gen-status'+(type?' '+type:'');
+}
+
+var dlCount=0;
+function downloadImg(){
+  var src=document.getElementById('dl-btn').dataset.src;
+  if(!src) return;
+  var product=document.getElementById('fp')?document.getElementById('fp').value.trim():'';
+  var prod=product?product.slice(0,12).replace(/[^a-zA-Z0-9一-鿿]/g,'_'):'visual';
+  dlCount++;
+  var seq=dlCount>1?'_'+dlCount:'';
+  var date=new Date().toISOString().slice(0,10);
+  var a=document.createElement('a');
+  a.href=src;
+  a.download='mvg_'+prod+'_'+date+seq+'.png';
+  a.click();
+}
+
+
+var DB={
+  goal:{
+    click:{
+      prompt:'strong visual hook, bold high-contrast focal point, immediate attention-grabbing, dynamic visual energy',
+      light_override:'cinematic',
+      composition_note:'high-energy dynamic rhythm, strong visual tension',
+      contrast:'high',
+      safe_note:''
+    },
+    convert:{
+      prompt:'clear product benefit showcase, trust signals visible, action-oriented visual narrative, result-focused atmosphere',
+      light_override:'studio',
+      composition_note:'visual path flows directly to action, conversion-focused visual rhythm',
+      contrast:'medium-high',
+      safe_note:'reserve bottom 15% and right 25% as text-safe zone for CTA overlay'
+    },
+    brand:{
+      prompt:'brand personality expression, cohesive aesthetic language, memorable visual identity, aspirational lifestyle mood',
+      light_override:null,
+      composition_note:'harmonious balanced rhythm, generous whitespace 40%+, brand color visually present, unhurried refined visual flow',
+      contrast:'low',
+      safe_note:''
+    },
+    explain:{
+      prompt:'clear visual hierarchy, step-by-step visual clarity, educational layout, pre-defined text zones — clean solid color band at bottom reserved for copy overlay',
+      light_override:'natural',
+      composition_note:'clear information hierarchy top-to-bottom, max 3 information layers, structured visual zones, educational reading flow',
+      contrast:'medium',
+      safe_note:'keep central 80% clear for diagram or infographic overlay'
+    }
+  },
+  em:{
+    trust:{
+      kw_b2c:['soft even diffused lighting, low contrast background','neutral muted palette, no saturated distractions','clean open composition, generous breathing room','warm natural light quality, no harsh shadows'],
+      kw_b2b:['soft even studio lighting, controlled low contrast','neutral palette, brand color as sole accent','clean structured layout, precise visual alignment','no dramatic shadows, no high saturation backgrounds'],
+      light_pref:'soft'
+    },
+    excitement:{
+      kw_b2c:['high saturation color treatment','bold graphic focal contrast','dynamic diagonal lighting','vibrant energetic color blocking'],
+      kw_b2b:['progressive clean composition, sharp geometric accents','bold brand color focal point, high visual weight','dynamic asymmetric balance','modern minimal with strong contrast anchor'],
+      light_pref:'cinematic'
+    },
+    urgency:{
+      kw_b2c:['high contrast lighting, deep background shadows','tight subject framing, minimal background','saturated accent color on focal point','bold sharp edges, no soft gradients'],
+      kw_b2b:['high contrast ratio 7:1, dramatic shadow depth','tight composed framing, compressed background','saturated brand color accent on key element','structured minimal composition, decisive visual weight'],
+      light_pref:'studio'
+    },
+    calm:{
+      kw_b2c:['low contrast soft palette, minimal saturation','wide generous negative space, open composition','clean symmetric balance, quiet visual rhythm','soft tonal gradients, no stark visual edges'],
+      kw_b2b:['neutral palette, low visual noise','structured symmetric layout, measured proportions','refined minimal aesthetic, authoritative understatement','measured tonal depth, no dramatic contrast'],
+      light_pref:'natural'
+    }
+  },
+  light:{soft:'soft diffused lighting, gentle gradual shadows, flattering even illumination',cinematic:'cinematic directional lighting, dramatic contrast, film-quality atmosphere',studio:'controlled studio lighting, precise highlights, professional product photography',natural:'natural daylight quality, organic light feel, authentic environmental illumination'},
+  lv:{1:'no watermark, clean background',2:'no watermark, no clutter, no random typography, no fake engagement bait',3:'no watermark, no clutter, no incorrect branding, no irrelevant objects, commercially safe, no absolute guarantee language, no exaggerated comparison imagery, strict composition adherence'},
+  dof:{shallow:'shallow depth of field, subject sharp, background softly blurred',deep:'deep focus throughout, full scene sharpness',flat:'flat graphic style, no depth perspective'},
+  imgStyle:{editorial:'editorial photography aesthetic, magazine-quality',minimal:'minimalist composition, extreme negative space',tech:'tech product visual language, modern clean aesthetic, sharp technical precision',luxury:'luxury brand visual codes, premium material quality'},
+  safeZone:{
+    '1:1':{
+      platform:'Shopee 主圖、IG 貼文、FB 廣告',
+      rule:'keep all key elements within central 80% of frame',
+      prompt_note:'keep all headline, CTA, and key visuals within central 80%; outer 10% is decorative only'
+    },
+    '4:5':{
+      platform:'IG 直式貼文（推薦格式）',
+      rule:'keep elements within central 80% horizontally, top 10% and bottom 15% reserved for platform UI',
+      prompt_note:'avoid placing headline, CTA, or logo in top 10% and bottom 15% — platform UI risk areas'
+    },
+    '9:16':{
+      platform:'限時動態、Reels、TikTok',
+      rule:'top 15% and bottom 20% are UI overlay risk areas — no critical elements; left and right 5% margins',
+      prompt_note:'avoid placing headline, CTA, or logo in top 15% and bottom 20% — platform UI risk areas; background can extend into these zones'
+    },
+    '16:9':{
+      platform:'YouTube 封面、官網 Banner、簡報',
+      rule:'keep key elements within central 80% of frame, outer 10% on all sides decorative only',
+      prompt_note:'keep all text, CTA, and logos within central 80%; outer 10% is decorative only'
+    },
+    '3:1':{
+      platform:'橫幅廣告、EDM Header',
+      rule:'central 60% horizontally is primary attention zone, left third for visual, right two-thirds for text',
+      prompt_note:'keep 10% margin on all edges, avoid placing critical elements in outer margins'
+    },
+    'custom':{
+      platform:'自訂比例',
+      rule:'keep all key elements within central 80% of frame as general safe zone rule',
+      prompt_note:'maintain 10% margin on all edges as safety buffer, keep critical elements centered'
+    }
+  },
+  badge:{
+    none:null,
+    tag:'label tag graphic element in corner, bold high-contrast text, sharp clean edges, strong visual accent',
+    stamp:'circular stamp overlay, distressed ink texture, bold uppercase text inside circle, authoritative mark',
+    badge:'shield or hexagon badge graphic, official emblem style, strong visual credential',
+    sticker:'torn corner sticker design, slightly rotated, casual handmade feel, white border, eye-catching accent',
+    box:'solid color rectangular overlay, high contrast text block, clean geometric shape, bold visual anchor',
+    ribbon:'diagonal ribbon banner across corner, folded fabric texture, strong directional accent'
+  }
+};
+
+var CONFLICTS=[
+  {a:'trust',b:'excitement',msg:'Trust 與 Excitement 情緒方向相反，圖的氛圍會互相抵消。建議擇一。'},
+  {a:'calm',b:'urgency',msg:'Calm 與 Urgency 互相矛盾。建議擇一。'},
+  {a:'trust',b:'cinematic',msg:'信任感搭配電影感光線可能削弱親切感。建議改用 Soft 柔光。'},
+  {a:'calm',b:'cinematic',msg:'平靜感與電影感方向不符。建議改用 Natural 或 Soft。'},
+  {a:'urgency',b:'soft',msg:'緊迫感搭配柔光效果偏弱。建議改用 Studio 或 Cinematic。'}
+];
+
+// Goal + Emotion combination hints
+var GOAL_EM_HINTS={
+  'convert+urgency':'Convert（轉換）搭配 Urgency（緊迫）方向相反——轉換需要建立安心感，緊迫製造壓力。建議改用 Trust 或 Excitement。',
+  'brand+urgency':'Brand（品牌感）搭配 Urgency（緊迫）張力過大，品牌形象容易顯得急迫。建議改用 Excitement 或 Calm。',
+  'explain+excitement':'Explain（內容說明）搭配 Excitement（興奮）氛圍過強，可能干擾資訊傳遞。建議改用 Trust 或 Calm。',
+  'click+trust':'Click（點擊率）搭配 Trust（信任）方向相反——點擊需要高對比高能量，Trust 輸出低對比柔和色調，兩者互相抵消。建議改用 Urgency 或 Excitement。'
+};
+
+function checkConflicts(){
+  var found=null;
+  // Check emotion+light conflicts
+  for(var i=0;i<CONFLICTS.length;i++){
+    var c=CONFLICTS[i];
+    if([selEm,selLight].indexOf(c.a)>-1&&[selEm,selLight].indexOf(c.b)>-1){found=c;break;}
+  }
+  // Check goal+emotion combination hints
+  if(!found&&typeof GOAL_EM_HINTS!=='undefined'){
+    var key=selGoal+'+'+selEm;
+    if(GOAL_EM_HINTS[key]) found={msg:GOAL_EM_HINTS[key]};
+  }
+  var box=document.getElementById('conflict-box');
+  if(found){box.classList.add('show');document.getElementById('conflict-text').textContent=found.msg;}
+  else box.classList.remove('show');
+}
+
+function hslToHex(h,s,l){s/=100;l/=100;var a=s*Math.min(l,1-l);var f=function(n){var k=(n+h/30)%12;var c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,'0');};return'#'+f(0)+f(8)+f(4);}
+function hexToHsl(hex){var r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;var max=Math.max(r,g,b),min=Math.min(r,g,b);var h,s,l=(max+min)/2;if(max===min){h=s=0;}else{var d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);if(max===r)h=(g-b)/d+(g<b?6:0);else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h/=6;}return[Math.round(h*360),Math.round(s*100),Math.round(l*100)];}
+function genSugg(hex){try{var hsl=hexToHsl(hex);var h=hsl[0],s=hsl[1],l=hsl[2];return[hslToHex((h+30)%360,Math.max(20,s-15),Math.min(85,l+25)),hslToHex((h+180)%360,Math.max(15,s-20),Math.min(90,l+30))];}catch(e){return['#AAAAAA','#CCCCCC'];}}
+function updateSugg(hex){var sg=genSugg(hex);document.getElementById('sc0').style.background=sg[0];document.getElementById('sc0').dataset.color=sg[0];document.getElementById('sc1').style.background=sg[1];document.getElementById('sc1').dataset.color=sg[1];}
+function onCP(i,v){if(i===0){primaryColor=v;document.getElementById('sw0').style.background=v;document.getElementById('hx0').value=v;updateSugg(v);}else{auxColors[i]=v;var sw=document.getElementById('sw-aux-'+i);if(sw)sw.style.background=v;var hx=document.getElementById('hx-aux-'+i);if(hx)hx.value=v;}bld();}
+function onHX(i,v){if(/^#[0-9A-Fa-f]{6}$/.test(v)){if(i===0){primaryColor=v;document.getElementById('sw0').style.background=v;document.getElementById('cp0').value=v;updateSugg(v);}else{auxColors[i]=v;var sw=document.getElementById('sw-aux-'+i);if(sw)sw.style.background=v;var cp=document.getElementById('cp-aux-'+i);if(cp)cp.value=v;}bld();}}
+document.getElementById('sc0').addEventListener('click',function(){applySugg(this.dataset.color,'1');});
+document.getElementById('sc1').addEventListener('click',function(){applySugg(this.dataset.color,'2');});
+function applySugg(hex,label){var id=++auxCount;auxColors[id]=hex;renderAuxRow(id,hex,'輔助色'+label);checkAddBtn();bld();}
+function addAux(){var id=++auxCount;auxColors[id]='#CCCCCC';renderAuxRow(id,'#CCCCCC','輔助色'+Object.keys(auxColors).length);checkAddBtn();bld();}
+function renderAuxRow(id,hex,label){
+  var row=document.createElement('div');row.className='aux-row';row.id='aux-row-'+id;
+  row.innerHTML='<span class="color-label" style="width:50px;font-size:12px;color:var(--text2)">'+label+'</span>'+
+    '<div class="color-swatch-wrap" style="position:relative;width:32px;height:32px;flex-shrink:0;">'+
+    '<div class="color-swatch" id="sw-aux-'+id+'" style="background:'+hex+';width:32px;height:32px;border-radius:6px;border:0.5px solid var(--border2);"></div>'+
+    '<input type="color" id="cp-aux-'+id+'" value="'+hex+'" class="color-input-hidden" oninput="onCP('+id+',this.value)">'+
+    '</div><input class="color-hex" id="hx-aux-'+id+'" type="text" value="'+hex+'" maxlength="7" oninput="onHX('+id+',this.value)">'+
+    '<button class="aux-remove" onclick="removeAux('+id+')" title="刪除"><svg viewBox="0 0 10 10" fill="none" width="8" height="8"><path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>';
+  document.getElementById('aux-add-btn').before(row);
+}
+function removeAux(id){var row=document.getElementById('aux-row-'+id);if(row)row.remove();delete auxColors[id];checkAddBtn();bld();}
+function checkAddBtn(){document.getElementById('aux-add-btn').style.display=Object.keys(auxColors).length>=2?'none':'flex';}
+
+
+function getBKw(x,y){var p=1-y,e=x,kw=[];if(p>0.65)kw.push('luxury product photography','refined high-end composition','premium quality visual');else if(p>0.35)kw.push('clean professional aesthetic','polished commercial photography');else kw.push('approachable friendly tone','relatable lifestyle aesthetic');if(e>0.65)kw.push('warm emotional resonance','lifestyle storytelling');else if(e>0.35)kw.push('balanced warmth and clarity');else kw.push('precise rational layout','geometric technical clarity');if(p>0.62&&e>0.62)kw.push('aspirational editorial quality');else if(p>0.62&&e<0.38)kw.push('minimalist tech-premium');else if(p<0.38&&e>0.62)kw.push('vibrant playful energy');return kw;}
+function getBLabel(x,y){var p=1-y,e=x;return(p>0.65?'Premium':p>0.35?'Mid-range':'Mass')+' × '+(e>0.65?'感性':e>0.35?'平衡':'理性');}
+
+function draw(){
+  var cv=document.getElementById('qc');var dpr=window.devicePixelRatio||1;var sz=cv.offsetWidth;
+  cv.width=sz*dpr;cv.height=sz*dpr;var ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  var S=sz,pad=28,inn=S-pad*2;
+  var qc=[['#1e1a2e','#151e1a'],['#181e28','#1e2010']];
+  function rr(x,y,w,h,c){ctx.fillStyle=c;ctx.beginPath();ctx.roundRect(x,y,w,h,5);ctx.fill();}
+  rr(pad,pad,inn/2,inn/2,qc[0][0]);rr(pad+inn/2,pad,inn/2,inn/2,qc[0][1]);
+  rr(pad,pad+inn/2,inn/2,inn/2,qc[1][0]);rr(pad+inn/2,pad+inn/2,inn/2,inn/2,qc[1][1]);
+  ctx.fillStyle='rgba(160,158,150,0.45)';ctx.font='9px sans-serif';ctx.textAlign='center';
+  ctx.fillText('Tech / Minimal',pad+inn/4,pad+inn/4+4);ctx.fillText('Luxury Lifestyle',pad+inn*3/4,pad+inn/4+4);
+  ctx.fillText('Value / Practical',pad+inn/4,pad+inn*3/4+4);ctx.fillText('Playful / Warm',pad+inn*3/4,pad+inn*3/4+4);
+  ctx.strokeStyle='rgba(160,158,150,0.12)';ctx.lineWidth=0.5;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(pad,S/2);ctx.lineTo(S-pad,S/2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(S/2,pad);ctx.lineTo(S/2,S-pad);ctx.stroke();ctx.setLineDash([]);
+  var dx=pad+dot.x*inn,dy=pad+dot.y*inn;
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=0.5;
+  ctx.beginPath();ctx.moveTo(dx,pad);ctx.lineTo(dx,S-pad);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(pad,dy);ctx.lineTo(S-pad,dy);ctx.stroke();
+  ctx.beginPath();ctx.arc(dx,dy,10,0,Math.PI*2);ctx.fillStyle='rgba(200,200,200,0.12)';ctx.fill();
+  ctx.beginPath();ctx.arc(dx,dy,5,0,Math.PI*2);ctx.fillStyle='#e8e6df';ctx.fill();
+}
+function onQ(e){
+  var cv=document.getElementById('qc');var rect=cv.getBoundingClientRect();
+  var sz=rect.width,pad=28,inn=sz-pad*2;
+  var cx=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  var cy=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  dot.x=Math.max(0,Math.min(1,(cx-pad)/inn));dot.y=Math.max(0,Math.min(1,(cy-pad)/inn));
+  draw();
+  document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+  document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);bld();
+}
+document.getElementById('qc').addEventListener('click',onQ);
+document.getElementById('qc').addEventListener('touchstart',function(e){e.preventDefault();onQ(e);},{passive:false});
+
+function mkPills(id,key){
+  document.querySelectorAll('#'+id+' .pill').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#'+id+' .pill').forEach(function(x){x.classList.remove('on');});
+      this.classList.add('on');
+      if(key==='em'){selEm=this.dataset.v;document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');}
+      if(key==='goal')selGoal=this.dataset.v;
+      if(key==='light')selLight=this.dataset.v;
+      if(key==='dof')selDof=this.dataset.v;
+      if(key==='imgStyle')selImgStyle=this.dataset.v;
+      if(key==='layer')selLayer=this.dataset.v;
+      bld();
+    });
+  });
+}
+// Product type toggle
+document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#g-ptype .ptype-btn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');
+    selPtype=this.dataset.v;
+    bld();
+  });
+});
+
+// Audience toggle
+document.querySelectorAll('#g-audience .aud-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#g-audience .aud-btn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');
+    selAudience=this.dataset.v;
+    // B2B defaults: shift dot toward rational, set studio light
+    if(selAudience==='b2b'){
+      if(dot.x>0.5){dot.x=Math.max(0.15,dot.x-0.3);}
+      if(selLight==='natural'||selLight==='soft') selLight='studio';
+      document.querySelectorAll('#g-light .pill').forEach(function(x){x.classList.remove('on');});
+      document.querySelector('#g-light .pill[data-v="'+selLight+'"]').classList.add('on');
+    }
+    draw();
+    document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+    document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
+    bld();
+  });
+});
+// Goal buttons use goal-btn class instead of pill
+document.querySelectorAll('#g-goal .goal-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#g-goal .goal-btn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');
+    selGoal=this.dataset.v;
+    bld();
+  });
+});
+mkPills('g-em','em');mkPills('g-light','light');
+mkPills('g-dof','dof');mkPills('g-style','imgStyle');mkPills('g-layer','layer');
+
+document.querySelectorAll('#g-badge .pill').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#g-badge .pill').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');
+    selBadge=this.dataset.v;
+    document.getElementById('badge-input-row').style.display=selBadge==='none'?'none':'block';
+    bld();
+  });
+});
+
+document.querySelectorAll('#ratio-grid .ratio-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#ratio-grid .ratio-btn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');selRatio=this.dataset.r;selAr=this.dataset.ar;
+    document.getElementById('ratio-custom').style.display=selRatio==='custom'?'flex':'none';bld();
+  });
+});
+document.querySelectorAll('#pos-grid .pos-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#pos-grid .pos-btn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');selPos=this.dataset.p;selPoKw=this.dataset.kw;bld();
+  });
+});
+document.querySelectorAll('#level-grid .level-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#level-grid .level-btn').forEach(function(x){x.classList.remove('on');});
+    this.classList.add('on');selLv=parseInt(this.dataset.lv);bld();
+  });
+});
+document.querySelectorAll('#ref-types .rtp').forEach(function(b){
+  b.addEventListener('click',function(){
+    this.classList.toggle('on');
+    refTypes=[];
+    document.querySelectorAll('#ref-types .rtp.on').forEach(function(x){refTypes.push(x.dataset.v);});
+    if(refTypes.length===0){this.classList.add('on');refTypes=[this.dataset.v];}
+    bld();
+  });
+});
+
+function trigRef(i){if(!document.getElementById('rslot-'+i).classList.contains('filled'))document.getElementById('rf'+i).click();}
+function loadRef(i,inp){
+  if(!inp.files||!inp.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    refData[i]=e.target.result;
+    var slot=document.getElementById('rslot-'+i);slot.innerHTML='';
+    var img=document.createElement('img');img.src=e.target.result;slot.appendChild(img);
+    var rm=document.createElement('button');rm.className='rm-btn';
+    rm.innerHTML='<svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 2l6 6M8 2l-6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>';
+    rm.onclick=function(ev){ev.stopPropagation();rmRef(i);};slot.appendChild(rm);
+    slot.classList.add('filled');slot.onclick=null;bld();
+  };reader.readAsDataURL(inp.files[0]);
+}
+function rmRef(i){
+  var labels=['商品圖','風格參考','競品參考'];
+  refData[i]=null;
+  var slot=document.getElementById('rslot-'+i);
+  slot.innerHTML='<div class="plus">+</div><span class="sl">'+labels[i]+'</span>';
+  slot.classList.remove('filled');slot.onclick=function(){trigRef(i);};
+  document.getElementById('rf'+i).value='';bld();
+}
+function hlg(inp){
+  if(inp.files&&inp.files[0]){
+    var n=document.getElementById('lgn');
+    n.innerHTML='已上傳：<strong>'+inp.files[0].name+'</strong> <button onclick="clearLogo()" style="margin-left:6px;font-size:11px;padding:1px 7px;border:0.5px solid var(--border2);border-radius:4px;background:transparent;color:var(--text3);cursor:pointer;">✕ 移除</button>';
+    n.style.display='block';
+    var reader=new FileReader();
+    reader.onload=function(e){refData._logo=e.target.result;};
+    reader.readAsDataURL(inp.files[0]);
+    bld();
+  }
+}
+function clearLogo(){
+  var inp=document.getElementById('lgi');
+  inp.value='';
+  var n=document.getElementById('lgn');
+  n.style.display='none';n.innerHTML='';
+  refData._logo=null;
+  bld();
+}
+function toggleAdv(){var sec=document.getElementById('adv-sec');sec.classList.toggle('open');document.getElementById('adv-icon').style.transform=sec.classList.contains('open')?'rotate(180deg)':'';}
+function toggleKey(){var fi=document.getElementById('api-key');fi.type=fi.type==='password'?'text':'password';}
+
+function set(id,val){var el=document.getElementById(id);if(el)el.textContent=val;}
+
+function buildPromptText(){
+  // ── Core variables ──
+  var bkw=getBKw(dot.x,dot.y);
+  var emData=DB.em[selEm];
+  var auxVals=Object.values(auxColors);
+  var product=document.getElementById('fp').value.trim();
+  var headline=document.getElementById('fh').value.trim();
+  var sub=document.getElementById('fs').value.trim();
+  var cta=document.getElementById('fc').value.trim();
+  var hasLogo=document.getElementById('lgi').files&&document.getElementById('lgi').files.length>0;
+  var ar=selRatio==='custom'?(function(){var cw=document.getElementById('cw').value.trim(),ch=document.getElementById('ch').value.trim();return(cw&&ch)?cw+':'+ch:'1:1';})():selAr;
+  var hasRef=refData.some(function(d){return d!==null;});
+  var hasText=(headline||sub||cta);
+  var rdPerSlot={
+    0:{role:'PRODUCT PHOTO',instruction:'Maintain the exact appearance, shape, texture, and details of this product. Use it as the main subject.'},
+    1:{role:'STYLE REFERENCE',instruction:'Match the overall visual atmosphere, mood, color grading, and aesthetic style. Do not copy the subject.'},
+    2:{role:'COMPETITOR REFERENCE',instruction:'Study the visual language and intentionally differentiate — use a distinct composition, color, or mood.'}
+  };
+
+  // ── Tier / strategy lookup ──
+  var p2=1-dot.y,e2=dot.x;
+  var tier=p2>0.65?'premium':p2>0.35?'mid':'mass';
+
+  // ── [INTENT] Visual strategy text ──
+  var intentRow=document.getElementById('ps-intent-row');
+  var intentText='';
+  try{ intentText=STRAT_DB[selAudience][tier][selGoal][selEm]||''; }catch(ex){}
+  if(intentText&&intentRow){ intentRow.style.display='flex'; set('ps-intent-val',intentText); }
+  else if(intentRow){ intentRow.style.display='none'; }
+
+  // ── [SUBJECT] What is in the image ──
+  var subjectParts=[];
+  if(product) subjectParts.push('Product: '+product);
+  var uploadedCount=0;
+  refData.forEach(function(d,i){
+    if(d!==null){
+      uploadedCount++;
+      var fileInput=document.getElementById('rf'+i);
+      var fname=(fileInput&&fileInput.files&&fileInput.files[0])?fileInput.files[0].name:'image_'+(i+1);
+      subjectParts.push('↳ Attach "'+fname+'" as Image '+(i+1)+' ['+rdPerSlot[i].role+']: '+rdPerSlot[i].instruction);
+    }
+  });
+  if(!product&&uploadedCount===0) subjectParts.push('product hero shot');
+  set('ps-subject',subjectParts.join('\n'));
+
+  // ── [VISUAL] What the image looks like ──
+  // Only: product type visual language + lighting + depth + image style
+  // No emotion, no composition, no constraints here
+  var vis=[];
+  var ptypeData=PTYPE_DB[selPtype]||{};
+  var blockedTerms=ptypeData.blocked||[];
+
+  // Layer 1: PTYPE core skeleton (minimum required, concise)
+  if(ptypeData.core) vis.push(ptypeData.core);
+
+  // Layer 2: Lighting — goal override takes priority
+  var goalDataV=DB.goal[selGoal];
+  var lightOverride=goalDataV?goalDataV.light_override:null;
+  var effectiveLight=lightOverride||selLight;
+  vis.push(DB.light[effectiveLight]);
+  if(lightOverride&&lightOverride!==selLight){
+    // secondary tone removed
+  }
+
+  // Layer 3: Image style — only if not blocked by PTYPE
+  var imgStyleVal=DB.imgStyle[selImgStyle]||'';
+  // Skip imgStyle if PTYPE already defines visual language
+  // saas/event/service: PTYPE core covers visual style, imgStyle adds noise
+  var ptypesWithOwnStyle=['saas','event','service'];
+  var visStr=vis.join(' ').toLowerCase();
+  var isBlockedByType=ptypesWithOwnStyle.indexOf(selPtype)>-1;
+  var isBlockedByTerm=blockedTerms.some(function(b){
+    return imgStyleVal.toLowerCase().indexOf(b.toLowerCase())>-1;
+  });
+  var isBlockedByCore=imgStyleVal.split(',').some(function(w){
+    return w.trim().length>5&&visStr.indexOf(w.trim().toLowerCase())>-1;
+  });
+  if(imgStyleVal&&!isBlockedByType&&!isBlockedByTerm&&!isBlockedByCore) vis.push(imgStyleVal);
+
+  // Layer 4: Depth of field — skip shallow for saas (screen must be sharp)
+  if(selPtype==='saas'){
+    vis.push('flat depth of field, screen fully in focus');
+  } else if(selPtype==='event'){
+    vis.push('flat or deep focus throughout, full scene sharpness');
+  } else {
+    vis.push(DB.dof[selDof]);
+    if(selLayer==='2') vis.push('two-layer depth: subject + background');
+    if(selLayer==='3') vis.push('three-layer depth: subject + midground + background');
+  }
+
+  // Layer 5: Lens — PTYPE defines appropriate focal length
+  if(ptypeData.lens) vis.push(ptypeData.lens);
+
+  // Layer 6: Rendering quality for B2B Premium rational
+  var p4v=1-dot.y,e4v=dot.x;
+  if(selAudience==='b2b'&&p4v>0.65&&e4v<0.4){
+    vis.push('cinematic render quality, volumetric lighting, commercial photography grade');
+  }
+
+  // Layer 7: Layout rules
+  vis.push('image-to-text ratio 7:3');
+  vis.push('single dominant focal point');
+  // Layer 7: negative space - context-aware
+  if(selPtype==='event'){
+    vis.push('generous negative space with clean geometric color field, no natural scene elements');
+  } else if(selPtype==='service'){
+    vis.push('generous negative space — fill with soft environmental depth or diffused lighting');
+  } else {
+    vis.push('generous negative space — fill with lighting gradients or subtle background depth, avoid unnatural empty gaps');
+  }
+
+  set('ps-visual',vis.filter(Boolean).join(', '));
+
+  // ── [EMOTION] How the image feels ──
+  // Only: goal mood + emotion keywords + audience language + strategy keywords
+  // No lighting, no composition, no constraints here
+  var goalData=DB.goal[selGoal];
+  var em=[];
+  if(goalData&&goalData.prompt) em.push(goalData.prompt);
+  // Use B2C or B2B emotion keywords based on audience
+  var emKw=selAudience==='b2b'?(emData.kw_b2b||emData.kw_b2c||[]):(emData.kw_b2c||emData.kw||[]);
+  em=em.concat(emKw.slice(0,3));
+  // Audience-specific language
+  if(selAudience==='b2b'){
+    em.push('professional B2B visual, logical decision support, business value clarity');
+
+  }
+  // STRAT_PROMPT_DB used for INTENT display only (not EMOTION)
+  // DB.em.kw already contains physical parameters - no duplication needed
+  set('ps-emotion',em.filter(Boolean).join(', '));
+
+  // ── [COMPOSITION] How elements are arranged ──
+  // Only: position + goal composition + aspect ratio
+  // Z-pattern as single clear instruction
+  var comp=[];
+  comp.push(selPoKw); // Layer 1: position ALWAYS wins
+  if(goalData&&goalData.composition_note) comp.push(goalData.composition_note); // Layer 2: energy/rhythm only
+  comp.push('photorealistic commercial photography');
+  set('ps-composition',comp.filter(Boolean).join(', '));
+
+  // ── [COLOR] Brand colors + CTA contrast logic ──
+  var col=['primary: '+primaryColor];
+  if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
+  col.push('color ratio: 60% primary / 30% secondary / 10% accent');
+  // Smart CTA color: contrast against background
+  if(cta){
+    col.push('CTA: maximum contrast against background — use '+primaryColor+' or white depending on bg');
+  }
+  set('ps-color',col.join(' / '));
+
+  // ── [COPY] Text to render in image ──
+  var copyRow=document.getElementById('ps-copy-row');
+  var cp=[];
+  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Reduce font size if needed.');
+  if(headline) cp.push('headline: "'+headline+'"');
+  if(sub) cp.push('subtext: "'+sub+'"');
+  if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
+  var lgiInput=document.getElementById('lgi');
+  var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
+  if(hasLogo&&logoFname) cp.push('↳ Attach "'+logoFname+'" as Logo: top-left corner, maintain proportions');
+  else if(hasLogo) cp.push('brand logo: top-left corner');
+  if(cp.length){ copyRow.style.display='flex'; set('ps-copy-val',cp.join(' / ')); }
+  else copyRow.style.display='none';
+
+  // ── [ACCENT] Badge/label element ──
+  var badgeRow=document.getElementById('ps-badge-row');
+  var badgeText=document.getElementById('f-badge-text')?document.getElementById('f-badge-text').value.trim():'';
+  if(selBadge!=='none'&&DB.badge[selBadge]){
+    var badgeDesc=DB.badge[selBadge];
+    if(badgeText) badgeDesc+=' — display text: "'+badgeText+'"';
+    badgeRow.style.display='flex'; set('ps-badge-val',badgeDesc);
+  } else badgeRow.style.display='none';
+
+  // ── [CONSTRAINT] What must NOT appear ──
+  // Base level constraint + product type background restriction
+  // No duplication, no format rules here
+  var constraintParts=[DB.lv[selLv]];
+  if(ptypeData&&ptypeData.constraint){
+    constraintParts.push(ptypeData.constraint);
+  }
+  // No logo uploaded → tell AI not to render any brand logo
+  if(!hasLogo){
+    constraintParts.push('do not render any brand logo or wordmark — ensure top-left zone has minimal visual detail to allow logo overlay in post-production, while maintaining background continuity');
+  }
+  // Deduplicate constraint phrases
+  var constraintRaw=constraintParts.filter(Boolean).join(', ');
+  var constraintSeen={};
+  var constraintFinal=constraintRaw.split(',').map(function(s){return s.trim();}).filter(function(s){
+    if(!s||constraintSeen[s]) return false;
+    constraintSeen[s]=true; return true;
+  }).join(', ');
+  set('ps-constraint',constraintFinal);
+
+  // ── [FORMAT] Technical output specs ──
+  var ratioKey=selRatio==='custom'?'custom':selAr;
+  var szData=DB.safeZone[ratioKey]||DB.safeZone['custom'];
+  var szPrompt=szData.prompt_note||'';
+  var szPlatform=szData.platform||'';
+  var szRule=szData.rule||'';
+  var goalSafeNote=goalData?goalData.safe_note:'';
+  var formatVal='aspect ratio '+ar+', high resolution, commercial photography quality';
+  if(hasText) formatVal+=', render all COPY text exactly as written';
+  else formatVal+=', no unspecified text overlays';
+  set('ps-format',formatVal);
+
+  // ── [SAFE ZONE] Platform rules ──
+  var szRow=document.getElementById('ps-safezone-row');
+  if(szRow&&szPrompt){
+    var szVal=szPrompt;
+    // goalSafeNote excluded - position rules belong in COMPOSITION
+    szVal+='; background extends to edges for continuity';
+    szRow.style.display='flex';
+    set('ps-safezone-val',szVal);
+  }
+
+  // ── [EXTRA] Free text ──
+  var extraRow=document.getElementById('ps-extra-row');
+  var extraVal=document.getElementById('f-extra')?document.getElementById('f-extra').value.trim():'';
+  if(extraVal){ extraRow.style.display='flex'; set('ps-extra-val',extraVal); }
+  else extraRow.style.display='none';
+
+  return document.getElementById('prompt-block').innerText;
+}
+
+
+function bld(){
+  checkConflicts();
+  buildPromptText();
+  var p=1-dot.y,e=dot.x;
+  var ps=p>0.65?'高端':p>0.35?'中端':'大眾';
+  var es=e>0.65?'感性':e>0.35?'平衡':'理性';
+  var goalTxt={click:'提升點擊率',convert:'促進轉換',brand:'強化品牌感',explain:'清楚傳達內容'};
+  var lvTxt={1:'Basic Clean',2:'Design Control',3:'Brand Safe'};
+  var hasRef=refData.some(function(d){return d!==null;});
+  var tier=( (1-dot.y)>0.65)?'premium':((1-dot.y)>0.35)?'mid':'mass';
+  var stratText='';
+  var stratEl=document.getElementById('strat');
+  if(typeof STRAT_DB!=='undefined'&&STRAT_DB[selAudience]&&STRAT_DB[selAudience][tier]&&STRAT_DB[selAudience][tier][selGoal]&&STRAT_DB[selAudience][tier][selGoal][selEm]){
+    stratText=STRAT_DB[selAudience][tier][selGoal][selEm];
+    stratEl.textContent=stratText;
+    stratEl.style.lineHeight='1.75';
+  } else {
+    stratEl.textContent=ps+'品牌 × '+es+'調性，目標：'+goalTxt[selGoal]+'，光線：'+selLight+'，潔淨：'+lvTxt[selLv]+'。';
+  }
+  if(hasRef){ stratEl.textContent+=' 已載入參考圖，Gemini 會直接讀取。'; }
+  console.log('strat check:',selAudience,tier,selGoal,selEm,'→',stratText?'OK':'MISS');
+}
+
+function buildFullPrompt(){
+  var sections=[['INTENT','ps-intent-val'],['SUBJECT','ps-subject'],['VISUAL','ps-visual'],['EMOTION','ps-emotion'],['COMPOSITION','ps-composition'],['COLOR','ps-color'],['CONSTRAINT','ps-constraint'],['FORMAT','ps-format']];
+  var lines=[];
+  sections.forEach(function(s){var el=document.getElementById(s[1]);if(el&&el.textContent&&el.textContent!=='—')lines.push('['+s[0]+']\n'+el.textContent);});
+  var cr=document.getElementById('ps-copy-row');
+  if(cr&&cr.style.display!=='none'){var cv=document.getElementById('ps-copy-val');if(cv&&cv.textContent)lines.push('[COPY]\n'+cv.textContent);}
+  var br=document.getElementById('ps-badge-row');
+  if(br&&br.style.display!=='none'){var bv=document.getElementById('ps-badge-val');if(bv&&bv.textContent)lines.push('[ACCENT]\n'+bv.textContent);}
+  var er=document.getElementById('ps-extra-row');
+  if(er&&er.style.display!=='none'){var ev=document.getElementById('ps-extra-val');if(ev&&ev.textContent)lines.push('[EXTRA]\n'+ev.textContent);}
+  var szr=document.getElementById('ps-safezone-row');
+  if(szr&&szr.style.display!=='none'){var szv=document.getElementById('ps-safezone-val');if(szv&&szv.textContent)lines.push('[SAFE ZONE]\n'+szv.textContent);}
+  return lines.join('\n\n');
+}
+
+function cpAll(){
+  navigator.clipboard.writeText(buildFullPrompt()).then(function(){
+    var btn=document.getElementById('cpb');btn.textContent='已複製 ✓';
+    setTimeout(function(){btn.innerHTML='<svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a2 2 0 00-2-2H3a2 2 0 002 2h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> 複製完整 Prompt';},1800);
+  });
+}
+
+setTimeout(function(){
+  draw();updateSugg(primaryColor);
+  document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+  document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);
+  document.getElementById('kw-em').innerHTML=(DB.em[selEm].kw||[]).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
+  bld();
+},80);
+window.addEventListener('resize',function(){draw();});
+</script>
+  <div class="version-footer">
+    <span class="version-badge">
+      <span class="version-dot"></span>
+      <span id="ver-txt">Marketing Visual Generator · v3-p5</span>
+    </span>
+  </div>
+  <script>
+  (function(){
+    var el=document.getElementById('ver-txt');
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-4';
+  })();
+  </script>
+</body>
+</html>
