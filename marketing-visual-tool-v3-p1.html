@@ -1195,7 +1195,7 @@ var DB={
     click:{
       prompt:'strong visual hook, bold high-contrast focal point, immediate attention-grabbing, dynamic visual energy',
       light_override:'cinematic',
-      composition_note:'high-energy dynamic rhythm, strong visual tension, bold asymmetric energy',
+      composition_note:'high-energy dynamic rhythm, strong visual tension',
       contrast:'high',
       safe_note:''
     },
@@ -1563,8 +1563,13 @@ function buildPromptText(){
   }
   // Lighting (from user selection, not overridden by goal here)
   vis.push(DB.light[selLight]);
-  // Image style
-  vis.push(DB.imgStyle[selImgStyle]);
+  // Image style - skip if overlaps with PTYPE visual
+  var imgStyleVal=DB.imgStyle[selImgStyle]||'';
+  var ptypeVisual=PTYPE_DB[selPtype]?PTYPE_DB[selPtype].visual:'';
+  var hasOverlap=imgStyleVal.split(',').some(function(w){
+    return w.trim().length>8&&ptypeVisual.toLowerCase().indexOf(w.trim().toLowerCase())>-1;
+  });
+  if(!hasOverlap) vis.push(imgStyleVal);
   // Depth of field
   vis.push(DB.dof[selDof]);
   // Layer depth
@@ -1764,7 +1769,7 @@ window.addEventListener('resize',function(){draw();});
   <div class="version-footer">
     <span class="version-badge">
       <span class="version-dot"></span>
-      Marketing Visual Generator &nbsp;·&nbsp; v3-p1 &nbsp;·&nbsp; 2026.05.02
+      Marketing Visual Generator &nbsp;·&nbsp; v3-p2 &nbsp;·&nbsp; 2026.05.02
     </span>
   </div>
 </body>
