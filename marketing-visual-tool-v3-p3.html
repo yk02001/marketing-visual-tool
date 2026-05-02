@@ -1251,22 +1251,22 @@ var DB={
     '1:1':{
       platform:'Shopee 主圖、IG 貼文、FB 廣告',
       rule:'keep all key elements within central 80% of frame',
-      prompt_note:'all critical elements within central 80% of frame, keep outer 10% on all sides decorative only'
+      prompt_note:'place all headline, CTA, and key visuals within central 80% of frame; outer 10% on all sides is decorative — background can extend to edges'
     },
     '4:5':{
       platform:'IG 直式貼文（推薦格式）',
       rule:'keep elements within central 80% horizontally, top 10% and bottom 15% reserved for platform UI',
-      prompt_note:'subject and text within central 80% safe area, keep top 10% and bottom 15% completely empty'
+      prompt_note:'avoid placing headline, CTA, or logo in top 10% and bottom 15% — platform UI overlay risk areas; background environment can extend to edges to maintain visual continuity'
     },
     '9:16':{
       platform:'限時動態、Reels、TikTok',
       rule:'keep top 15% and bottom 20% completely empty for platform UI overlay, left and right 5% margins',
-      prompt_note:'critical elements within central 90% width only, keep top 15% and bottom 20% completely empty for platform UI overlay'
+      prompt_note:'avoid placing headline, CTA, or logo in top 15% and bottom 20% — these are platform UI overlay risk areas; background visuals, lighting, and environment can extend into these zones to maintain visual continuity'
     },
     '16:9':{
       platform:'YouTube 封面、官網 Banner、簡報',
       rule:'keep key elements within central 80% of frame, outer 10% on all sides decorative only',
-      prompt_note:'all text and logos within central 80% safe zone, outer 10% on all sides decorative only'
+      prompt_note:'place all text, CTA, and logos within central 80%; outer 10% on all sides is decorative background only — visual environment can extend to edges'
     },
     '3:1':{
       platform:'橫幅廣告、EDM Header',
@@ -1590,7 +1590,7 @@ function buildPromptText(){
   if(selLayer==='3') vis.push('three-layer depth: subject + midground + background');
   // Core visual rules (insight-based)
   vis.push('image-to-text ratio 7:3');
-  vis.push('minimum 35% whitespace');
+  vis.push('generous negative space for visual balance — use natural scene depth, soft lighting gradients, or background environment to fill negative areas, avoid unnatural empty gaps');
   vis.push('single dominant focal point');
   // Rendering quality for high-end rational (B2B Premium)
   var p4v=1-dot.y,e4v=dot.x;
@@ -1681,7 +1681,7 @@ function buildPromptText(){
   }
   // No logo uploaded → tell AI not to render any brand logo
   if(!hasLogo){
-    constraintParts.push('do not render any brand logo or wordmark — keep top-left 15% zone as flat clean area with no textures or decorative elements, reserved for logo placement in post-production');
+    constraintParts.push('do not render any brand logo or wordmark — ensure top-left zone has minimal visual detail to allow logo overlay in post-production, while maintaining background continuity');
   }
   // Deduplicate constraint phrases
   var constraintRaw=constraintParts.filter(Boolean).join(', ');
@@ -1709,6 +1709,7 @@ function buildPromptText(){
   if(szRow&&szPrompt){
     var szVal=szPrompt;
     if(goalSafeNote) szVal+=', '+goalSafeNote;
+    szVal+='; ensure visual continuity across entire frame, avoid unnatural empty space';
     szRow.style.display='flex';
     set('ps-safezone-val',szVal);
   }
