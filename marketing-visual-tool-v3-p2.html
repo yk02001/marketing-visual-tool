@@ -732,7 +732,7 @@ var STRAT_PROMPT_DB={
   },
   mid:{
     click:{trust:'warm professional tone, relatable balance, approachable credibility',excitement:'everyday joy captured, vibrant approachable energy, spontaneous visual delight',urgency:'value-forward composition, high-contrast benefit focus, deal-urgency atmosphere',calm:'unhurried natural feel, soft welcoming tone, scroll-stopping serenity'},
-    convert:{trust:'practical clarity, CTA-ready composition, useful trust signals',excitement:'ownership joy, value excitement, heart-and-mind conversion visual',urgency:'smart-shopper framing, limited-time visual logic, decisive value composition',calm:'low-friction layout, decision fatigue reduction, relaxed conversion design'},
+    convert:{trust:'practical clarity, decision-clarity visual, useful trust signals',excitement:'ownership joy, value excitement, heart-and-mind conversion visual',urgency:'smart-shopper framing, limited-time visual logic, decisive value composition',calm:'low-friction layout, decision fatigue reduction, relaxed conversion design'},
     brand:{trust:'consistent reliable palette, honest brand warmth, cumulative trust building',excitement:'brand vitality, memorable color energy, positive brand momentum',urgency:'competitive brand presence, dominant focal brand color, leadership visual stance',calm:'long-term brand familiarity, visual consistency, reassuring brand stability'},
     explain:{trust:'bold headline top half, cutout speaker on geometric color block, 3-tier info hierarchy, bottom isolated CTA, high-saturation main color, authority credibility signals',excitement:'high-saturation color splash background, large headline + partner logo, cutout person overlay, hashtag topic labels, energetic B2B event visual',urgency:'headline + date high visibility, bottom CTA color block maximum contrast, minimal info layers, fast registration path',calm:'3-layer layout discipline, saturated but clean palette, cutout figure simplifies background, clear CTA separation'}
   },
@@ -1200,7 +1200,7 @@ var DB={
       safe_note:''
     },
     convert:{
-      prompt:'clear product benefit showcase, trust signals visible, action-oriented framing, CTA zone reserved, conversion-optimized layout',
+      prompt:'clear product benefit showcase, trust signals visible, action-oriented visual narrative, result-focused atmosphere',
       light_override:'studio',
       composition_note:'visual path flows directly to action, negative space reserved for text overlay, conversion-focused visual rhythm',
       contrast:'medium-high',
@@ -1250,23 +1250,23 @@ var DB={
   safeZone:{
     '1:1':{
       platform:'Shopee 主圖、IG 貼文、FB 廣告',
-      rule:'keep all key elements within central 80% of frame (safe zone: ~864×864px of 1080×1080) | Shopee: information clarity first / IG: atmosphere and aesthetic first',
-      prompt_note:'all critical elements centered within 80% of frame, avoid placing text or logos near edges'
+      rule:'keep all key elements within central 80% of frame',
+      prompt_note:'all critical elements within central 80% of frame, keep outer 10% on all sides decorative only'
     },
     '4:5':{
-      platform:'IG 直式貼文（推薦格式）— 圖片美感優先，氛圍感強，適合品牌形象和生活感內容',
-      rule:'keep elements within central 80% horizontally, top 10% and bottom 15% reserved for IG UI',
-      prompt_note:'keep subject and text within central safe area, avoid bottom 15% (IG caption bar) and top 10%'
+      platform:'IG 直式貼文（推薦格式）',
+      rule:'keep elements within central 80% horizontally, top 10% and bottom 15% reserved for platform UI',
+      prompt_note:'subject and text within central 80% safe area, keep top 10% and bottom 15% completely empty'
     },
     '9:16':{
       platform:'限時動態、Reels、TikTok',
-      rule:'safe zone: central 900×1400px. Top 250px = profile/buttons. Bottom 320px = caption/CTA bar. Left/right 60px margins.',
-      prompt_note:'critical elements within central 900×1400px zone only, keep top 250px and bottom 320px completely empty for platform UI overlay'
+      rule:'keep top 15% and bottom 20% completely empty for platform UI overlay, left and right 5% margins',
+      prompt_note:'critical elements within central 90% width only, keep top 15% and bottom 20% completely empty for platform UI overlay'
     },
     '16:9':{
       platform:'YouTube 封面、官網 Banner、簡報',
-      rule:'keep key elements within central 80% (safe zone: ~1728×972px of 1920×1080), avoid edges',
-      prompt_note:'all text and logos within central 80% safe zone, outer 10% on all sides should be decorative only'
+      rule:'keep key elements within central 80% of frame, outer 10% on all sides decorative only',
+      prompt_note:'all text and logos within central 80% safe zone, outer 10% on all sides decorative only'
     },
     '3:1':{
       platform:'橫幅廣告、EDM Header',
@@ -1669,7 +1669,7 @@ function buildPromptText(){
   }
   // No logo uploaded → tell AI not to render any brand logo
   if(!hasLogo){
-    constraintParts.push('do not render any brand logo or wordmark — leave top-left area clean for later design overlay');
+    constraintParts.push('do not render any brand logo or wordmark — keep top-left 15% zone as flat clean area with no textures or decorative elements, reserved for logo placement in post-production');
   }
   // Deduplicate constraint phrases
   var constraintRaw=constraintParts.filter(Boolean).join(', ');
@@ -1694,10 +1694,9 @@ function buildPromptText(){
 
   // ── [SAFE ZONE] Platform rules ──
   var szRow=document.getElementById('ps-safezone-row');
-  if(szRow&&szPlatform){
-    var szVal='Platform: '+szPlatform+' | Rule: '+szRule;
-    if(goalSafeNote) szVal+=' | '+goalSafeNote;
-    if(szPrompt) szVal+=' | '+szPrompt;
+  if(szRow&&szPrompt){
+    var szVal=szPrompt;
+    if(goalSafeNote) szVal+=', '+goalSafeNote;
     szRow.style.display='flex';
     set('ps-safezone-val',szVal);
   }
