@@ -237,6 +237,9 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
         <span class="aud-sub">邏輯驅動 · 長期評估 · 商業價值</span>
       </button>
     </div>
+    <div id="b2b-hint" style="display:none;margin-top:6px;padding:6px 10px;background:var(--bg3);border-radius:var(--radius-sm);border-left:2px solid var(--text2);">
+      <span style="font-size:11px;color:var(--text2);">💡 B2B 受眾建議：將品牌象限座標往「理性」方向調整，視覺策略更符合企業決策者偏好。</span>
+    </div>
     <p class="sec">行銷目標</p>
     <div class="goal-grid" id="g-goal">
       <button class="goal-btn on" data-v="click">
@@ -1274,7 +1277,7 @@ var DB={
     },
     '3:1':{
       platform:'橫幅廣告、EDM Header',
-      rule:'central 60% horizontally is primary attention zone, left third for visual, right two-thirds for text',
+      rule:'keep all key elements within central 80%, outer 10% on all sides decorative only',
       prompt_note:'keep 10% margin on all edges, avoid placing critical elements in outer margins'
     },
     'custom':{
@@ -1419,6 +1422,9 @@ document.querySelectorAll('#g-audience .aud-btn').forEach(function(b){
     document.querySelectorAll('#g-audience .aud-btn').forEach(function(x){x.classList.remove('on');});
     this.classList.add('on');
     selAudience=this.dataset.v;
+    // Show/hide B2B hint
+    var b2bHint=document.getElementById('b2b-hint');
+    if(b2bHint) b2bHint.style.display=selAudience==='b2b'?'block':'none';
     // B2B defaults: shift dot toward rational, set studio light
     if(selAudience==='b2b'){
       if(dot.x>0.5){dot.x=Math.max(0.15,dot.x-0.3);}
@@ -1821,7 +1827,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-8';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-9';
   })();
   </script>
 </body>
