@@ -299,11 +299,12 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div class="color-section">
       <div class="color-row">
         <span class="color-label">主色</span>
-        <div class="color-swatch-wrap"><div class="color-swatch" id="sw0" style="background:#6B5CE7"></div><input class="color-input-hidden" type="color" id="cp0" value="#6B5CE7" oninput="onCP(0,this.value)"></div>
-        <input class="color-hex" id="hx0" type="text" value="#6B5CE7" oninput="onHX(0,this.value)" maxlength="7" placeholder="#000000">
+        <div class="color-swatch-wrap"><div class="color-swatch" id="sw0" style="background:var(--bg3);border:1.5px dashed var(--border2)"></div><input class="color-input-hidden" type="color" id="cp0" value="#6B5CE7" oninput="onCP(0,this.value)"></div>
+        <input class="color-hex" id="hx0" type="text" value="" oninput="onHX(0,this.value)" maxlength="7" placeholder="不指定（AI 自動）">
+        <button onclick="clearPC()" style="font-size:10px;padding:2px 6px;border:0.5px solid var(--border2);border-radius:4px;background:transparent;color:var(--text2);cursor:pointer;margin-left:4px;flex-shrink:0;">清除</button>
       </div>
       <div class="suggest-row">
-        <span class="suggest-label">建議配色：</span>
+        <span class="suggest-label">色彩延伸參考：</span>
         <div class="suggest-chip" id="sc0"></div>
         <div class="suggest-chip" id="sc1"></div>
         <span class="suggest-label" style="margin-left:2px;">← 點擊套用</span>
@@ -353,9 +354,9 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     </button>
     <div class="adv-section" id="adv-sec">
       <p class="sec" style="margin-bottom:7px;margin-top:3px;">景深</p>
-      <div class="pills" id="g-dof"><button class="pill on" data-v="shallow">焦點集中</button><button class="pill" data-v="deep">層次清晰</button><button class="pill" data-v="flat">均勻對焦</button></div>
+      <div class="pills" id="g-dof"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="shallow">焦點集中</button><button class="pill" data-v="deep">層次清晰</button><button class="pill" data-v="flat">均勻對焦</button></div>
       <p class="sec" style="margin-bottom:7px;">圖片風格</p>
-      <div class="pills" id="g-style"><button class="pill on" data-v="editorial">Editorial</button><button class="pill" data-v="minimal">Minimal</button><button class="pill" data-v="tech">Tech</button><button class="pill" data-v="luxury">Luxury</button></div>
+      <div class="pills" id="g-style"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="editorial">Editorial</button><button class="pill" data-v="minimal">Minimal</button><button class="pill" data-v="tech">Tech</button><button class="pill" data-v="luxury">Luxury</button></div>
       <p class="sec" style="margin-bottom:7px;">視覺層級</p>
       <div class="pills" id="g-layer"><button class="pill on" data-v="1">單層</button><button class="pill" data-v="2">雙層</button><button class="pill" data-v="3">三層</button></div>
     </div>
@@ -525,7 +526,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 </div>
 
 <script>
-var dot={x:0.72,y:0.22};
+var dot={x:0.5,y:0.5};var dotMoved=false;
 var selAudience='b2c';
 var selPtype='physical';
 
@@ -557,10 +558,10 @@ var PTYPE_DB={
 };
 var selGoal='click',selEm='trust',selLight='soft',selRatio='1:1',selAr='1:1';
 var selPos='center',selPoKw='REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides';
-var selLv=1,selDof='shallow',selImgStyle='editorial',selLayer='1';
+var selLv=1,selDof='',selImgStyle='',selLayer='1';
 var refTypes=['product'];
 var selBadge='none';
-var primaryColor='#6B5CE7';
+var primaryColor='';
 var auxColors={};
 var auxCount=0;
 var refData=[null,null,null]; // base64 data
@@ -811,7 +812,7 @@ function applySettings(s){
     selDof=s.dof||'shallow';
     selImgStyle=s.imgStyle||'editorial';
     selLayer=s.layer||'1';
-    if(s.dot){dot.x=s.dot.x;dot.y=s.dot.y;}
+    if(s.dot){dot.x=s.dot.x;dot.y=s.dot.y;dotMoved=true;}
     primaryColor=s.primaryColor||'#6B5CE7';
     auxColors=s.auxColors||{};
     selBadge=s.badge||'none';
@@ -1258,32 +1259,32 @@ var DB={
     '1:1':{
       platform:'Shopee 主圖、IG 貼文、FB 廣告',
       rule:'keep all key elements within central 80% of frame',
-      prompt_note:'keep all headline, CTA, and key visuals within central 80%; outer 10% is decorative only'
+      prompt_note:'keep all headline, CTA, and key visuals within central 80%; outer 10% must be filled with background visuals, not left empty'
     },
     '4:5':{
       platform:'IG 直式貼文（推薦格式）',
-      rule:'keep elements within central 80% horizontally, top 10% and bottom 15% reserved for platform UI',
+      rule:'keep elements within central 80% horizontally, avoid top 10% and bottom 15% (platform UI overlay risk areas)',
       prompt_note:'avoid placing headline, CTA, or logo in top 10% and bottom 15% — platform UI risk areas'
     },
     '9:16':{
       platform:'限時動態、Reels、TikTok',
       rule:'top 15% and bottom 20% are UI overlay risk areas — no critical elements; left and right 5% margins',
-      prompt_note:'avoid placing headline, CTA, or logo in top 15% and bottom 20% — platform UI risk areas; background can extend into these zones'
+      prompt_note:'avoid placing headline, CTA, or logo in top 15% and bottom 20% — platform UI risk areas'
     },
     '16:9':{
       platform:'YouTube 封面、官網 Banner、簡報',
       rule:'keep key elements within central 80% of frame, outer 10% on all sides decorative only',
-      prompt_note:'keep all text, CTA, and logos within central 80%; outer 10% is decorative only'
+      prompt_note:'keep all text, CTA, and logos within central 80%; outer 10% must be filled with background visuals, not left empty'
     },
     '3:1':{
       platform:'橫幅廣告、EDM Header',
       rule:'keep all key elements within central 80%, outer 10% on all sides decorative only',
-      prompt_note:'keep 10% margin on all edges, avoid placing critical elements in outer margins'
+      prompt_note:'keep 10% margin on all edges, avoid placing critical elements in outer margins; all margins must be filled with background visuals, not left empty'
     },
     'custom':{
       platform:'自訂比例',
       rule:'keep all key elements within central 80% of frame as general safe zone rule',
-      prompt_note:'maintain 10% margin on all edges as safety buffer, keep critical elements centered'
+      prompt_note:'maintain 10% margin on all edges as safety buffer, keep critical elements centered; all margins must be filled with background visuals, not left empty'
     }
   },
   badge:{
@@ -1334,8 +1335,16 @@ function hslToHex(h,s,l){s/=100;l/=100;var a=s*Math.min(l,1-l);var f=function(n)
 function hexToHsl(hex){var r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;var max=Math.max(r,g,b),min=Math.min(r,g,b);var h,s,l=(max+min)/2;if(max===min){h=s=0;}else{var d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);if(max===r)h=(g-b)/d+(g<b?6:0);else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h/=6;}return[Math.round(h*360),Math.round(s*100),Math.round(l*100)];}
 function genSugg(hex){try{var hsl=hexToHsl(hex);var h=hsl[0],s=hsl[1],l=hsl[2];return[hslToHex((h+30)%360,Math.max(20,s-15),Math.min(85,l+25)),hslToHex((h+180)%360,Math.max(15,s-20),Math.min(90,l+30))];}catch(e){return['#AAAAAA','#CCCCCC'];}}
 function updateSugg(hex){var sg=genSugg(hex);document.getElementById('sc0').style.background=sg[0];document.getElementById('sc0').dataset.color=sg[0];document.getElementById('sc1').style.background=sg[1];document.getElementById('sc1').dataset.color=sg[1];}
-function onCP(i,v){if(i===0){primaryColor=v;document.getElementById('sw0').style.background=v;document.getElementById('hx0').value=v;updateSugg(v);}else{auxColors[i]=v;var sw=document.getElementById('sw-aux-'+i);if(sw)sw.style.background=v;var hx=document.getElementById('hx-aux-'+i);if(hx)hx.value=v;}bld();}
-function onHX(i,v){if(/^#[0-9A-Fa-f]{6}$/.test(v)){if(i===0){primaryColor=v;document.getElementById('sw0').style.background=v;document.getElementById('cp0').value=v;updateSugg(v);}else{auxColors[i]=v;var sw=document.getElementById('sw-aux-'+i);if(sw)sw.style.background=v;var cp=document.getElementById('cp-aux-'+i);if(cp)cp.value=v;}bld();}}
+function clearPC(){
+  primaryColor='';
+  var sw=document.getElementById('sw0');
+  sw.style.background='var(--bg3)';
+  sw.style.border='1.5px dashed var(--border2)';
+  document.getElementById('hx0').value='';
+  bld();
+}
+function onCP(i,v){if(i===0){primaryColor=v;var sw=document.getElementById('sw0');sw.style.background=v;sw.style.border='';document.getElementById('hx0').value=v;updateSugg(v);}else{auxColors[i]=v;var sw=document.getElementById('sw-aux-'+i);if(sw)sw.style.background=v;var hx=document.getElementById('hx-aux-'+i);if(hx)hx.value=v;}bld();}
+function onHX(i,v){if(v===''&&i===0){clearPC();return;}if(/^#[0-9A-Fa-f]{6}$/.test(v)){if(i===0){primaryColor=v;var sw=document.getElementById('sw0');sw.style.background=v;sw.style.border='';document.getElementById('cp0').value=v;updateSugg(v);}else{auxColors[i]=v;var sw=document.getElementById('sw-aux-'+i);if(sw)sw.style.background=v;var cp=document.getElementById('cp-aux-'+i);if(cp)cp.value=v;}bld();}}
 document.getElementById('sc0').addEventListener('click',function(){applySugg(this.dataset.color,'1');});
 document.getElementById('sc1').addEventListener('click',function(){applySugg(this.dataset.color,'2');});
 function applySugg(hex,label){var id=++auxCount;auxColors[id]=hex;renderAuxRow(id,hex,'輔助色'+label);checkAddBtn();bld();}
@@ -1383,7 +1392,7 @@ function onQ(e){
   var sz=rect.width,pad=28,inn=sz-pad*2;
   var cx=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
   var cy=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
-  dot.x=Math.max(0,Math.min(1,(cx-pad)/inn));dot.y=Math.max(0,Math.min(1,(cy-pad)/inn));
+  dot.x=Math.max(0,Math.min(1,(cx-pad)/inn));dot.y=Math.max(0,Math.min(1,(cy-pad)/inn));dotMoved=true;
   draw();
   document.getElementById('kw-brand').innerHTML=getBKw(dot.x,dot.y).map(function(k){return'<span class="kw">'+k+'</span>';}).join('');
   document.getElementById('blabel').textContent=getBLabel(dot.x,dot.y);bld();
@@ -1556,7 +1565,7 @@ function buildPromptText(){
 
   // ── Tier / strategy lookup ──
   var p2=1-dot.y,e2=dot.x;
-  var tier=p2>0.65?'premium':p2>0.35?'mid':'mass';
+  var tier=dotMoved?(p2>0.65?'premium':p2>0.35?'mid':'mass'):'mid';
 
   // ── [INTENT] Visual strategy text ──
   var intentRow=document.getElementById('ps-intent-row');
@@ -1600,7 +1609,7 @@ function buildPromptText(){
   }
 
   // Layer 3: Image style — only if not blocked by PTYPE
-  var imgStyleVal=DB.imgStyle[selImgStyle]||'';
+  var imgStyleVal=selImgStyle?DB.imgStyle[selImgStyle]||'':'';
   // Skip imgStyle if PTYPE already defines visual language
   // saas/event/service: PTYPE core covers visual style, imgStyle adds noise
   var ptypesWithOwnStyle=['saas','event','service'];
@@ -1620,7 +1629,7 @@ function buildPromptText(){
   } else if(selPtype==='event'){
     vis.push('flat or deep focus throughout, full scene sharpness');
   } else {
-    vis.push(DB.dof[selDof]);
+    if(selDof) vis.push(DB.dof[selDof]);
     if(selLayer==='2') vis.push('two-layer depth: subject + background');
     if(selLayer==='3') vis.push('three-layer depth: subject + midground + background');
   }
@@ -1630,7 +1639,7 @@ function buildPromptText(){
 
   // Layer 6: Rendering quality for B2B Premium rational
   var p4v=1-dot.y,e4v=dot.x;
-  if(selAudience==='b2b'&&p4v>0.65&&e4v<0.4){
+  if(dotMoved&&selAudience==='b2b'&&p4v>0.65&&e4v<0.4){
     vis.push('cinematic render quality, volumetric lighting, commercial photography grade');
   }
 
@@ -1680,13 +1689,16 @@ function buildPromptText(){
   set('ps-composition',comp.filter(Boolean).join(', '));
 
   // ── [COLOR] Brand colors + CTA contrast logic ──
-  var col=['primary: '+primaryColor];
-  if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
-  col.push('color ratio: 60% primary / 30% secondary / 10% accent');
-  // Smart CTA color: contrast against background
-  if(cta){
-    col.push('CTA: maximum contrast against background — use '+primaryColor+' or white depending on bg');
+  // Only output COLOR if primary color is specified
+  var col=[];
+  if(primaryColor){
+    col.push('primary: '+primaryColor);
+    if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
+    col.push('color ratio: 60% primary / 30% secondary / 10% accent');
+    if(cta) col.push('CTA: maximum contrast against background — use '+primaryColor+' or white depending on bg');
   }
+  var colorRow=document.getElementById('ps-color-row');
+  if(colorRow) colorRow.style.display=col.length>0?'flex':'none';
   set('ps-color',col.join(' / '));
 
   // ── [COPY] Text to render in image ──
@@ -1749,7 +1761,7 @@ function buildPromptText(){
   if(szRow&&szPrompt){
     var szVal=szPrompt;
     // goalSafeNote excluded - position rules belong in COMPOSITION
-    szVal+='; background extends to edges for continuity';
+    szVal+='; background must extend and fill all edges, no empty or blank areas at borders';
     szRow.style.display='flex';
     set('ps-safezone-val',szVal);
   }
@@ -1773,7 +1785,7 @@ function bld(){
   var goalTxt={click:'提升點擊率',convert:'促進轉換',brand:'強化品牌感',explain:'清楚傳達內容'};
   var lvTxt={1:'Basic Clean',2:'Design Control',3:'Brand Safe'};
   var hasRef=refData.some(function(d){return d!==null;});
-  var tier=( (1-dot.y)>0.65)?'premium':((1-dot.y)>0.35)?'mid':'mass';
+  var tier=dotMoved?(( (1-dot.y)>0.65)?'premium':((1-dot.y)>0.35)?'mid':'mass'):'mid';
   var stratText='';
   var stratEl=document.getElementById('strat');
   if(typeof STRAT_DB!=='undefined'&&STRAT_DB[selAudience]&&STRAT_DB[selAudience][tier]&&STRAT_DB[selAudience][tier][selGoal]&&STRAT_DB[selAudience][tier][selGoal][selEm]){
@@ -1827,7 +1839,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-9';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-10';
   })();
   </script>
 </body>
