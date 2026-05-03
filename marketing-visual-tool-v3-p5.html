@@ -210,14 +210,14 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 
   <!-- Step 1 -->
   <div class="card">
-    <div class="sh"><span class="sb">1</span><span class="st">品牌風格定位</span></div>
+    <div class="sh"><span class="sb">1</span><span class="st">品牌風格定位 Brand Positioning</span></div>
     <p class="hint">在象限圖點選你的品牌座標</p>
     <div class="q-outer">
       <canvas id="qc" width="640" height="640"></canvas>
       <span class="ax" style="top:3px;left:50%;transform:translateX(-50%)">高端 Premium</span>
       <span class="ax" style="bottom:3px;left:50%;transform:translateX(-50%)">大眾 Mass</span>
-      <span class="ax" style="left:2px;top:50%;transform:translateY(-50%)">理性</span>
-      <span class="ax" style="right:2px;top:50%;transform:translateY(-50%)">感性</span>
+      <span class="ax" style="left:2px;top:50%;transform:translateY(-50%)">理性 Rational</span>
+      <span class="ax" style="right:2px;top:50%;transform:translateY(-50%)">感性 Emotional</span>
     </div>
     <div class="result-row"><span style="font-size:11px;color:var(--text3)">定位：</span><span class="badge" id="blabel">Premium × 感性</span></div>
     <div class="kw-row" id="kw-brand"></div>
@@ -225,8 +225,8 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 
   <!-- Step 2 -->
   <div class="card">
-    <div class="sh"><span class="sb">2</span><span class="st">製圖意圖</span></div>
-    <p class="sec" style="margin-bottom:8px;">受眾類型</p>
+    <div class="sh"><span class="sb">2</span><span class="st">製圖意圖 Visual Intent</span></div>
+    <p class="sec" style="margin-bottom:8px;">受眾類型 Audience</p>
     <div class="audience-toggle" id="g-audience">
       <button class="aud-btn on" data-v="b2c">
         <span class="aud-main">B2C 消費者市場</span>
@@ -240,26 +240,26 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div id="b2b-hint" style="display:none;margin-top:6px;padding:6px 10px;background:var(--bg3);border-radius:var(--radius-sm);border-left:2px solid var(--text2);">
       <span style="font-size:11px;color:var(--text2);">💡 B2B 受眾建議：將品牌象限座標往「理性」方向調整，視覺策略更符合企業決策者偏好。</span>
     </div>
-    <p class="sec">行銷目標</p>
+    <p class="sec">行銷目標 Goal</p>
     <div class="goal-grid" id="g-goal">
       <button class="goal-btn on" data-v="click">
-        <span class="goal-main">點擊率</span>
+        <span class="goal-main">點擊率 Click</span>
         <span class="goal-sub">讓人停下來看 · Attention</span>
       </button>
       <button class="goal-btn" data-v="convert">
-        <span class="goal-main">轉換</span>
+        <span class="goal-main">轉換 Convert</span>
         <span class="goal-sub">讓人現在採取行動 · Convert</span>
       </button>
       <button class="goal-btn" data-v="brand">
-        <span class="goal-main">品牌感</span>
+        <span class="goal-main">品牌感 Brand</span>
         <span class="goal-sub">讓人記住我是誰 · Brand</span>
       </button>
       <button class="goal-btn" data-v="explain">
-        <span class="goal-main">內容解釋</span>
+        <span class="goal-main">內容解釋 Explain</span>
         <span class="goal-sub">讓人看懂我在說什麼 · Explain</span>
       </button>
     </div>
-    <p class="sec">情緒定位</p>
+    <p class="sec">情緒定位 Emotion</p>
     <div class="pills" id="g-em">
       <button class="pill on" data-v="trust">Trust 信任</button>
       <button class="pill" data-v="excitement">Excitement 興奮</button>
@@ -268,7 +268,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     </div>
     <div class="kw-row" id="kw-em"></div>
     <div class="divider"></div>
-    <p class="sec">輸出比例</p>
+    <p class="sec">輸出比例 Ratio</p>
     <div class="ratio-grid" id="ratio-grid">
       <button class="ratio-btn on" data-r="1:1" data-ar="1:1"><span class="r-main">1 : 1</span><span class="r-sub">Shopee 主圖、IG 貼文、FB 廣告</span></button>
       <button class="ratio-btn" data-r="4:5" data-ar="4:5"><span class="r-main">4 : 5</span><span class="r-sub">IG 直式貼文、FB 直式廣告</span></button>
@@ -286,8 +286,8 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 
   <!-- Step 3 -->
   <div class="card">
-    <div class="sh"><span class="sb">3</span><span class="st">視覺語言</span></div>
-    <p class="sec">光線風格</p>
+    <div class="sh"><span class="sb">3</span><span class="st">視覺語言 Visual Language</span></div>
+    <p class="sec">光線風格 Lighting</p>
     <div class="pills" id="g-light">
       <button class="pill on" data-v="soft">Soft 柔光</button>
       <button class="pill" data-v="cinematic">Cinematic 電影感</button>
@@ -295,7 +295,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       <button class="pill" data-v="natural">Natural 自然光</button>
     </div>
     <div class="divider"></div>
-    <p class="sec" style="margin-bottom:9px;">色彩系統</p>
+    <p class="sec" style="margin-bottom:9px;">色彩系統 Colors</p>
     <div class="color-section">
       <div class="color-row">
         <span class="color-label">主色</span>
@@ -316,20 +316,20 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       </button>
     </div>
     <div class="divider"></div>
-    <p class="sec" style="margin-bottom:7px;">主體位置</p>
+    <p class="sec" style="margin-bottom:7px;">主體位置 Position</p>
     <div class="pos-grid" id="pos-grid">
       <button class="pos-btn" data-p="left" data-kw="REQUIRED: subject strictly on left third of frame, large negative space on right side for text, asymmetric composition">
-        <div class="pos-icon"><div class="pos-dot" style="left:16%"></div></div><span class="pos-label">左置</span>
+        <div class="pos-icon"><div class="pos-dot" style="left:16%"></div></div><span class="pos-label">左置 Left</span>
       </button>
       <button class="pos-btn on" data-p="center" data-kw="REQUIRED: subject centered in frame, symmetrical balanced composition, equal space on both sides">
-        <div class="pos-icon"><div class="pos-dot" style="left:50%;transform:translate(-50%,-50%)"></div></div><span class="pos-label">置中</span>
+        <div class="pos-icon"><div class="pos-dot" style="left:50%;transform:translate(-50%,-50%)"></div></div><span class="pos-label">置中 Center</span>
       </button>
       <button class="pos-btn" data-p="right" data-kw="REQUIRED: subject strictly on right third of frame, large negative space on left side for text, asymmetric composition">
-        <div class="pos-icon"><div class="pos-dot" style="right:16%"></div></div><span class="pos-label">右置</span>
+        <div class="pos-icon"><div class="pos-dot" style="right:16%"></div></div><span class="pos-label">右置 Right</span>
       </button>
     </div>
     <div class="divider"></div>
-    <p class="sec" style="margin-bottom:7px;">畫面潔淨等級</p>
+    <p class="sec" style="margin-bottom:7px;">畫面潔淨等級 Clean Level</p>
     <div class="level-grid" id="level-grid">
       <button class="level-btn on" data-lv="1">
         <div class="lv-header"><span class="lv-num">Level 1</span><span class="lv-title">Basic Clean</span></div>
@@ -353,18 +353,18 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       進階設定
     </button>
     <div class="adv-section" id="adv-sec">
-      <p class="sec" style="margin-bottom:7px;margin-top:3px;">景深</p>
-      <div class="pills" id="g-dof"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="shallow">焦點集中</button><button class="pill" data-v="deep">層次清晰</button><button class="pill" data-v="flat">均勻對焦</button></div>
-      <p class="sec" style="margin-bottom:7px;">圖片風格</p>
-      <div class="pills" id="g-style"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="editorial">Editorial</button><button class="pill" data-v="minimal">Minimal</button><button class="pill" data-v="tech">Tech</button><button class="pill" data-v="luxury">Luxury</button></div>
-      <p class="sec" style="margin-bottom:7px;">視覺層級</p>
-      <div class="pills" id="g-layer"><button class="pill on" data-v="1">單層</button><button class="pill" data-v="2">雙層</button><button class="pill" data-v="3">三層</button></div>
+      <p class="sec" style="margin-bottom:7px;margin-top:3px;">景深 Depth of Field</p>
+      <div class="pills" id="g-dof"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="shallow">焦點集中 Shallow</button><button class="pill" data-v="deep">層次清晰 Deep</button><button class="pill" data-v="flat">均勻對焦 Flat</button></div>
+      <p class="sec" style="margin-bottom:7px;">圖片風格 Image Style</p>
+      <div class="pills" id="g-style"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="editorial">Editorial 雜誌感</button><button class="pill" data-v="minimal">Minimal 極簡</button><button class="pill" data-v="tech">Tech 科技</button><button class="pill" data-v="luxury">Luxury 奢華</button></div>
+      <p class="sec" style="margin-bottom:7px;">視覺層級 Visual Layer</p>
+      <div class="pills" id="g-layer"><button class="pill on" data-v="1">單層 Single</button><button class="pill" data-v="2">雙層 Double</button><button class="pill" data-v="3">三層 Triple</button></div>
     </div>
   </div>
 
   <!-- Step 4 -->
   <div class="card">
-    <div class="sh"><span class="sb">4</span><span class="st">產品參考圖</span></div>
+    <div class="sh"><span class="sb">4</span><span class="st">產品參考圖 Reference</span></div>
     <p class="hint">上傳商品圖或視覺參考，最多 3 張（Gemini 會直接讀取圖片內容生成）</p>
     <div class="ref-grid">
       <div class="ref-slot" id="rslot-0" onclick="trigRef(0)"><div class="plus">+</div><span class="sl">商品圖</span></div>
@@ -385,8 +385,8 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
 
   <!-- Step 5 -->
   <div class="card">
-    <div class="sh"><span class="sb">5</span><span class="st">核心文案與品牌</span></div>
-    <p class="sec" style="margin-bottom:8px;">商品類型</p>
+    <div class="sh"><span class="sb">5</span><span class="st">核心文案與品牌 Copy & Brand</span></div>
+    <p class="sec" style="margin-bottom:8px;">商品類型 Product Type</p>
     <div class="ptype-grid" id="g-ptype">
       <button class="ptype-btn on" data-v="physical">
         <span class="ptype-main">實體商品</span>
@@ -417,16 +417,15 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     </div>
     <div id="lgn" style="font-size:11px;color:var(--text3);margin-top:3px;display:none;"></div>
     <div class="divider"></div>
-    <p class="sec" style="margin-bottom:7px;">局部強調設計</p>
+    <p class="sec" style="margin-bottom:7px;">局部強調設計 Accent</p>
     <p class="hint" style="margin-bottom:9px;">選擇視覺強調元素，文案可以是 CTA、促銷訊息、標章說明或任何視覺重點</p>
     <div class="pills" id="g-badge">
       <button class="pill on" data-v="none">無</button>
-      <button class="pill" data-v="tag">特價標籤</button>
-      <button class="pill" data-v="stamp">印章</button>
-      <button class="pill" data-v="badge">徽章</button>
-      <button class="pill" data-v="sticker">撕角貼紙</button>
-      <button class="pill" data-v="box">色塊 Box</button>
-      <button class="pill" data-v="ribbon">緞帶</button>
+      <button class="pill" data-v="stamp">印章 Stamp</button>
+      <button class="pill" data-v="badge">徽章 Badge</button>
+      <button class="pill" data-v="ribbon">緞帶 Ribbon</button>
+      <button class="pill" data-v="circle">圓形色塊 Circle</button>
+      <button class="pill" data-v="chamfer">截角 Chamfer</button>
     </div>
     <div id="badge-input-row" style="display:none;margin-top:4px;">
       <div class="field-row">
@@ -435,23 +434,26 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       </div>
     </div>
     <div class="divider"></div>
-    <p class="sec" style="margin-bottom:6px;">額外補充說明</p>
+    <p class="sec" style="margin-bottom:6px;">額外補充說明 Notes</p>
     <p class="hint" style="margin-bottom:7px;">可自由補充任何額外要求或細節，會附加到 Prompt 最尾端</p>
     <textarea class="fi" id="f-extra" rows="3" placeholder="e.g. 背景需要有模糊城市感、整體色調偏冷、產品需要有水滴質感..." oninput="bld()" style="resize:vertical;font-size:12px;line-height:1.5;padding-top:8px;"></textarea>
   </div>
 
   <!-- Step 6: Result -->
   <div class="card">
-    <div class="sh"><span class="sb">6</span><span class="st">生成結果</span></div>
-    <p class="sec" style="margin-bottom:6px;">視覺策略建議</p>
+    <div class="sh"><span class="sb">6</span><span class="st">生成結果 Output</span></div>
+    <p class="sec" style="margin-bottom:6px;">視覺策略建議 Strategy</p>
     <div class="strat" id="strat">選擇上方選項後自動產生…</div>
-    <div id="conflict-box" class="conflict-box">
+    <div style="margin-bottom:8px;">
+      <button onclick="runConflictCheck()" style="font-size:11px;padding:4px 10px;border:0.5px solid var(--border2);border-radius:6px;background:transparent;color:var(--text2);cursor:pointer;">⚠ 檢查選項衝突 Check Conflicts</button>
+    </div>
+    <div id="conflict-box" class="conflict-box" style="display:none;">
       <span class="conflict-icon">⚠</span>
       <span class="conflict-text" id="conflict-text"></span>
     </div>
     <div class="divider"></div>
     <div class="rb">
-      <p class="sec" style="margin-bottom:0;">結構化 Prompt</p>
+      <p class="sec" style="margin-bottom:0;">結構化 Prompt Structure</p>
       <button class="copy-btn" id="cpb" onclick="cpAll()">
         <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M11 5V3a2 2 0 00-2-2H3a2 2 0 002 2h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
         複製完整 Prompt
@@ -1289,12 +1291,11 @@ var DB={
   },
   badge:{
     none:null,
-    tag:'label tag graphic element in bottom-right or top-right corner (avoid top-left logo zone), bold high-contrast text, sharp clean edges, strong visual accent',
     stamp:'circular stamp overlay in bottom-right or top-right corner (avoid top-left logo zone), distressed ink texture, bold uppercase text inside circle, authoritative mark',
     badge:'shield or hexagon badge graphic in bottom-right or top-right corner (avoid top-left logo zone), official emblem style, strong visual credential',
-    sticker:'torn corner sticker in bottom-right or top-right corner (avoid top-left logo zone), slightly rotated, casual handmade feel, white border, eye-catching accent',
-    box:'solid color rectangular overlay in bottom-right area (avoid top-left logo zone), high contrast text block, clean geometric shape, bold visual anchor',
-    ribbon:'diagonal ribbon banner across bottom-right or top-right corner (avoid top-left logo zone), folded fabric texture, strong directional accent'
+    ribbon:'diagonal ribbon banner across bottom-right or top-right corner (avoid top-left logo zone), folded fabric texture, strong directional accent',
+    circle:'solid filled circle in bottom-right or top-right corner (avoid top-left logo zone), clean flat color, bold centered white text, modern UI badge style, strong focal accent',
+    chamfer:'chamfered rectangle with 45-degree cut corners in bottom-right or top-right corner (avoid top-left logo zone), solid flat color, bold centered white text, tech UI aesthetic, sharp dynamic accent'
   }
 };
 
@@ -1315,6 +1316,9 @@ var GOAL_EM_HINTS={
 };
 
 function checkConflicts(){
+  // No-op: conflict check is now manual via runConflictCheck()
+}
+function runConflictCheck(){
   var found=null;
   // Check emotion+light conflicts
   for(var i=0;i<CONFLICTS.length;i++){
@@ -1327,8 +1331,15 @@ function checkConflicts(){
     if(GOAL_EM_HINTS[key]) found={msg:GOAL_EM_HINTS[key]};
   }
   var box=document.getElementById('conflict-box');
-  if(found){box.classList.add('show');document.getElementById('conflict-text').textContent=found.msg;}
-  else box.classList.remove('show');
+  if(found){
+    box.style.display='block';
+    box.classList.add('show');
+    document.getElementById('conflict-text').textContent=found.msg;
+  } else {
+    box.style.display='block';
+    box.classList.remove('show');
+    document.getElementById('conflict-text').textContent='✓ 目前選項組合無明顯衝突 No conflicts detected';
+  }
 }
 
 function hslToHex(h,s,l){s/=100;l/=100;var a=s*Math.min(l,1-l);var f=function(n){var k=(n+h/30)%12;var c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,'0');};return'#'+f(0)+f(8)+f(4);}
