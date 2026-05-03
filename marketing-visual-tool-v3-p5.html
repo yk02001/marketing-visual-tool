@@ -350,7 +350,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     </button>
     <div class="adv-section" id="adv-sec">
       <p class="sec" style="margin-bottom:7px;margin-top:3px;">景深</p>
-      <div class="pills" id="g-dof"><button class="pill on" data-v="shallow">Shallow 淺景深</button><button class="pill" data-v="deep">Deep 全景清晰</button><button class="pill" data-v="flat">Flat 平面感</button></div>
+      <div class="pills" id="g-dof"><button class="pill on" data-v="shallow">焦點集中</button><button class="pill" data-v="deep">層次清晰</button><button class="pill" data-v="flat">均勻對焦</button></div>
       <p class="sec" style="margin-bottom:7px;">圖片風格</p>
       <div class="pills" id="g-style"><button class="pill on" data-v="editorial">Editorial</button><button class="pill" data-v="minimal">Minimal</button><button class="pill" data-v="tech">Tech</button><button class="pill" data-v="luxury">Luxury</button></div>
       <p class="sec" style="margin-bottom:7px;">視覺層級</p>
@@ -536,7 +536,7 @@ var PTYPE_DB={
   'saas':{
     core:'laptop or monitor displaying software UI dashboard, screen content sharp and legible, data visualization elements visible inside screen, clean tech product aesthetic',
     lens:'35mm wide angle, clean technical perspective',
-    constraint:'background must not compete with screen content, no lifestyle props, no human hands unless purposeful',
+    constraint:'background must not compete with screen content, no lifestyle props, no human hands unless purposeful, no lens flares or light leaks across screen area, maintain 100% visibility of UI and data visualization elements',
     blocked:['lifestyle scene','natural environment','tactile','authentic human touch','luxury brand']
   },
   'event':{
@@ -1227,8 +1227,8 @@ var DB={
   },
   em:{
     trust:{
-      kw_b2c:['soft even diffused lighting, low contrast background','neutral muted palette, no saturated distractions','clean open composition, generous breathing room','warm natural light quality, no harsh shadows'],
-      kw_b2b:['soft even studio lighting, controlled low contrast','neutral palette, brand color as sole accent','clean structured layout, precise visual alignment','no dramatic shadows, no high saturation backgrounds'],
+      kw_b2c:['low contrast background, no harsh shadows','neutral muted palette, no saturated distractions','clean open composition, generous breathing room','soft tonal gradients, warm understated depth'],
+      kw_b2b:['controlled low contrast, no dramatic shadows','neutral palette, brand color as sole accent','clean structured layout, precise visual alignment','no high saturation backgrounds, measured tonal depth'],
       light_pref:'soft'
     },
     excitement:{
@@ -1285,12 +1285,12 @@ var DB={
   },
   badge:{
     none:null,
-    tag:'label tag graphic element in corner, bold high-contrast text, sharp clean edges, strong visual accent',
-    stamp:'circular stamp overlay, distressed ink texture, bold uppercase text inside circle, authoritative mark',
-    badge:'shield or hexagon badge graphic, official emblem style, strong visual credential',
-    sticker:'torn corner sticker design, slightly rotated, casual handmade feel, white border, eye-catching accent',
-    box:'solid color rectangular overlay, high contrast text block, clean geometric shape, bold visual anchor',
-    ribbon:'diagonal ribbon banner across corner, folded fabric texture, strong directional accent'
+    tag:'label tag graphic element in bottom-right or top-right corner (avoid top-left logo zone), bold high-contrast text, sharp clean edges, strong visual accent',
+    stamp:'circular stamp overlay in bottom-right or top-right corner (avoid top-left logo zone), distressed ink texture, bold uppercase text inside circle, authoritative mark',
+    badge:'shield or hexagon badge graphic in bottom-right or top-right corner (avoid top-left logo zone), official emblem style, strong visual credential',
+    sticker:'torn corner sticker in bottom-right or top-right corner (avoid top-left logo zone), slightly rotated, casual handmade feel, white border, eye-catching accent',
+    box:'solid color rectangular overlay in bottom-right area (avoid top-left logo zone), high contrast text block, clean geometric shape, bold visual anchor',
+    ribbon:'diagonal ribbon banner across bottom-right or top-right corner (avoid top-left logo zone), folded fabric texture, strong directional accent'
   }
 };
 
@@ -1667,6 +1667,10 @@ function buildPromptText(){
   comp.push(selPoKw); // Layer 1: position ALWAYS wins
   if(goalData&&goalData.composition_note) comp.push(goalData.composition_note); // Layer 2: energy/rhythm only
   comp.push('photorealistic commercial photography');
+  // 3:1 ratio: prevent subject stretching
+  if(selRatio==='3:1'){
+    comp.push('subject must maintain its natural aspect ratio — fill extra width with background extension, not subject stretching');
+  }
   set('ps-composition',comp.filter(Boolean).join(', '));
 
   // ── [COLOR] Brand colors + CTA contrast logic ──
@@ -1711,7 +1715,7 @@ function buildPromptText(){
   }
   // No logo uploaded → tell AI not to render any brand logo
   if(!hasLogo){
-    constraintParts.push('do not render any brand logo or wordmark — ensure top-left zone has minimal visual detail to allow logo overlay in post-production, while maintaining background continuity');
+    constraintParts.push('do not render any brand logo or wordmark — top-left zone must be clean undisturbed background, no placeholder icons or symbols, no bright highlights or specular reflections in this zone, reserved for logo placement in post-production');
   }
   // Deduplicate constraint phrases
   var constraintRaw=constraintParts.filter(Boolean).join(', ');
@@ -1817,7 +1821,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-5';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-8';
   })();
   </script>
 </body>
