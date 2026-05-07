@@ -1680,11 +1680,10 @@ function buildPromptText(){
   var tier=dotMoved?(p2>0.65?'premium':p2>0.35?'mid':'mass'):'mid';
 
   // ── [INTENT] Visual strategy text ──
+  // 只顯示在介面（視覺策略建議區塊），不輸出進 Prompt
+  // 中文內容對 Gemini 生圖無貢獻，語意已涵蓋在 VISUAL/EMOTION/COMPOSITION 英文指令內
   var intentRow=document.getElementById('ps-intent-row');
-  var intentText='';
-  try{ intentText=STRAT_DB[selAudience][tier][selGoal][selEm]||''; }catch(ex){}
-  if(intentText&&intentRow){ intentRow.style.display='flex'; set('ps-intent-val',intentText); }
-  else if(intentRow){ intentRow.style.display='none'; }
+  if(intentRow) intentRow.style.display='none';
 
   // ── [SUBJECT] What is in the image ──
   var subjectParts=[];
@@ -1964,7 +1963,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p6-2';
+    if(el) el.textContent='Marketing Visual Generator · v3-p6-3';
   })();
   </script>
 </body>
