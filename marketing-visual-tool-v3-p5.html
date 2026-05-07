@@ -1347,10 +1347,9 @@ var GOAL_EM_HINTS={
 
 function checkConflicts(){
   // Auto-triggered on every bld() call
-  // Returns {level:'red'|'yellow', msg:'...'}
   var found=null;
 
-  // ── 🔴 High Risk (likely to produce unusable image) ──
+  // ── 🔴 High Risk ──
 
   // Emotion + Light conflicts
   for(var i=0;i<CONFLICTS.length;i++){
@@ -1364,27 +1363,42 @@ function checkConflicts(){
     var key=selGoal+'+'+selEm;
     if(GOAL_EM_HINTS[key]) found={level:'red',msg:GOAL_EM_HINTS[key]};
   }
-  // SaaS + Shallow DOF → screen blur risk
+  // Item 2: SaaS + Shallow → friendly notice (system already overrides to flat)
   if(!found&&selPtype==='saas'&&selDof==='shallow'){
-    found={level:'red',msg:'SaaS 截圖搭配淺景深 Shallow：螢幕介面可能模糊，建議改用「均勻對焦 Flat」確保 UI 清晰可讀。'};
+    found={level:'red',msg:'SaaS 截圖已自動套用均勻對焦保護——你選的淺景深在此商品類型下不會生效，螢幕 UI 將維持完整清晰度。'};
+  }
+  // Item 3: Event + Shallow → same logic as SaaS
+  if(!found&&selPtype==='event'&&selDof==='shallow'){
+    found={level:'red',msg:'活動類型已自動套用均勻對焦保護——你選的淺景深在此商品類型下不會生效，人物與幾何色塊將維持完整清晰度。'};
   }
   // Physical + Tech style → texture mismatch risk
   if(!found&&selPtype==='physical'&&selImgStyle==='tech'){
     found={level:'red',msg:'實體商品搭配 Tech 科技風格：商品質感可能失真，建議改用 Editorial 或 Minimal。'};
   }
-  // 繁體中文密度 → ghost text risk
+  // Item 4: SaaS + Editorial or Luxury → style blocked by PTYPE
+  if(!found&&selPtype==='saas'&&(selImgStyle==='editorial'||selImgStyle==='luxury')){
+    found={level:'red',msg:'SaaS 商品類型與此圖片風格不相容：Editorial 和 Luxury 的生活情境風格會與軟體介面截圖衝突，建議改用 Minimal 或不指定。'};
+  }
+
+  // ── 🟡 Caution ──
+
+  // Item 1: 繁中密度（降為黃色，改為空間競爭警示）
   if(!found){
     var headline=document.getElementById('fh')?document.getElementById('fh').value.trim():'';
     var sub=document.getElementById('fs')?document.getElementById('fs').value.trim():'';
     var ptag=document.getElementById('fp')?document.getElementById('fp').value.trim():'';
     var ptagShow=document.getElementById('ptag-show');
-    var chineseCount=[headline,sub,(ptagShow&&ptagShow.checked)?ptag:''].filter(function(t){return /[一-鿿]/.test(t);}).length;
+    var hasPtag=ptagShow&&ptagShow.checked&&ptag.length>0;
+    var chineseCount=[headline,sub,hasPtag?ptag:''].filter(function(t){return /[一-鿿]/.test(t);}).length;
     if(chineseCount>=3&&(selRatio==='4:5'||selRatio==='1:1')){
-      found={level:'red',msg:'繁體中文密度過高：直式構圖下同時有主標、副標、商品標註三組中文，容易產生幽靈亂碼，建議移除商品標註或縮短副標。'};
+      found={level:'yellow',msg:'三組繁體中文在直式構圖下視覺密度較高，建議移除商品標註或縮短副標，確保文字層次清楚。'};
     }
   }
-
-  // ── 🟡 Caution (may reduce quality, not necessarily unusable) ──
+  // Item 5: Center + Badge → badge may be hidden behind subject
+  if(!found&&selPos==='center'&&selBadge!=='none'){
+    found={level:'yellow',msg:'置中構圖下商品主體可能遮住角落的局部強調設計，建議改用「左置 Left」或「右置 Right」讓角落空間更充裕。'};
+  }
+  // 16:9 + Center + Click
   if(!found&&selRatio==='16:9'&&selPos==='center'&&selGoal==='click'){
     found={level:'yellow',msg:'寬螢幕比例搭配置中構圖：點擊率目標下建議改用「左置 Left」增加視覺張力和右側文案空間。'};
   }
@@ -1946,7 +1960,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-14';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-15';
   })();
   </script>
 </body>
