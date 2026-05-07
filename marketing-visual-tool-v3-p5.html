@@ -554,7 +554,7 @@ var PTYPE_DB={
     blocked:['lifestyle scene','natural environment','tactile','authentic human touch','luxury brand']
   },
   'event':{
-    core:'speaker cutout portrait on geometric background, headline dominates 50%+ visual weight, three-tier information hierarchy',
+    core:'keynote presenter portrait cutout on geometric background, headline dominates 50%+ visual weight, three-tier information hierarchy',
     lens:'50mm standard lens, editorial perspective',
     constraint:'no realistic photography backgrounds, no complex textures',
     blocked:['lifestyle','natural environment','UI dashboard','interface','luxury']
@@ -1698,7 +1698,11 @@ function buildPromptText(){
       subjectParts.push('↳ Attach "'+fname+'" as Image '+(i+1)+' ['+rdPerSlot[i].role+']: '+rdPerSlot[i].instruction);
     }
   });
-  if(!product&&uploadedCount===0) subjectParts.push('product hero shot');
+  if(!product&&uploadedCount===0){
+    if(selPtype==='event') subjectParts.push('event visual concept — no product attachment required');
+    else if(selPtype==='service') subjectParts.push('professional person as subject — no product attachment required');
+    else subjectParts.push('product hero shot');
+  }
   set('ps-subject',subjectParts.join('\n'));
 
   // ── [VISUAL] What the image looks like ──
@@ -1824,7 +1828,7 @@ function buildPromptText(){
   if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Natural line breaks allowed — maximum 2 lines per text element, maintain legible font size, do not reduce font to fit single line. Text positioning: strictly adhere to negative space zones; zero intersection between text overlays and primary product silhouette.');
   if(headline) cp.push('headline: "'+headline+'"');
   var ptagShow=document.getElementById('ptag-show');
-  if(ptag&&ptagShow&&ptagShow.checked) cp.push('product_tag: "'+ptag+'" — rendered as high-contrast branding label near the subject, legible and sharp');
+  if(ptag&&ptagShow&&ptagShow.checked) cp.push('product_tag: "'+ptag+'" — rendered as high-contrast branding label outside the product boundary, in the negative space area, legible and sharp');
   if(sub) cp.push('subtext (appears directly below headline, nowhere else): "'+sub+'"');
   if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
   var lgiInput=document.getElementById('lgi');
@@ -1855,7 +1859,7 @@ function buildPromptText(){
     constraintParts.push('do not render any brand logo or wordmark — top-left zone must be clean undisturbed background, no placeholder icons or symbols, no bright highlights or specular reflections in this zone, reserved for logo placement in post-production');
   }
   // Ghost text prevention
-  constraintParts.push('strictly zero tolerance for ghost text or nonsensical characters — area between subtext and CTA must be a clean visual void, no floating artifacts or hallucinated text anywhere in the frame');
+  constraintParts.push('strictly zero tolerance for ghost text or nonsensical characters — area between subtext and CTA must be a clean visual void, no floating artifacts or hallucinated text anywhere in the frame, no decorative icons or symbols not specified in COPY or ACCENT');
   // Deduplicate constraint phrases
   var constraintRaw=constraintParts.filter(Boolean).join(', ');
   var constraintSeen={};
@@ -1960,7 +1964,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-15';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-16';
   })();
   </script>
 </body>
