@@ -406,6 +406,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
       </button>
     </div>
     <div class="field-row"><span class="fl">主題商品</span><input class="fi" id="fp" type="text" placeholder="e.g. 玻尿酸精華液" oninput="bld()"></div>
+    <div class="field-row"><span class="fl" style="font-size:11px;color:var(--text2);">商品標註</span><input class="fi" id="f-ptag" type="text" placeholder="顯示在圖上的商品名稱 e.g. awoo GEO Suite" oninput="bld()" style="font-size:12px;"></div>
     <div class="field-row"><span class="fl">主標題</span><input class="fi" id="fh" type="text" placeholder="e.g. 72小時鎖水" oninput="bld()"></div>
     <div class="field-row"><span class="fl">副標題</span><input class="fi" id="fs" type="text" placeholder="e.g. 皮膚科醫師推薦" oninput="bld()"></div>
     <div class="field-row"><span class="fl">CTA</span><input class="fi" id="fc" type="text" placeholder="e.g. 立即搶購" oninput="bld()"></div>
@@ -435,8 +436,8 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     </div>
     <div class="divider"></div>
     <p class="sec" style="margin-bottom:6px;">額外補充說明 Notes</p>
-    <p class="hint" style="margin-bottom:7px;">可自由補充任何額外要求或細節，會附加到 Prompt 最尾端</p>
-    <textarea class="fi" id="f-extra" rows="3" placeholder="e.g. 背景需要有模糊城市感、整體色調偏冷、產品需要有水滴質感..." oninput="bld()" style="resize:vertical;font-size:12px;line-height:1.5;padding-top:8px;"></textarea>
+    <p class="hint" style="margin-bottom:7px;">補充視覺細節（請用英文，指令才有效）</p>
+    <textarea class="fi" id="f-extra" rows="3" placeholder="請輸入英文指令 e.g. add metallic texture on product surface, include subtle water droplets effect, cool color temperature" oninput="bld()" style="resize:vertical;font-size:12px;line-height:1.5;padding-top:8px;"></textarea>
   </div>
 
   <!-- Step 6: Result -->
@@ -1261,32 +1262,32 @@ var DB={
     '1:1':{
       platform:'Shopee 主圖、IG 貼文、FB 廣告',
       rule:'keep all key elements within central 80% of frame',
-      prompt_note:'keep all headline, CTA, and key visuals within central 80%; outer 10% must be filled with background visuals, not left empty'
+      prompt_note:'background must fill entire frame edge to edge; place all headline, CTA, and key visuals within central 80%'
     },
     '4:5':{
       platform:'IG 直式貼文（推薦格式）',
       rule:'keep elements within central 80% horizontally, avoid top 10% and bottom 15% (platform UI overlay risk areas)',
-      prompt_note:'avoid placing headline, CTA, or logo in top 10% and bottom 15% — platform UI risk areas'
+      prompt_note:'background must fill entire frame including top and bottom edges; place text and CTA within middle 75% of frame height only'
     },
     '9:16':{
       platform:'限時動態、Reels、TikTok',
       rule:'top 15% and bottom 20% are UI overlay risk areas — no critical elements; left and right 5% margins',
-      prompt_note:'avoid placing headline, CTA, or logo in top 15% and bottom 20% — platform UI risk areas'
+      prompt_note:'background must fill entire frame including top and bottom edges; place text and CTA within middle 65% of frame height only'
     },
     '16:9':{
       platform:'YouTube 封面、官網 Banner、簡報',
       rule:'keep key elements within central 80% of frame, outer 10% on all sides decorative only',
-      prompt_note:'keep all text, CTA, and logos within central 80%; outer 10% must be filled with background visuals, not left empty'
+      prompt_note:'background must fill entire frame edge to edge; place all text, CTA, and logos within central 80%'
     },
     '3:1':{
       platform:'橫幅廣告、EDM Header',
       rule:'keep all key elements within central 80%, outer 10% on all sides decorative only',
-      prompt_note:'keep 10% margin on all edges, avoid placing critical elements in outer margins; all margins must be filled with background visuals, not left empty'
+      prompt_note:'background must fill entire frame edge to edge; keep all critical elements within central 80%'
     },
     'custom':{
       platform:'自訂比例',
       rule:'keep all key elements within central 80% of frame as general safe zone rule',
-      prompt_note:'maintain 10% margin on all edges as safety buffer, keep critical elements centered; all margins must be filled with background visuals, not left empty'
+      prompt_note:'background must fill entire frame edge to edge; keep critical elements within central safe area'
     }
   },
   badge:{
@@ -1561,6 +1562,7 @@ function buildPromptText(){
   var emData=DB.em[selEm];
   var auxVals=Object.values(auxColors);
   var product=document.getElementById('fp').value.trim();
+  var ptag=document.getElementById('f-ptag')?document.getElementById('f-ptag').value.trim():'';
   var headline=document.getElementById('fh').value.trim();
   var sub=document.getElementById('fs').value.trim();
   var cta=document.getElementById('fc').value.trim();
@@ -1697,6 +1699,10 @@ function buildPromptText(){
   if(selRatio==='3:1'){
     comp.push('subject must maintain its natural aspect ratio — fill extra width with background extension, not subject stretching');
   }
+  // 4:5 / 9:16: prevent top empty space
+  if(selRatio==='4:5'||selRatio==='9:16'){
+    comp.push('subject must occupy at least 60% of frame height — no unintentional empty space at top of frame');
+  }
   set('ps-composition',comp.filter(Boolean).join(', '));
 
   // ── [COLOR] Brand colors + CTA contrast logic ──
@@ -1717,6 +1723,7 @@ function buildPromptText(){
   var cp=[];
   if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Reduce font size if needed.');
   if(headline) cp.push('headline: "'+headline+'"');
+  if(ptag) cp.push('product_tag: "'+ptag+'" — rendered as high-contrast branding label near the subject, legible and sharp');
   if(sub) cp.push('subtext: "'+sub+'"');
   if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
   var lgiInput=document.getElementById('lgi');
@@ -1772,7 +1779,7 @@ function buildPromptText(){
   if(szRow&&szPrompt){
     var szVal=szPrompt;
     // goalSafeNote excluded - position rules belong in COMPOSITION
-    szVal+='; background must extend and fill all edges, no empty or blank areas at borders';
+    szVal+='; no dead space or empty borders — background fills edge to edge';
     szRow.style.display='flex';
     set('ps-safezone-val',szVal);
   }
@@ -1850,7 +1857,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-10';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-11';
   })();
   </script>
 </body>
