@@ -405,8 +405,16 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
         <span class="ptype-sub">情境人像 · 專業感 · 信任感</span>
       </button>
     </div>
-    <div class="field-row"><span class="fl">主題商品</span><input class="fi" id="fp" type="text" placeholder="e.g. 玻尿酸精華液" oninput="bld()"></div>
-    <div class="field-row"><span class="fl" style="font-size:11px;color:var(--text2);">商品標註</span><input class="fi" id="f-ptag" type="text" placeholder="顯示在圖上的商品名稱 e.g. awoo GEO Suite" oninput="bld()" style="font-size:12px;"></div>
+    <div class="field-row" style="align-items:flex-start;gap:8px;">
+      <span class="fl" style="padding-top:6px;">商品名稱</span>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+        <input class="fi" id="fp" type="text" placeholder="e.g. awoo GEO Suite" oninput="bld()" style="margin:0;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--text2);">
+          <input type="checkbox" id="ptag-show" checked onchange="bld()" style="width:13px;height:13px;accent-color:var(--text);cursor:pointer;">
+          同步顯示在圖面上
+        </label>
+      </div>
+    </div>
     <div class="field-row"><span class="fl">主標題</span><input class="fi" id="fh" type="text" placeholder="e.g. 72小時鎖水" oninput="bld()"></div>
     <div class="field-row"><span class="fl">副標題</span><input class="fi" id="fs" type="text" placeholder="e.g. 皮膚科醫師推薦" oninput="bld()"></div>
     <div class="field-row"><span class="fl">CTA</span><input class="fi" id="fc" type="text" placeholder="e.g. 立即搶購" oninput="bld()"></div>
@@ -1562,7 +1570,7 @@ function buildPromptText(){
   var emData=DB.em[selEm];
   var auxVals=Object.values(auxColors);
   var product=document.getElementById('fp').value.trim();
-  var ptag=document.getElementById('f-ptag')?document.getElementById('f-ptag').value.trim():'';
+  var ptag=document.getElementById('fp')?document.getElementById('fp').value.trim():'';
   var headline=document.getElementById('fh').value.trim();
   var sub=document.getElementById('fs').value.trim();
   var cta=document.getElementById('fc').value.trim();
@@ -1723,7 +1731,8 @@ function buildPromptText(){
   var cp=[];
   if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Reduce font size if needed.');
   if(headline) cp.push('headline: "'+headline+'"');
-  if(ptag) cp.push('product_tag: "'+ptag+'" — rendered as high-contrast branding label near the subject, legible and sharp');
+  var ptagShow=document.getElementById('ptag-show');
+  if(ptag&&ptagShow&&ptagShow.checked) cp.push('product_tag: "'+ptag+'" — rendered as high-contrast branding label near the subject, legible and sharp');
   if(sub) cp.push('subtext: "'+sub+'"');
   if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
   var lgiInput=document.getElementById('lgi');
