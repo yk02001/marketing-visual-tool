@@ -354,11 +354,10 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     </button>
     <div class="adv-section" id="adv-sec">
       <p class="sec" style="margin-bottom:7px;margin-top:3px;">景深 Depth of Field</p>
-      <div class="pills" id="g-dof"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="shallow">焦點集中 Shallow</button><button class="pill" data-v="deep">層次清晰 Deep</button><button class="pill" data-v="flat">均勻對焦 Flat</button></div>
+      <div class="pills" id="g-dof"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="shallow">Shallow 淺景深（主體清晰）</button><button class="pill" data-v="deep">Deep 深景深（前後清晰）</button><button class="pill" data-v="flat">Flat 均勻對焦（全景）</button></div>
       <p class="sec" style="margin-bottom:7px;">圖片風格 Image Style</p>
       <div class="pills" id="g-style"><button class="pill on" data-v="">不指定</button><button class="pill" data-v="editorial">Editorial 雜誌感</button><button class="pill" data-v="minimal">Minimal 極簡</button><button class="pill" data-v="tech">Tech 科技</button><button class="pill" data-v="luxury">Luxury 奢華</button></div>
-      <p class="sec" style="margin-bottom:7px;">視覺層級 Visual Layer</p>
-      <div class="pills" id="g-layer"><button class="pill on" data-v="1">單層 Single</button><button class="pill" data-v="2">雙層 Double</button><button class="pill" data-v="3">三層 Triple</button></div>
+      
     </div>
   </div>
 
@@ -408,7 +407,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div class="field-row" style="align-items:flex-start;gap:8px;">
       <span class="fl" style="padding-top:6px;">商品名稱</span>
       <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
-        <input class="fi" id="fp" type="text" placeholder="e.g. awoo GEO Suite" oninput="bld()" style="margin:0;">
+        <input class="fi" id="fp" type="text" placeholder="e.g. 玻尿酸精華液保濕組" oninput="bld()" style="margin:0;">
         <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;color:var(--text2);">
           <input type="checkbox" id="ptag-show" checked onchange="bld()" style="width:13px;height:13px;accent-color:var(--text);cursor:pointer;">
           同步顯示在圖面上
@@ -550,8 +549,8 @@ var PTYPE_DB={
   },
   'saas':{
     core:'laptop or monitor displaying software UI dashboard, screen content sharp and legible, data visualization elements visible inside screen, clean tech product aesthetic',
-    lens:'35mm wide angle, clean technical perspective',
-    constraint:'background must not compete with screen content, no lifestyle props, no human hands unless purposeful, no lens flares or light leaks across screen area, maintain 100% visibility of UI and data visualization elements',
+    lens:'50mm standard lens, natural proportions, clean technical perspective',
+    constraint:'background must not compete with screen content, no lifestyle props, no human hands unless purposeful, no lens flares or light leaks across screen area, maintain 100% visibility of UI and data visualization elements, matte finish in text overlay zones, no specular highlights in right-side or bottom text areas',
     blocked:['lifestyle scene','natural environment','tactile','authentic human touch','luxury brand']
   },
   'event':{
@@ -1202,10 +1201,32 @@ function downloadImg(){
   dlCount++;
   var seq=dlCount>1?'_'+dlCount:'';
   var date=new Date().toISOString().slice(0,10);
-  var a=document.createElement('a');
-  a.href=src;
-  a.download='mvg_'+prod+'_'+date+seq+'.png';
-  a.click();
+  var filename='mvg_'+prod+'_'+date+seq+'.png';
+  // Convert base64 to Blob for proper macOS Finder thumbnail support
+  try {
+    var base64=src.split(',')[1];
+    var binary=atob(base64);
+    var bytes=new Uint8Array(binary.length);
+    for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    var blob=new Blob([bytes],{type:'image/png'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    // Delay revoke to allow macOS to index the file for thumbnail
+    setTimeout(function(){
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    },3000);
+  } catch(e) {
+    // Fallback: direct data URI download
+    var a=document.createElement('a');
+    a.href=src;
+    a.download=filename;
+    a.click();
+  }
 }
 
 
@@ -1325,7 +1346,25 @@ var GOAL_EM_HINTS={
 };
 
 function checkConflicts(){
-  // No-op: conflict check is now manual via runConflictCheck()
+  // Auto-triggered on every bld() call
+  var found=null;
+  for(var i=0;i<CONFLICTS.length;i++){
+    var c=CONFLICTS[i];
+    if([selEm,selLight].indexOf(c.a)>-1&&[selEm,selLight].indexOf(c.b)>-1){found=c;break;}
+  }
+  if(!found&&typeof GOAL_EM_HINTS!=='undefined'){
+    var key=selGoal+'+'+selEm;
+    if(GOAL_EM_HINTS[key]) found={msg:GOAL_EM_HINTS[key]};
+  }
+  // SaaS + shallow DOF warning
+  if(!found&&selPtype==='saas'&&selDof==='shallow'){
+    found={msg:'SaaS 截圖搭配淺景深 Shallow：螢幕介面可能模糊，建議改用「均勻對焦 Flat」確保 UI 清晰可讀。'};
+  }
+  var box=document.getElementById('conflict-box');
+  if(box){
+    if(found){box.style.display='block';box.classList.add('show');document.getElementById('conflict-text').textContent=found.msg;}
+    else{box.style.display='none';box.classList.remove('show');}
+  }
 }
 function runConflictCheck(){
   var found=null;
@@ -1477,8 +1516,7 @@ document.querySelectorAll('#g-goal .goal-btn').forEach(function(b){
   });
 });
 mkPills('g-em','em');mkPills('g-light','light');
-mkPills('g-dof','dof');mkPills('g-style','imgStyle');mkPills('g-layer','layer');
-
+mkPills('g-dof','dof');mkPills('g-style','imgStyle');
 document.querySelectorAll('#g-badge .pill').forEach(function(b){
   b.addEventListener('click',function(){
     document.querySelectorAll('#g-badge .pill').forEach(function(x){x.classList.remove('on');});
@@ -1651,8 +1689,6 @@ function buildPromptText(){
     vis.push('flat or deep focus throughout, full scene sharpness');
   } else {
     if(selDof) vis.push(DB.dof[selDof]);
-    if(selLayer==='2') vis.push('two-layer depth: subject + background');
-    if(selLayer==='3') vis.push('three-layer depth: subject + midground + background');
   }
 
   // Layer 5: Lens — PTYPE defines appropriate focal length
@@ -1721,6 +1757,7 @@ function buildPromptText(){
     if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
     col.push('color ratio: 60% primary / 30% secondary / 10% accent');
     if(cta) col.push('CTA: maximum contrast against background — use '+primaryColor+' or white depending on bg');
+    col.push('isolate brand color to CTA and accent nodes only; maintain pure neutral whites in UI dashboard and background areas — no color bleeding into environment');
   }
   var colorRow=document.getElementById('ps-color-row');
   if(colorRow) colorRow.style.display=col.length>0?'flex':'none';
@@ -1729,11 +1766,11 @@ function buildPromptText(){
   // ── [COPY] Text to render in image ──
   var copyRow=document.getElementById('ps-copy-row');
   var cp=[];
-  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Reduce font size if needed.');
+  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Reduce font size if needed. Text positioning: strictly adhere to negative space zones; zero intersection between text overlays and primary product silhouette.');
   if(headline) cp.push('headline: "'+headline+'"');
   var ptagShow=document.getElementById('ptag-show');
   if(ptag&&ptagShow&&ptagShow.checked) cp.push('product_tag: "'+ptag+'" — rendered as high-contrast branding label near the subject, legible and sharp');
-  if(sub) cp.push('subtext: "'+sub+'"');
+  if(sub) cp.push('subtext (appears directly below headline, nowhere else): "'+sub+'"');
   if(cta) cp.push('CTA button: "'+cta+'" — isolated high-contrast button, bottom of image');
   var lgiInput=document.getElementById('lgi');
   var logoFname=(lgiInput&&lgiInput.files&&lgiInput.files[0])?lgiInput.files[0].name:null;
@@ -1866,7 +1903,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-11';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-13';
   })();
   </script>
 </body>
