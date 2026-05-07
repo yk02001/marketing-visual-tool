@@ -1347,23 +1347,62 @@ var GOAL_EM_HINTS={
 
 function checkConflicts(){
   // Auto-triggered on every bld() call
+  // Returns {level:'red'|'yellow', msg:'...'}
   var found=null;
+
+  // ── 🔴 High Risk (likely to produce unusable image) ──
+
+  // Emotion + Light conflicts
   for(var i=0;i<CONFLICTS.length;i++){
     var c=CONFLICTS[i];
-    if([selEm,selLight].indexOf(c.a)>-1&&[selEm,selLight].indexOf(c.b)>-1){found=c;break;}
+    if([selEm,selLight].indexOf(c.a)>-1&&[selEm,selLight].indexOf(c.b)>-1){
+      found={level:'red',msg:c.msg};break;
+    }
   }
+  // Goal + Emotion conflicts
   if(!found&&typeof GOAL_EM_HINTS!=='undefined'){
     var key=selGoal+'+'+selEm;
-    if(GOAL_EM_HINTS[key]) found={msg:GOAL_EM_HINTS[key]};
+    if(GOAL_EM_HINTS[key]) found={level:'red',msg:GOAL_EM_HINTS[key]};
   }
-  // SaaS + shallow DOF warning
+  // SaaS + Shallow DOF → screen blur risk
   if(!found&&selPtype==='saas'&&selDof==='shallow'){
-    found={msg:'SaaS 截圖搭配淺景深 Shallow：螢幕介面可能模糊，建議改用「均勻對焦 Flat」確保 UI 清晰可讀。'};
+    found={level:'red',msg:'SaaS 截圖搭配淺景深 Shallow：螢幕介面可能模糊，建議改用「均勻對焦 Flat」確保 UI 清晰可讀。'};
   }
+  // Physical + Tech style → texture mismatch risk
+  if(!found&&selPtype==='physical'&&selImgStyle==='tech'){
+    found={level:'red',msg:'實體商品搭配 Tech 科技風格：商品質感可能失真，建議改用 Editorial 或 Minimal。'};
+  }
+  // 繁體中文密度 → ghost text risk
+  if(!found){
+    var headline=document.getElementById('fh')?document.getElementById('fh').value.trim():'';
+    var sub=document.getElementById('fs')?document.getElementById('fs').value.trim():'';
+    var ptag=document.getElementById('fp')?document.getElementById('fp').value.trim():'';
+    var ptagShow=document.getElementById('ptag-show');
+    var chineseCount=[headline,sub,(ptagShow&&ptagShow.checked)?ptag:''].filter(function(t){return /[一-鿿]/.test(t);}).length;
+    if(chineseCount>=3&&(selRatio==='4:5'||selRatio==='1:1')){
+      found={level:'red',msg:'繁體中文密度過高：直式構圖下同時有主標、副標、商品標註三組中文，容易產生幽靈亂碼，建議移除商品標註或縮短副標。'};
+    }
+  }
+
+  // ── 🟡 Caution (may reduce quality, not necessarily unusable) ──
+  if(!found&&selRatio==='16:9'&&selPos==='center'&&selGoal==='click'){
+    found={level:'yellow',msg:'寬螢幕比例搭配置中構圖：點擊率目標下建議改用「左置 Left」增加視覺張力和右側文案空間。'};
+  }
+
+  // ── Update UI ──
   var box=document.getElementById('conflict-box');
   if(box){
-    if(found){box.style.display='block';box.classList.add('show');document.getElementById('conflict-text').textContent=found.msg;}
-    else{box.style.display='none';box.classList.remove('show');}
+    if(found){
+      box.style.display='block';
+      box.classList.add('show');
+      box.style.borderLeftColor=found.level==='red'?'#e53e3e':'#d69e2e';
+      box.style.background=found.level==='red'?'rgba(229,62,62,0.08)':'rgba(214,158,46,0.08)';
+      var icon=found.level==='red'?'🔴':'🟡';
+      document.getElementById('conflict-text').textContent=icon+' '+found.msg;
+    } else {
+      box.style.display='none';
+      box.classList.remove('show');
+    }
   }
 }
 function runConflictCheck(){
@@ -1747,6 +1786,8 @@ function buildPromptText(){
   if(selRatio==='4:5'||selRatio==='9:16'){
     comp.push('subject must occupy at least 60% of frame height — no unintentional empty space at top of frame');
   }
+  // Headline separation — prevent 2-line headline from overlapping product
+  comp.push('maintain clear visual separation between headline text and product silhouette — no overlap between copy and subject');
   set('ps-composition',comp.filter(Boolean).join(', '));
 
   // ── [COLOR] Brand colors + CTA contrast logic ──
@@ -1766,7 +1807,7 @@ function buildPromptText(){
   // ── [COPY] Text to render in image ──
   var copyRow=document.getElementById('ps-copy-row');
   var cp=[];
-  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Reduce font size if needed. Text positioning: strictly adhere to negative space zones; zero intersection between text overlays and primary product silhouette.');
+  if(hasText) cp.push('⚠ TEXT RENDERING REQUIRED: each element EXACTLY ONCE — NO duplicates. NO truncation, every word complete. Natural line breaks allowed — maximum 2 lines per text element, maintain legible font size, do not reduce font to fit single line. Text positioning: strictly adhere to negative space zones; zero intersection between text overlays and primary product silhouette.');
   if(headline) cp.push('headline: "'+headline+'"');
   var ptagShow=document.getElementById('ptag-show');
   if(ptag&&ptagShow&&ptagShow.checked) cp.push('product_tag: "'+ptag+'" — rendered as high-contrast branding label near the subject, legible and sharp');
@@ -1799,6 +1840,8 @@ function buildPromptText(){
   if(!hasLogo){
     constraintParts.push('do not render any brand logo or wordmark — top-left zone must be clean undisturbed background, no placeholder icons or symbols, no bright highlights or specular reflections in this zone, reserved for logo placement in post-production');
   }
+  // Ghost text prevention
+  constraintParts.push('strictly zero tolerance for ghost text or nonsensical characters — area between subtext and CTA must be a clean visual void, no floating artifacts or hallucinated text anywhere in the frame');
   // Deduplicate constraint phrases
   var constraintRaw=constraintParts.filter(Boolean).join(', ');
   var constraintSeen={};
@@ -1903,7 +1946,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p5-13';
+    if(el) el.textContent='Marketing Visual Generator · v3-p5-14';
   })();
   </script>
 </body>
