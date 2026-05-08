@@ -441,7 +441,6 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
     <div class="field-row"><span class="fl">主標題</span><input class="fi" id="fh" type="text" placeholder="e.g. 72小時鎖水" oninput="bld()"></div>
     <div class="field-row"><span class="fl">副標題</span><input class="fi" id="fs" type="text" placeholder="e.g. 皮膚科醫師推薦" oninput="bld()"></div>
     <div class="divider"></div>
-    <div class="divider"></div>
     <p class="sec" style="margin-bottom:4px;">強調設計 Accent</p>
     <p class="hint" style="margin-bottom:9px;">不填 → 不輸出強調指令；樣式決定 AI 語意（CTA 按鈕 vs Badge 標籤）</p>
     <div class="field-row"><span class="fl">強調文案</span><input class="fi" id="fc" type="text" placeholder="e.g. 立即諮詢 / 限時優惠" oninput="bld();updateAccentUI()"></div>
@@ -793,11 +792,7 @@ var SETTINGS_KEY='mvg_settings';
 var MAX_HIST=20;
 
 function getCurrentSettings(){
-  var slotLabels=['商品圖','風格參考','競品參考'];
-  var refNames=refData.map(function(d,i){
-    var inp=document.getElementById('rf'+i);
-    return (inp&&inp.files&&inp.files[0])?inp.files[0].name:null;
-  });
+  var refNames=refGroups.map(function(g){return g.label;});
   return {
     version:9,
     timestamp:new Date().toISOString(),
@@ -2036,7 +2031,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p8-1';
+    if(el) el.textContent='Marketing Visual Generator · v3-p8-2';
   })();
   </script>
 </body>
