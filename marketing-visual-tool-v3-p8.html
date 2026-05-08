@@ -1119,17 +1119,18 @@ async function generate(){
 
   if(hasRef){
     var parts=[];
-    var imgLabels=[
-      'This is Image 1 — the PRODUCT PHOTO. Maintain its exact appearance, shape, texture, and details as the main subject.',
-      'This is Image 2 — the STYLE REFERENCE. Match its visual atmosphere, mood, and aesthetic. Do not copy its subject.',
-      'This is Image 3 — the COMPETITOR REFERENCE. Study its visual language and intentionally differentiate in composition, color, or mood.'
-    ];
-    refData.forEach(function(d,i){
-      if(!d)return;
-      var b64=d.split(',')[1];
-      var mime=d.split(';')[0].split(':')[1];
-      parts.push({text:imgLabels[i]});
-      parts.push({inline_data:{mime_type:mime,data:b64}});
+    var imgIdx=1;
+    refGroups.forEach(function(g,gi){
+      for(var si=0;si<3;si++){
+        var key=gi+'-'+si;
+        var d=refData[key];
+        if(!d)continue;
+        var b64=d.split(',')[1];
+        var mime=d.split(';')[0].split(':')[1];
+        parts.push({text:'This is Image '+imgIdx+' ['+g.promptTag+']: '+g.instruction});
+        parts.push({inline_data:{mime_type:mime,data:b64}});
+        imgIdx++;
+      }
     });
     parts.push({text:'Now generate a marketing visual image following this specification:\n\n'+prompt});
     contents=[{role:'user',parts:parts}];
