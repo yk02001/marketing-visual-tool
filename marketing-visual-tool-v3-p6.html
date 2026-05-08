@@ -1808,14 +1808,19 @@ function buildPromptText(){
   set('ps-composition',comp.filter(Boolean).join(', '));
 
   // ── [COLOR] Brand colors + CTA contrast logic ──
-  // Only output COLOR if primary color is specified
+  // Phase 1: 色彩職責語言（移除 ratio 比例語言）
+  // 品牌色 → 氛圍色溫 ambient tint，不控制面積
+  // CTA 色 → 視覺錨點 anchor，背景自動配合突顯
   var col=[];
   if(primaryColor){
-    col.push('primary: '+primaryColor);
-    if(auxVals.length>0) col.push('secondary: '+auxVals.join(', '));
-    col.push('color ratio: 60% primary / 30% secondary / 10% accent');
-    if(cta) col.push('CTA: maximum contrast against background — use '+primaryColor+' or white depending on bg');
-    col.push('isolate brand color to CTA and accent nodes only; maintain pure neutral whites in UI dashboard and background areas — no color bleeding into environment');
+    col.push('brand color: '+primaryColor);
+    col.push('apply as subtle ambient tint on lighting, rim light, and key accent nodes only — avoid large-area color fill or background flooding');
+    if(auxVals.length>0) col.push('supporting tones: '+auxVals.join(', ')+' — used for depth and shadows only');
+  }
+  if(cta&&primaryColor){
+    col.push('CTA button: solid '+primaryColor+', maximum visual contrast, primary focal attention point — background and surrounding layout remain neutral to maximize CTA visibility');
+  } else if(cta){
+    col.push('CTA button: high-contrast color, maximum visual contrast against background — background and surrounding layout remain neutral to maximize CTA visibility');
   }
   var colorRow=document.getElementById('ps-color-row');
   if(colorRow) colorRow.style.display=col.length>0?'flex':'none';
@@ -1963,7 +1968,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p6-3';
+    if(el) el.textContent='Marketing Visual Generator · v3-p6-4';
   })();
   </script>
 </body>
