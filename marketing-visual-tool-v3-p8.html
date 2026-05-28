@@ -380,6 +380,7 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helveti
   <div class="card">
     <div class="sh"><span class="sb">4</span><span class="st">產品參考圖 Reference</span></div>
     <p class="hint">上傳商品圖或視覺參考，最多 3 張（Gemini 會直接讀取圖片內容生成）</p>
+    <p style="font-size:11px;color:#b7791f;background:rgba(214,158,46,0.08);border-left:2px solid #d69e2e;padding:6px 10px;border-radius:4px;margin-bottom:8px;">建議上傳參考圖，有附圖的生成品質明顯更穩定；建議使用 PNG 格式</p>
     <div id="ref-groups-container"></div>
     <button class="ref-add-btn" id="ref-add-btn" onclick="showRefPicker()">
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v8M2 6h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1355,7 +1356,8 @@ var GOAL_EM_HINTS={
 
 function checkConflicts(){
   // Auto-triggered on every bld() call
-  var found=null;
+  // 改為陣列收集所有警示，全部顯示
+  var warnings=[];
 
   // ── 🔴 High Risk ──
 
@@ -1363,64 +1365,67 @@ function checkConflicts(){
   for(var i=0;i<CONFLICTS.length;i++){
     var c=CONFLICTS[i];
     if([selEm,selLight].indexOf(c.a)>-1&&[selEm,selLight].indexOf(c.b)>-1){
-      found={level:'red',msg:c.msg};break;
+      warnings.push({level:'red',msg:c.msg});break;
     }
   }
   // Goal + Emotion conflicts
-  if(!found&&typeof GOAL_EM_HINTS!=='undefined'){
+  if(typeof GOAL_EM_HINTS!=='undefined'){
     var key=selGoal+'+'+selEm;
-    if(GOAL_EM_HINTS[key]) found={level:'red',msg:GOAL_EM_HINTS[key]};
+    if(GOAL_EM_HINTS[key]) warnings.push({level:'red',msg:GOAL_EM_HINTS[key]});
   }
-  // Item 2: SaaS + Shallow → friendly notice (system already overrides to flat)
-  if(!found&&selPtype==='saas'&&selDof==='shallow'){
-    found={level:'red',msg:'SaaS 截圖已自動套用均勻對焦保護——你選的淺景深在此商品類型下不會生效，螢幕 UI 將維持完整清晰度。'};
+  // SaaS + Shallow
+  if(selPtype==='saas'&&selDof==='shallow'){
+    warnings.push({level:'red',msg:'SaaS 截圖已自動套用均勻對焦保護——你選的淺景深在此商品類型下不會生效，螢幕 UI 將維持完整清晰度。'});
   }
-  // Item 3: Event + Shallow → same logic as SaaS
-  if(!found&&selPtype==='event'&&selDof==='shallow'){
-    found={level:'red',msg:'活動類型已自動套用均勻對焦保護——你選的淺景深在此商品類型下不會生效，人物與幾何色塊將維持完整清晰度。'};
+  // Event + Shallow
+  if(selPtype==='event'&&selDof==='shallow'){
+    warnings.push({level:'red',msg:'活動類型已自動套用均勻對焦保護——你選的淺景深在此商品類型下不會生效，人物與幾何色塊將維持完整清晰度。'});
   }
-  // Physical + Tech style → texture mismatch risk
-  if(!found&&selPtype==='physical'&&selImgStyle==='tech'){
-    found={level:'red',msg:'實體商品搭配 Tech 科技風格：商品質感可能失真，建議改用 Editorial 或 Minimal。'};
+  // Physical + Tech style
+  if(selPtype==='physical'&&selImgStyle==='tech'){
+    warnings.push({level:'red',msg:'實體商品搭配 Tech 科技風格：商品質感可能失真，建議改用 Editorial 或 Minimal。'});
   }
-  // Item 4: SaaS + Editorial or Luxury → style blocked by PTYPE
-  if(!found&&selPtype==='saas'&&(selImgStyle==='editorial'||selImgStyle==='luxury')){
-    found={level:'red',msg:'SaaS 商品類型與此圖片風格不相容：Editorial 和 Luxury 的生活情境風格會與軟體介面截圖衝突，建議改用 Minimal 或不指定。'};
+  // SaaS + Editorial or Luxury
+  if(selPtype==='saas'&&(selImgStyle==='editorial'||selImgStyle==='luxury')){
+    warnings.push({level:'red',msg:'SaaS 商品類型與此圖片風格不相容：Editorial 和 Luxury 的生活情境風格會與軟體介面截圖衝突，建議改用 Minimal 或不指定。'});
   }
 
   // ── 🟡 Caution ──
 
-  // Item 1: 繁中密度（降為黃色，改為空間競爭警示）
-  if(!found){
-    var headline=document.getElementById('fh')?document.getElementById('fh').value.trim():'';
-    var sub=document.getElementById('fs')?document.getElementById('fs').value.trim():'';
-    var ptag=document.getElementById('fp')?document.getElementById('fp').value.trim():'';
-    var ptagShow=document.getElementById('ptag-show');
-    var hasPtag=ptagShow&&ptagShow.checked&&ptag.length>0;
-    var chineseCount=[headline,sub,hasPtag?ptag:''].filter(function(t){return /[一-鿿]/.test(t);}).length;
-    if(chineseCount>=3&&(selRatio==='4:5'||selRatio==='1:1')){
-      found={level:'yellow',msg:'三組繁體中文在直式構圖下視覺密度較高，建議移除商品標註或縮短副標，確保文字層次清楚。'};
-    }
+  // 繁中密度
+  var headline=document.getElementById('fh')?document.getElementById('fh').value.trim():'';
+  var sub=document.getElementById('fs')?document.getElementById('fs').value.trim():'';
+  var ptag=document.getElementById('fp')?document.getElementById('fp').value.trim():'';
+  var ptagShow=document.getElementById('ptag-show');
+  var hasPtag=ptagShow&&ptagShow.checked&&ptag.length>0;
+  var chineseCount=[headline,sub,hasPtag?ptag:''].filter(function(t){return /[一-鿿]/.test(t);}).length;
+  if(chineseCount>=3&&(selRatio==='4:5'||selRatio==='1:1')){
+    warnings.push({level:'yellow',msg:'三組繁體中文在直式構圖下視覺密度較高，建議移除商品標註或縮短副標，確保文字層次清楚。'});
   }
-  // Item 5: Center + Badge → badge may be hidden behind subject
-  if(!found&&selPos==='center'&&selBadge!=='none'){
-    found={level:'yellow',msg:'置中構圖下商品主體可能遮住角落的局部強調設計，建議改用「左置 Left」或「右置 Right」讓角落空間更充裕。'};
+  // Center + Badge
+  if(selPos==='center'&&selBadge!=='none'&&selBadge!=='cta'){
+    warnings.push({level:'yellow',msg:'置中構圖下商品主體可能遮住角落的局部強調設計，建議改用「左置 Left」或「右置 Right」讓角落空間更充裕。'});
   }
   // 16:9 + Center + Click
-  if(!found&&selRatio==='16:9'&&selPos==='center'&&selGoal==='click'){
-    found={level:'yellow',msg:'寬螢幕比例搭配置中構圖：點擊率目標下建議改用「左置 Left」增加視覺張力和右側文案空間。'};
+  if(selRatio==='16:9'&&selPos==='center'&&selGoal==='click'){
+    warnings.push({level:'yellow',msg:'寬螢幕比例搭配置中構圖：點擊率目標下建議改用「左置 Left」增加視覺張力和右側文案空間。'});
   }
 
   // ── Update UI ──
   var box=document.getElementById('conflict-box');
-  if(box){
-    if(found){
+  var ct=document.getElementById('conflict-text');
+  if(box&&ct){
+    if(warnings.length>0){
       box.style.display='block';
       box.classList.add('show');
-      box.style.borderLeftColor=found.level==='red'?'#e53e3e':'#d69e2e';
-      box.style.background=found.level==='red'?'rgba(229,62,62,0.08)':'rgba(214,158,46,0.08)';
-      var icon=found.level==='red'?'🔴':'🟡';
-      document.getElementById('conflict-text').textContent=icon+' '+found.msg;
+      // 有紅色警示時邊框用紅色，否則黃色
+      var hasRed=warnings.some(function(w){return w.level==='red';});
+      box.style.borderLeftColor=hasRed?'#e53e3e':'#d69e2e';
+      box.style.background=hasRed?'rgba(229,62,62,0.08)':'rgba(214,158,46,0.08)';
+      ct.innerHTML=warnings.map(function(w){
+        var icon=w.level==='red'?'🔴':'🟡';
+        return icon+' '+w.msg;
+      }).join('<br><br>');
     } else {
       box.style.display='none';
       box.classList.remove('show');
@@ -2031,7 +2036,7 @@ window.addEventListener('resize',function(){draw();});
   <script>
   (function(){
     var el=document.getElementById('ver-txt');
-    if(el) el.textContent='Marketing Visual Generator · v3-p8-2';
+    if(el) el.textContent='Marketing Visual Generator · v3-p8-3';
   })();
   </script>
 </body>
